@@ -1,0 +1,68 @@
+version = 2
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+   [[blocks.segments]]
+    type = 'root'
+    style = 'plain'
+    template = '  '
+    foreground = '#3ea6ff'
+
+  [[blocks.segments]]
+    type = 'path'
+    style = 'plain'
+    template = ' {{ .Path }} '
+    foreground = '#3ea6ff'
+
+    [blocks.segments.properties]
+      style = 'full'
+
+  [[blocks.segments]]
+    type = 'git'
+    style = 'plain'
+    template = '<#26C6DA>❯ </>{{ .HEAD }} '
+    foreground = '#fe90c9'
+
+    [block.segments.properties]
+      branch_icon = ""
+
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'right'
+
+  [[blocks.segments]]
+    type = "sysinfo"
+    foreground = "#ffffff"
+    background = "transparent"
+    template = "<#ffffff>\ue266</> RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB "
+    style = "powerline"
+
+  [blocks.segments.properties]
+    precision = 2
+
+  [[blocks.segments]]
+    type = 'time'
+    style = 'plain'
+    template = '| {{ .CurrentDate | date .Format }}'
+    foreground = '#ffffff'
+
+    [blocks.segments.properties]
+      time_format = '15:04:05'
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+  newline = true
+
+  [[blocks.segments]]
+    type = 'status'
+    style = 'plain'
+    foreground_templates = ['{{ if gt .Code 0 }}#FF5252{{ end }}']
+    template = ' ❯ '
+    foreground = '#fe90c9'
+
+    [blocks.segments.properties]
+      always_enabled = true

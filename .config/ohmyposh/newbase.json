@@ -1,0 +1,118 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "root",
+          "style": "plain",
+          "template": " \uf0e7 ",
+          "foreground": "p:blue"
+        },
+        {
+          "type": "path",
+          "style": "plain",
+          "template": "{{ .Path }} ",
+          "properties": {
+            "style": "full"
+          },
+          "foreground": "p:blue"
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "template": "<#26C6DA>❯ </>{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} ",
+          "foreground": "p:pink",
+          "properties": {
+            "branch_icon": "",
+            "fetch_status": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "rprompt",
+      "overflow": "hidden",
+      "segments": [
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "#fdb900",
+          "background": "transparent",
+          "template": " {{ .FormattedMs }}",
+          "properties": {
+            "threshold": 5000,
+            "style": "round"
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "sysinfo",
+          "style": "powerline",
+          "template": "<p:white>\ue266</> RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB ",
+          "properties": {
+            "precision": 2
+          },
+          "background": "transparent",
+          "foreground": "p:white"
+        },
+        {
+          "type": "time",
+          "style": "plain",
+          "template": "| {{ .CurrentDate | date .Format }}",
+          "properties": {
+            "time_format": "15:04:05"
+          },
+          "foreground": "p:white"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "status",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}#FF5252{{ end }}",
+            "{{ if eq .Code 0 }}p:pink{{ end }}"
+          ],
+          "template": " ❯ ",
+          "properties": {
+            "always_enabled": true
+          },
+          "foreground": "p:pink"
+        }
+      ],
+      "newline": true
+    }
+  ],
+  "transient_prompt": {
+    "foreground_templates": [
+      "{{ if gt .Code 0 }}#FF5252{{ end }}",
+      "{{ if eq .Code 0 }}p:pink{{ end }}"
+    ],
+    "background": "transparent",
+    "template": "❯ "
+  },
+  "palette": {
+    "pink": "#fe90c9",
+    "blue": "#3ea6ff",
+    "white": "#ffffff"
+  },
+  "secondary_prompt": {
+    "foreground": "p:pink",
+    "background": "transparent",
+    "template": "❯❯ "
+  }
+}

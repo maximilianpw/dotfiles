@@ -10,6 +10,8 @@ CVS
 _darcs
 \.hg
 
+.idea
+
 \.git
 \.gitignore
 \.gitmodules
