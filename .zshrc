@@ -54,7 +54,7 @@ autoload -Uz compinit
 compinit
 
 # adds zoxide to path
-eval "$(zoxide init zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 
 # lock the pc by typing lock
 alias lock='xdg-screensaver lock'
