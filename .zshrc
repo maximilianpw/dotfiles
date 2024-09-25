@@ -6,9 +6,6 @@ prompt adam1
 
 setopt histignorealldups sharehistory
 
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
-
 # adds homebrew to path
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
@@ -55,6 +52,9 @@ compinit
 
 # adds zoxide to path
 eval "$(zoxide init --cmd cd zsh)"
+
+# adds asdf to path
+. "$HOME/.asdf/asdf.sh"
 
 # lock the pc by typing lock
 alias lock='xdg-screensaver lock'
