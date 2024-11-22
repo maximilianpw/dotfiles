@@ -7,6 +7,7 @@ my current dotfiles
 ### Requirements
 
 to install this configuration, the packages required are : **stow, git, nvim, homebrew**
+also download any nerdfont (firacode is cool)
 
 ```bash
 sudo apt install stow git neovim
@@ -23,5 +24,5 @@ commands to create the symlinks to the config files
 
 ```bash
 cd ./dotfiles
-stow .
+stow -t ~/.config .config
 ```
