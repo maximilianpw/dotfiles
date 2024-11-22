@@ -10,7 +10,7 @@ CVS
 _darcs
 \.hg
 
-.idea
+\.idea
 
 \.git
 \.gitignore
