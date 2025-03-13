@@ -1,7 +1,7 @@
 return {
   {
-    "catppuccin/nvim",
+    "alexwu/nvim-snazzy",
     lazy = true,
-    name = "catppuccin",
-  }
+    name = "snazzy",
+  },
 }

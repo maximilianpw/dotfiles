@@ -56,8 +56,7 @@ eval "$(zoxide init --cmd cd zsh)"
 # adds asdf to path
 . "$HOME/.asdf/asdf.sh"
 
-# lock the pc by typing lock
-alias lock='xdg-screensaver lock'
+alias brewup='brew update; brew upgrade; brew cleanup; brew doctor'
 
 # launches oh my posh config
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/newbase.json)"
