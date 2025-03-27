@@ -31,8 +31,11 @@ vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
-vim.opt.scrolloff = 15
+vim.opt.scrolloff = 10
 vim.opt.confirm = true
+
+-- buffer setup
+vim.opt.termguicolors = true
 
 -- [[ Basic Keymaps ]]
 -- Clear highlights on search when pressing <Esc> in normal mode
@@ -86,7 +89,11 @@ require('lazy').setup({
   --
   -- Use `opts = {}` to automatically pass options to a plugin's `setup()` function, forcing the plugin to be loaded.
   --
-
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+  },
   {
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -153,7 +160,6 @@ require('lazy').setup({
     end,
   },
 
-
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -163,18 +169,16 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-   require 'kickstart.plugins.debug',
-   require 'kickstart.plugins.indent_line',
-   require 'kickstart.plugins.lint',
-   require 'kickstart.plugins.autopairs',
-   require 'kickstart.plugins.neo-tree',
-   require 'kickstart.plugins.gitsigns',
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.gitsigns',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-   { import = 'plugins' },
+  { import = 'plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
