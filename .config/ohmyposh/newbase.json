@@ -81,7 +81,7 @@
             "precision": 2
           },
           "style": "powerline",
-          "template": "<p:white>\ue266</> RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB ",
+          "template": "<p:white>\ue266</> RAM: {{ (div ((sub .PhysicalAvailableMemory 0)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB ",
           "foreground": "p:white",
           "background": "transparent",
           "type": "sysinfo"
