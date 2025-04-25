@@ -6,11 +6,13 @@ return {
     config = function()
       local lint = require 'lint'
       lint.linters_by_ft = {
-        markdown = { 'markdownlint' },
-        dockerfile = { "hadolint" },
-        json = { "jsonlint" },
-        terraform = { "tflint" },
-        text = { "vale" }
+        markdown = { 'vale' },
+        dockerfile = { 'hadolint' },
+        json = { 'jsonlint' },
+        terraform = { 'tflint' },
+        text = { 'vale' },
+        typescript = { 'eslint' },
+        java = { 'checkstyle' },
       }
 
       -- Create autocommand which carries out the actual linting
