@@ -1,4 +1,4 @@
-# Set up the prompt
+
 
 autoload -Uz promptinit
 promptinit
@@ -32,6 +32,8 @@ zinit snippet OMZP::aws
 zinit snippet OMZP::brew
 zinit snippet OMZP::colored-man-pages
 zinit snippet OMZP::zoxide
+zinit snippet OMZP::docker-compose
+zinit snippet OMZP::brew
 
 # History
 HISTSIZE=5000
@@ -53,9 +55,10 @@ compinit
 # adds zoxide to path
 eval "$(zoxide init --cmd cd zsh)"
 
-# adds asdf to path
-. "$HOME/.asdf/asdf.sh"
+# lock the pc by typing lock
+alias lock='xdg-screensaver lock'
 
+# update brew
 alias brewup='brew update; brew upgrade; brew cleanup; brew doctor'
 
 # launches oh my posh config
@@ -84,4 +87,23 @@ zinit light-mode for \
     zdharma-continuum/zinit-annex-rust
 
 ### End of Zinit's installer chunk
+
+# 1Password cli Requirements
+source /Users/max-vev/.config/op/plugins.sh
+
+# Rust requirements
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+
+# Java requirements
+# export JAVA_HOME=$(/usr/libexec/java_home)
+# export PATH="$JAVA_HOME/bin:$PATH"
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/max-vev/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
 
