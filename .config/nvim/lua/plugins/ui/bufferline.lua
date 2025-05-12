@@ -1,3 +1,4 @@
+-- Buffer line configuration for tab/buffer management
 return {
   'akinsho/bufferline.nvim',
   keys = {

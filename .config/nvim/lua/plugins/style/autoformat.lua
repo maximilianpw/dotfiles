@@ -32,11 +32,56 @@ return { -- Autoformat
         end,
         formatters_by_ft = {
             lua = { 'stylua' },
+            -- JavaScript family with Prettier for formatting
+            javascript = { 'prettierd', 'prettier' },
+            typescript = { 'prettierd', 'prettier' },
+            javascriptreact = { 'prettierd', 'prettier' },
+            typescriptreact = { 'prettierd', 'prettier' },
+            vue = { 'prettierd', 'prettier' },
+            css = { 'prettierd', 'prettier' },
+            scss = { 'prettierd', 'prettier' },
+            less = { 'prettierd', 'prettier' },
+            html = { 'prettierd', 'prettier' },
+            json = { 'prettierd', 'prettier' },
+            jsonc = { 'prettierd', 'prettier' },
+            yaml = { 'prettierd', 'prettier' },
+            markdown = { 'prettierd', 'prettier' },
+            graphql = { 'prettierd', 'prettier' },
             -- Conform can also run multiple formatters sequentially
-            -- python = { "isort", "black" },
-            --
-            -- You can use 'stop_after_first' to run the first available formatter from the list
-            -- javascript = { "prettierd", "prettier", stop_after_first = true },
+            python = { 'isort', 'black' },
+        },
+        -- Set up formatter configurations
+        formatters = {
+            prettier = {
+                -- Use .prettierrc or package.json configs if they exist in the project
+                prepend_args = function(self, ctx)
+                    -- Check if we should use eslint integration
+                    local has_eslint = vim.fs.find({ '.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml' }, {
+                        upward = true,
+                        path = ctx.filename,
+                    })[1]
+
+                    if has_eslint then
+                        return { "--plugin=prettier-plugin-eslint" }
+                    end
+                    return {}
+                end,
+            },
+            prettierd = {
+                -- Use .prettierrc or package.json configs if they exist in the project
+                prepend_args = function(self, ctx)
+                    -- Check if we should use eslint integration
+                    local has_eslint = vim.fs.find({ '.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml' }, {
+                        upward = true,
+                        path = ctx.filename,
+                    })[1]
+
+                    if has_eslint then
+                        return { "--plugin=prettier-plugin-eslint" }
+                    end
+                    return {}
+                end,
+            }
         },
     },
 }

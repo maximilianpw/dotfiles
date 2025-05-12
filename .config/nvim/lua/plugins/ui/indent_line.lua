@@ -1,3 +1,4 @@
+-- Indentation guide display
 return {
   {
     'lukas-reineke/indent-blankline.nvim',

@@ -11,7 +11,11 @@ return {
         json = { 'jsonlint' },
         terraform = { 'tflint' },
         text = { 'vale' },
-        typescript = { 'eslint' },
+        javascript = { 'eslint_d' },
+        typescript = { 'eslint_d' },
+        javascriptreact = { 'eslint_d' },
+        typescriptreact = { 'eslint_d' },
+        vue = { 'eslint_d' },
         java = { 'checkstyle' },
       }
 
