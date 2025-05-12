@@ -1,3 +1,4 @@
+-- Telescope fuzzy finder configuration
 return { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -41,8 +42,15 @@ return { -- Fuzzy Finder (files, lsp, etc)
         }
 
         -- Enable Telescope extensions if they are installed
-        pcall(require('telescope').load_extension, 'fzf')
-        pcall(require('telescope').load_extension, 'ui-select')
+        local success, err = pcall(require('telescope').load_extension, 'fzf')
+        if not success then
+            vim.notify('Failed to load Telescope extension: fzf', vim.log.levels.ERROR)
+        end
+
+        success, err = pcall(require('telescope').load_extension, 'ui-select')
+        if not success then
+            vim.notify('Failed to load Telescope extension: ui-select', vim.log.levels.ERROR)
+        end
 
         -- See `:help telescope.builtin`
         local builtin = require 'telescope.builtin'

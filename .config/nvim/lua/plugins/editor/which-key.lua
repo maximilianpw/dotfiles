@@ -1,4 +1,5 @@
-return { -- Useful plugin to show you pending keybinds.
+-- Useful plugin to show pending keybinds
+return {
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -46,6 +47,11 @@ return { -- Useful plugin to show you pending keybinds.
             { '<leader>w', group = 'Workspace' },
             { '<leader>t', group = 'Toggle' },
             { '<leader>h', group = 'Git Hunk', mode = { 'n', 'v' } },
+            { '<leader>q', group = 'Diagnostics' },
+            { '<leader>b', group = 'Debugging' },
+            { '<leader>g', group = 'Git' },
+            { '<leader>f', group = 'Find' },
+            { '<leader>e', group = 'Explorer' },
         },
     },
 }
