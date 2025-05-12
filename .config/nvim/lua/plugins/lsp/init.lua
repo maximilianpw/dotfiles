@@ -14,6 +14,11 @@ return {{
         'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
+        -- Enable faster module loading in Neovim 0.9+
+        if vim.fn.has('nvim-0.9') == 1 then
+            vim.loader.enable()
+        end
+
         --  This function gets run when an LSP attaches to a particular buffer.
         --    That is to say, every time a new file is opened that is associated with
         --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -166,13 +171,21 @@ return {{
 
         }
 
-        -- You can add other tools here that you want Mason to install
-        -- for you, so that they are available from within Neovim.
+        -- Add other tools here that you want Mason to install
         local ensure_installed = vim.tbl_keys(servers or {})
         vim.list_extend(ensure_installed, {
             'stylua', -- Used to format Lua code
+            'prettier', -- Used to format JavaScript/TypeScript code
+            'eslint_d', -- Faster version of eslint
         })
-        require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+        -- Error handling for Mason Tool Installer
+        local ok, mason_tool_installer = pcall(require, 'mason-tool-installer')
+        if ok then
+            mason_tool_installer.setup { ensure_installed = ensure_installed }
+        else
+            vim.notify('Failed to load mason-tool-installer', vim.log.levels.ERROR)
+        end
 
         require('mason-lspconfig').setup {
             ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
@@ -180,9 +193,12 @@ return {{
             handlers = {
                 function(server_name)
                     local server = servers[server_name] or {}
-                    -- This handles overriding only values explicitly passed
-                    -- by the server configuration above. Useful when disabling
-                    -- certain features of an LSP (for example, turning off formatting for ts_ls)
+                    -- Example: Disable formatting for ts_ls if prettier is used
+                    if server_name == 'ts_ls' then
+                        server.on_attach = function(client, bufnr)
+                            client.server_capabilities.documentFormattingProvider = false
+                        end
+                    end
                     server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
                     require('lspconfig')[server_name].setup(server)
                 end,

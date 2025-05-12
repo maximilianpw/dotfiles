@@ -1,13 +1,8 @@
-
-
 autoload -Uz promptinit
 promptinit
 prompt adam1
 
 setopt histignorealldups sharehistory
-
-# adds homebrew to path
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
