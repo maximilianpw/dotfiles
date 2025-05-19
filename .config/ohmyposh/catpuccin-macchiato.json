@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "palette": {
     "os": "#ACB0BE",
-    "closer": "p:os",
+    "closer": "p:blue",
     "pink": "#F5BDE6",
     "lavender": "#B7BDF8",
     "blue": "#8AADF4"
@@ -16,7 +16,7 @@
           "properties": {
             "style": "agnoster_short",
             "max_depth": 3,
-            "mapped_locations_enabled": true,
+            "mapped_locations_enabled": false,
             "mapped_locations": {
               "/Users/max-vev/Documents/Vev Platform Services/vev-docker-compose/submodules/": "vev-docker",
               "~/Documents/dotfiles/": "dotfiles",
