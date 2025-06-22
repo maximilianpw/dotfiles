@@ -29,6 +29,7 @@ zinit snippet OMZP::colored-man-pages
 zinit snippet OMZP::zoxide
 zinit snippet OMZP::docker-compose
 zinit snippet OMZP::brew
+zinit snippet OMZP::terraform
 
 # History
 HISTSIZE=5000
@@ -42,22 +43,6 @@ setopt hist_ignore_all_dups
 setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
-
-# Use modern completion system
-autoload -Uz compinit
-compinit
-
-# adds zoxide to path
-eval "$(zoxide init --cmd cd zsh)"
-
-# lock the pc by typing lock
-alias lock='xdg-screensaver lock'
-
-# update brew
-alias brewup='brew update; brew upgrade; brew cleanup; brew doctor'
-
-# launches oh my posh config
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/catpuccin-macchiato.json)"
 
 
 ### Added by Zinit's installer
@@ -93,12 +78,23 @@ export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
 # export JAVA_HOME=$(/usr/libexec/java_home)
 # export PATH="$JAVA_HOME/bin:$PATH"
 
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/max-vev/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 
+# update brew
+alias brewup='brew update; brew upgrade; brew cleanup; brew doctor'
+
+# adds zoxide to path
+eval "$(zoxide init --cmd cd zsh)"
+
+# launches oh my posh config
+eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/catpuccin-macchiato.json)"
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
+
+# jj completions
+source <(jj util completion zsh)
