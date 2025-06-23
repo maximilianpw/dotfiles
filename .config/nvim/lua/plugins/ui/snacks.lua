@@ -1,0 +1,218 @@
+return {
+  'folke/snacks.nvim',
+  priority = 1000,
+  lazy = false,
+  opts = {
+    -- Core features
+    indent = { enabled = true },
+    input = { enabled = true },
+    notifier = { enabled = true },
+    scope = { enabled = true },
+    scroll = { enabled = true },
+    statuscolumn = { enabled = false }, -- we set this in options.lua
+    words = { enabled = true },
+
+    -- Dashboard configuration
+    dashboard = {
+      enabled = true,
+      preset = {
+        -- Configure layout to place header on the left
+        width = 80,
+        height = 25,
+        -- Use sections to control layout - header first (left), then keys (right)
+        sections = {
+          -- Left side: Header
+          {
+            section = 'header',
+            align = 'left',
+            width = 40,
+            padding = 1,
+          },
+          -- Right side: Keys
+          {
+            section = 'keys',
+            align = 'left',
+            width = 35,
+            padding = 1,
+          },
+        },
+        header = [[
+                                                                                                                          
+     ______  _______         _____                          _____   ______    ____      ____  ____      ______  _______   
+    |      \/       \    ___|\    \  _____      _____      |\    \ |\     \  |    |    |    ||    |    |      \/       \  
+   /          /\     \  /    /\    \ \    \    /    /       \\    \| \     \ |    |    |    ||    |   /          /\     \ 
+  /     /\   / /\     ||    |  |    | \    \  /    /         \|    \  \     ||    |    |    ||    |  /     /\   / /\     |
+ /     /\ \_/ / /    /||    |__|    |  \____\/____/           |     \  |    ||    |    |    ||    | /     /\ \_/ / /    /|
+|     |  \|_|/ /    / ||    .--.    |  /    /\    \           |      \ |    ||    |    |    ||    ||     |  \|_|/ /    / |
+|     |       |    |  ||    |  |    | /    /  \    \          |    |\ \|    ||\    \  /    /||    ||     |       |    |  |
+|\____\       |____|  /|____|  |____|/____/ /\ \____\         |____||\_____/|| \ ___\/___ / ||____||\____\       |____|  /
+| |    |      |    | / |    |  |    ||    |/  \|    |         |    |/ \|   || \ |   ||   | / |    || |    |      |    | / 
+ \|____|      |____|/  |____|  |____||____|    |____|         |____|   |___|/  \|___||___|/  |____| \|____|      |____|/  
+    \(          )/       \(      )/    \(        )/             \(       )/      \(    )/      \(      \(          )/     
+     '          '         '      '      '        '               '       '        '    '        '       '          '      
+                                                                                                                          
+]],
+        -- Dashboard keys without LazyVim dependencies
+        keys = {
+          {
+            icon = ' ',
+            key = 'f',
+            desc = 'Find File',
+            action = function()
+              if vim.fn.exists ':Telescope' == 2 then
+                vim.cmd 'Telescope find_files'
+              elseif vim.fn.exists ':FzfLua' == 2 then
+                vim.cmd 'FzfLua files'
+              else
+                vim.cmd 'edit .'
+              end
+            end,
+          },
+          { icon = ' ', key = 'n', desc = 'New File', action = ':ene | startinsert' },
+          {
+            icon = ' ',
+            key = 'g',
+            desc = 'Find Text',
+            action = function()
+              if vim.fn.exists ':Telescope' == 2 then
+                vim.cmd 'Telescope live_grep'
+              elseif vim.fn.exists ':FzfLua' == 2 then
+                vim.cmd 'FzfLua live_grep'
+              else
+                vim.cmd 'grep '
+              end
+            end,
+          },
+          {
+            icon = ' ',
+            key = 'r',
+            desc = 'Recent Files',
+            action = function()
+              if vim.fn.exists ':Telescope' == 2 then
+                vim.cmd 'Telescope oldfiles'
+              elseif vim.fn.exists ':FzfLua' == 2 then
+                vim.cmd 'FzfLua oldfiles'
+              else
+                vim.cmd 'browse oldfiles'
+              end
+            end,
+          },
+          {
+            icon = ' ',
+            key = 'c',
+            desc = 'Config',
+            action = function()
+              local config_dir = vim.fn.stdpath 'config'
+              if vim.fn.exists ':Telescope' == 2 then
+                vim.cmd('Telescope find_files cwd=' .. config_dir)
+              elseif vim.fn.exists ':FzfLua' == 2 then
+                vim.cmd('FzfLua files cwd=' .. config_dir)
+              else
+                vim.cmd('edit ' .. config_dir)
+              end
+            end,
+          },
+          {
+            icon = '󰒲 ',
+            key = 'l',
+            desc = 'Lazy',
+            action = function()
+              if vim.fn.exists ':Lazy' == 2 then
+                vim.cmd 'Lazy'
+              else
+                print 'Lazy.nvim not available'
+              end
+            end,
+          },
+          { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
+        },
+      },
+    },
+  },
+  -- Key mappings
+  keys = {
+    {
+      '<leader>n',
+      function()
+        local snacks = require 'snacks'
+        if snacks.picker and snacks.picker.enabled then
+          snacks.picker.notifications()
+        else
+          snacks.notifier.show_history()
+        end
+      end,
+      desc = 'Notification History',
+    },
+    {
+      '<leader>un',
+      function()
+        require('snacks').notifier.hide()
+      end,
+      desc = 'Dismiss All Notifications',
+    },
+    {
+      '<leader>gg',
+      function()
+        require('snacks').lazygit()
+      end,
+      desc = 'Lazygit',
+    },
+    {
+      '<leader>gb',
+      function()
+        require('snacks').git.blame_line()
+      end,
+      desc = 'Git Blame Line',
+    },
+    {
+      '<leader>gB',
+      function()
+        require('snacks').gitbrowse()
+      end,
+      desc = 'Git Browse',
+    },
+    {
+      '<leader>gf',
+      function()
+        require('snacks').lazygit.log_file()
+      end,
+      desc = 'Lazygit Current File History',
+    },
+    {
+      '<leader>gl',
+      function()
+        require('snacks').lazygit.log()
+      end,
+      desc = 'Lazygit Log (cwd)',
+    },
+    {
+      '<c-/>',
+      function()
+        require('snacks').terminal()
+      end,
+      desc = 'Toggle Terminal',
+    },
+    {
+      '<c-_>',
+      function()
+        require('snacks').terminal()
+      end,
+      desc = 'which_key_ignore',
+    },
+  },
+  init = function()
+    vim.api.nvim_create_autocmd('User', {
+      pattern = 'VeryLazy',
+      callback = function()
+        -- Setup some globals for easier access
+        _G.dd = function(...)
+          require('snacks').debug.inspect(...)
+        end
+        _G.bt = function()
+          require('snacks').debug.backtrace()
+        end
+        vim.print = _G.dd -- Override print to use snacks for `:=` command
+      end,
+    })
+  end,
+}
