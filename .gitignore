@@ -1,1 +1,13 @@
 .idea
+
+# Nix
+result
+result-*
+.direnv/
+
+# Home Manager
+.config/systemd/
+.config/fontconfig/
+
+# macOS
+.DS_Store
