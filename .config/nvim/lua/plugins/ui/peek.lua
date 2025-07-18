@@ -1,3 +1,4 @@
+-- markdown preview plugin
 return {
   {
     'toppair/peek.nvim',

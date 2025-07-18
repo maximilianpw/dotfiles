@@ -16,25 +16,20 @@ return {
     dashboard = {
       enabled = true,
       preset = {
-        -- Configure layout to place header on the left
         width = 80,
-        height = 25,
-        -- Use sections to control layout - header first (left), then keys (right)
         sections = {
-          -- Left side: Header
           {
             section = 'header',
-            align = 'left',
             width = 40,
             padding = 1,
           },
-          -- Right side: Keys
           {
             section = 'keys',
-            align = 'left',
-            width = 35,
+            height = 5,
             padding = 1,
           },
+          { icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
+          { icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
         },
         header = [[
                                                                                                                           
