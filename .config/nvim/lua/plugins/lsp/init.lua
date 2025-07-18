@@ -1,68 +1,68 @@
 return {
   {
-    "folke/lazydev.nvim",
-    ft = "lua", -- only load on lua files
+    'folke/lazydev.nvim',
+    ft = 'lua', -- only load on lua files
     opts = {
       library = {
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
       },
     },
   },
   { -- optional cmp completion source for require statements and module annotations
-    "hrsh7th/nvim-cmp",
+    'hrsh7th/nvim-cmp',
     opts = function(_, opts)
       opts.sources = opts.sources or {}
       table.insert(opts.sources, {
-        name = "lazydev",
+        name = 'lazydev',
         group_index = 0, -- set group index to 0 to skip loading LuaLS completions
       })
     end,
   },
   { -- optional blink completion source for require statements and module annotations
-    "saghen/blink.cmp",
+    'saghen/blink.cmp',
     lazy = false, -- load immediately to avoid issues
-    version = "1.*",
+    version = '1.*',
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
       fuzzy = {
-        implementation = "prefer_rust_with_warning", 
+        implementation = 'prefer_rust_with_warning',
       },
       sources = {
-        default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+        default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' },
         providers = {
           lazydev = {
-            name = "LazyDev",
-            module = "lazydev.integrations.blink",
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
             score_offset = 100,
           },
         },
       },
     },
   },
-  { "folke/neodev.nvim", enabled = false }, -- make sure to uninstall or disable neodev.nvim
+  { 'folke/neodev.nvim', enabled = false }, -- make sure to uninstall or disable neodev.nvim
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
     dependencies = {
-        -- Mason must be loaded before its dependents so we need to set it up here.
-        { 'williamboman/mason.nvim', opts = {} },
-        'williamboman/mason-lspconfig.nvim',
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
+      -- Mason must be loaded before its dependents so we need to set it up here.
+      { 'williamboman/mason.nvim', opts = {} },
+      'williamboman/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
 
-        -- Useful status updates for LSP.
-        { 'j-hui/fidget.nvim', opts = {} },
+      -- Useful status updates for LSP.
+      { 'j-hui/fidget.nvim', opts = {} },
 
-        -- Allows extra capabilities provided by nvim-cmp
-        'hrsh7th/cmp-nvim-lsp',
+      -- Allows extra capabilities provided by nvim-cmp
+      'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
-        -- Enable faster module loading in Neovim 0.9+
-        if vim.fn.has('nvim-0.9') == 1 then
-            vim.loader.enable()
-        end
+      -- Enable faster module loading in Neovim 0.9+
+      if vim.fn.has 'nvim-0.9' == 1 then
+        vim.loader.enable()
+      end
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
@@ -193,13 +193,12 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-      -- add more lsp servers
+            -- add more lsp servers
       local servers = {
         clangd = {},
         gopls = {},
         pyright = {},
         rust_analyzer = {},
-        ts_ls = {},
         dockerls = {},
         angularls = {},
         tailwindcss = {},
@@ -237,12 +236,6 @@ return {
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
-            -- Example: Disable formatting for ts_ls if prettier is used
-            if server_name == 'ts_ls' then
-              server.on_attach = function(client, bufnr)
-                client.server_capabilities.documentFormattingProvider = false
-              end
-            end
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
