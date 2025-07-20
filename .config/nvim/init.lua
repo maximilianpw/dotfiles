@@ -96,21 +96,12 @@ require('lazy').setup({
     end,
   },
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-  { -- Collection of various small independent plugins/modules
+  {
     'echasnovski/mini.nvim',
+    version = false,
     config = function()
-      --  used for having pairs of brackets / parentheses
-      require('mini.pairs').setup()
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-
       require('mini.move').setup()
-
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
     end,
   },
@@ -121,7 +112,7 @@ require('lazy').setup({
   { import = 'plugins.java' },
   { import = 'plugins.lsp' },
   { import = 'plugins.style' },
-  --  { import = 'plugins.testing' },
+  { import = 'plugins.testing' },
   { import = 'plugins.ui' },
 }, {
   ui = {
