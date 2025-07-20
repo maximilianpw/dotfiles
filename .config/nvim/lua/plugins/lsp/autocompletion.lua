@@ -3,7 +3,6 @@ local has_nvim, nvim_version = pcall(vim.fn.has, 'nvim-0.8')
 local is_modern = has_nvim and nvim_version == 1
 
 return {
-  -- Completion engine
   {
     'hrsh7th/nvim-cmp',
     cond = function()
@@ -11,14 +10,23 @@ return {
     end,
     event = 'InsertEnter',
     dependencies = {
+      -- Snippet engine: define and expand code snippets on demand
       { 'L3MON4D3/LuaSnip', lazy = true },
+      -- A large, ready-to-use snippet collection for LuaSnip
       { 'rafamadriz/friendly-snippets', lazy = true },
+      -- Bridges LuaSnip snippets into the nvim-cmp completion menu
       'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-      'hrsh7th/cmp-nvim-lsp-signature-help',
+      -- Adds pictograms (icons) and annotation text to completion items
       'onsails/lspkind-nvim',
+      -- Source for language server protocol (LSP) completions
+      'hrsh7th/cmp-nvim-lsp',
+      -- Source for filesystem path completions (e.g. require(), :edit)
+      'hrsh7th/cmp-path',
+      -- Source for LSP signature help (function signatures) in the completion menu
+      'hrsh7th/cmp-nvim-lsp-signature-help',
+      -- Source for buffer-based completions (words from open buffers)
       'hrsh7th/cmp-buffer',
+      -- Source for on-the-fly calculator results (e.g. =2*3 → 6)
       'hrsh7th/cmp-calc',
     },
     opts = function()
@@ -85,7 +93,6 @@ return {
             cmp.config.compare.offset,
             cmp.config.compare.exact,
             cmp.config.compare.score,
-            require('cmp-under-comparator').under,
             cmp.config.compare.kind,
             cmp.config.compare.sort_text,
             cmp.config.compare.length,
