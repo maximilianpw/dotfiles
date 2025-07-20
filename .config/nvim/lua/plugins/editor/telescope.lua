@@ -2,7 +2,7 @@
 return {
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
+    cmd = 'Telescope',
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -26,16 +26,30 @@ return {
     config = function()
       -- [[ Configure Telescope ]]
       require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {
+          prompt_prefix = '❯ ',
+          selection_caret = '➜ ',
+          path_display = { 'smart' },
+          file_ignore_patterns = { 'node_modules/', '%.git/' },
+          layout_strategy = 'horizontal',
+          layout_config = {
+            horizontal = { width = 0.9, preview_width = 0.6 },
+            vertical = { height = 0.9, preview_height = 0.5 },
+          },
+          mappings = {
+            i = {
+              ['<C-j>'] = 'move_selection_next',
+              ['<C-k>'] = 'move_selection_previous',
+            },
+          },
+        },
         extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = 'smart_case',
+          },
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
           },
@@ -43,14 +57,10 @@ return {
       }
 
       -- Enable Telescope extensions if they are installed
-      local success, err = pcall(require('telescope').load_extension, 'fzf')
-      if not success then
-        vim.notify('Failed to load Telescope extension: fzf', vim.log.levels.ERROR)
-      end
-
-      success, err = pcall(require('telescope').load_extension, 'ui-select')
-      if not success then
-        vim.notify('Failed to load Telescope extension: ui-select', vim.log.levels.ERROR)
+      for _, ext in ipairs { 'fzf', 'ui-select' } do
+        if not pcall(require('telescope').load_extension, ext) then
+          vim.notify('Couldn’t load Telescope extension: ' .. ext, vim.log.levels.WARN)
+        end
       end
 
       -- See `:help telescope.builtin`
@@ -60,10 +70,13 @@ return {
       vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = 'Search Select Telescope' })
       vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = 'Find current Word' })
-      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Find by Grep' })
+      vim.keymap.set('n', '<leader>fl', builtin.live_grep, { desc = 'Find by Grep' })
       vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = 'Search Diagnostics' })
       vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = 'Resume Search' })
       vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = 'Find Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '<leader>fgf', builtin.git_files, { desc = 'Find Git Files' })
+      vim.keymap.set('n', '<leader>fgb', builtin.git_branches, { desc = 'Checkout Git Branch' })
+      vim.keymap.set('n', '<leader>fgc', builtin.git_commits, { desc = 'Checkout Commit' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
@@ -103,4 +116,3 @@ return {
   },
   },
 }
-

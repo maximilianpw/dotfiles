@@ -125,7 +125,7 @@ return {
   -- Key mappings
   keys = {
     {
-      '<leader>n',
+      '<leader>nn',
       function()
         local snacks = require 'snacks'
         if snacks.picker and snacks.picker.enabled then
@@ -137,7 +137,7 @@ return {
       desc = 'Notification History',
     },
     {
-      '<leader>un',
+      '<leader>nd',
       function()
         require('snacks').notifier.hide()
       end,

@@ -121,7 +121,7 @@ require('lazy').setup({
   { import = 'plugins.java' },
   { import = 'plugins.lsp' },
   { import = 'plugins.style' },
-  { import = 'plugins.testing' },
+  --  { import = 'plugins.testing' },
   { import = 'plugins.ui' },
 }, {
   ui = {
