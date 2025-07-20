@@ -85,11 +85,6 @@ require('lazy').setup({
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   {
-    'akinsho/bufferline.nvim',
-    version = '*',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-  },
-  {
     'navarasu/onedark.nvim',
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
