@@ -65,4 +65,3 @@ return {
     context_playground = { enable = true },
   },
 }
-

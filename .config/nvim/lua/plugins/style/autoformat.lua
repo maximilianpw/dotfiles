@@ -48,6 +48,7 @@ return { -- Autoformat
       markdown = { 'prettierd', 'prettier' },
       graphql = { 'prettierd', 'prettier' },
       python = { 'isort', 'black' },
+      nix = { 'alejandra' },
 
       -- Add C/C++ formatting via clang-format
       c = { 'clang_format' },
@@ -95,4 +96,3 @@ return { -- Autoformat
     },
   },
 }
-

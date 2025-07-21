@@ -116,11 +116,11 @@ return {
         lualine_z = {
           {
             function()
-              local clients = vim.lsp.get_active_clients()
+              local clients = vim.lsp.get_clients()
               return clients[1] and clients[1].name or ''
             end,
             cond = function()
-              return #vim.lsp.get_active_clients() > 0
+              return #vim.lsp.get_clients() > 0
             end,
           },
           {
@@ -139,14 +139,16 @@ return {
         lualine_z = {},
       },
       winbar = navic_ok and {
-        lualine_a = { {
-          function()
-            return navic.get_location()
-          end,
-          cond = function()
-            return navic.is_available()
-          end,
-        } },
+        lualine_a = {
+          {
+            function()
+              return navic.get_location()
+            end,
+            cond = function()
+              return navic.is_available()
+            end,
+          },
+        },
       } or {},
       extensions = { 'neo-tree', 'lazy', 'fzf' },
     }

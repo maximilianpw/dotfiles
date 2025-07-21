@@ -5,22 +5,6 @@ return {
     {
       'neovim/nvim-lspconfig',
       opts = {
-        servers = {
-          jdtls = {
-            settings = {
-              java = {
-                configuration = {
-                  runtimes = {
-                    {
-                      name = 'JavaSE-23',
-                      path = '/opt/homebrew/opt/openjdk/libexec/openjdk.jdk',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
         setup = {
           jdtls = function()
             -- Your nvim-java configuration goes here

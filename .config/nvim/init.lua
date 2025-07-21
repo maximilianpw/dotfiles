@@ -63,7 +63,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
@@ -79,9 +79,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- [[ Configure and install plugins ]]
--- NOTE: Here is where you install your plugins.
 require('lazy').setup({
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   {
@@ -105,7 +103,6 @@ require('lazy').setup({
       require('mini.surround').setup()
     end,
   },
-
   { import = 'plugins.coding' },
   { import = 'plugins.editor' },
   { import = 'plugins.git' },

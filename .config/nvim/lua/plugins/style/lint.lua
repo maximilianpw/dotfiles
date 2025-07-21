@@ -17,6 +17,7 @@ return {
         typescriptreact = { 'eslint_d' },
         vue = { 'eslint_d' },
         java = { 'checkstyle' },
+        nix = { 'nix' },
       }
 
       -- Create autocommand which carries out the actual linting

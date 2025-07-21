@@ -1,23 +1,16 @@
 return {
   'nvim-neo-tree/neo-tree.nvim',
-  version = 'v2.*',
   dependencies = {
     'nvim-lua/plenary.nvim',
-    'nvim-tree/nvim-web-devicons',
     'MunifTanjim/nui.nvim',
+    'nvim-tree/nvim-web-devicons',
   },
-  cmd = { 'Neotree', 'NeoTreeReveal', 'NeoTreeToggle' },
+  cmd = { 'Neotree', 'NeoTreeToggle' },
   keys = {
     {
       '<leader>e',
       '<cmd>Neotree toggle filesystem<CR>',
       desc = 'NeoTree ▸ toggle sidebar',
-      nowait = true,
-    },
-    {
-      '<leader>r',
-      '<cmd>Neotree reveal<CR>',
-      desc = 'NeoTree ▸ reveal current file',
       nowait = true,
     },
   },
