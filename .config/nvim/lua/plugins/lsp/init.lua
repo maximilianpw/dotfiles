@@ -1,3 +1,4 @@
+local util = require 'lspconfig.util'
 return {
   {
     'folke/lazydev.nvim',
@@ -150,9 +151,17 @@ return {
         pyright = {},
         rust_analyzer = {},
         dockerls = {},
-        angularls = {},
         tailwindcss = {},
-
+        angularls = {
+          on_attach = function(client, bufnr)
+            local project_root = client.config.root_dir
+            if not vim.fn.filereadable(project_root .. '/angular.json') then
+              client.stop()
+              return
+            end
+          end,
+          root_dir = util.root_pattern('angular.json', '.git'),
+        },
         lua_ls = {
           settings = {
             Lua = {
@@ -162,6 +171,8 @@ return {
             },
           },
         },
+        ruby_lsp = {},
+        elixirls = {},
       }
 
       -- Add other tools here that you want Mason to install
@@ -180,6 +191,12 @@ return {
         vim.notify('Failed to load mason-tool-installer', vim.log.levels.ERROR)
       end
 
+      require('lspconfig').nushell.setup {
+        cmd = { 'nu', '--lsp' },
+        filetypes = { 'nu' },
+        root_dir = util.root_pattern('.git', vim.fn.getcwd()),
+        capabilities = capabilities,
+      }
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,

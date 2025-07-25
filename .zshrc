@@ -98,3 +98,7 @@ source <(ng completion script)
 
 # jj completions
 source <(jj util completion zsh)
+
+# gpg configuration
+export GPG_TTY=$(tty)
+gpgconf --launch gpg-agent
