@@ -1,0 +1,10 @@
+"$schema" = "https://jj-vcs.github.io/jj/latest/config-schema.json"
+
+[user]
+name = "Maximilian PINDER-WHITE"
+email = "mpinderwhite@proton.me"
+
+[ui]
+default-command = "log"
+paginate = "never"
+editor = "nvim"
