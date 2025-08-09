@@ -1,25 +1,41 @@
 return {
   'folke/trouble.nvim',
-  opts = {}, -- for default options, refer to the configuration section for custom setup.
+  opts = {
+    modes = {
+      -- Enhanced diagnostics mode with preview
+      diagnostics = {
+        mode = "diagnostics",
+        preview = {
+          type = "split",
+          relative = "win",
+          position = "right",
+          size = 0.3,
+        },
+        focus = true,
+        win = {
+          position = "bottom",
+          size = 0.3,
+        },
+        format = "{file_icon} {filename} {pos} {item.message}",
+      },
+    },
+  },
   cmd = 'Trouble',
   keys = {
+    -- Diagnostics
     {
-      '<leader>q',
+      '<leader>qq',
       '<cmd>Trouble diagnostics toggle<cr>',
       desc = 'Diagnostics (Trouble)',
     },
+    -- Other Trouble features
     {
-      '<leader>xX',
-      '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
-      desc = 'Buffer Diagnostics (Trouble)',
-    },
-    {
-      '<leader>cs',
+      '<leader>xs',
       '<cmd>Trouble symbols toggle focus=false<cr>',
       desc = 'Symbols (Trouble)',
     },
     {
-      '<leader>xL',
+      '<leader>xl',
       '<cmd>Trouble loclist toggle<cr>',
       desc = 'Location List (Trouble)',
     },

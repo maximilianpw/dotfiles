@@ -1,216 +1,494 @@
 return {
-  'folke/snacks.nvim',
-  priority = 1000,
-  lazy = false,
-  opts = {
-    -- Core features
-    indent = { enabled = true },
-    input = { enabled = true },
-    notifier = { enabled = true },
-    scope = { enabled = true },
-    scroll = { enabled = true },
-    statuscolumn = { enabled = false }, -- we set this in options.lua
-    words = { enabled = true },
+	"folke/snacks.nvim",
+	priority = 1000,
+	lazy = false,
+	opts = {
+		-- ═══════════════════════════════════════════════════════════════
+		-- 🎨 VISUAL & UI ENHANCEMENTS
+		-- ═══════════════════════════════════════════════════════════════
 
-    -- Dashboard configuration
-    dashboard = {
-      enabled = true,
-      preset = {
-        width = 80,
-        sections = {
-          {
-            section = 'header',
-            width = 40,
-            padding = 1,
-          },
-          {
-            section = 'keys',
-            height = 5,
-            padding = 1,
-          },
-          { icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
-          { icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
-        },
-        header = [[
-         _          __________                              _,            
-     _.-(_)._     ."          ".      .--""--.          _.-{__}-._        
-   .'________'.   | .--------. |    .'        '.      .:-'`____`'-:.      
-  [____________] /` |________| `\  /   .'``'.   \    /_.-"`_  _`"-._\     
-  /  / .\/. \  \|  / / .\/. \ \  ||  .'/.\/.\'.  |  /`   / .\/. \   `\    
-  |  \__/\__/  |\_/  \__/\__/  \_/|  : |_/\_| ;  |  |    \__/\__/    |    
-  \            /  \            /   \ '.\    /.' / .-\                /-.  
-  /'._  --  _.'\  /'._  --  _.'\   /'. `'--'` .'\/   '._-.__--__.-_.'   \ 
- /_   `""""`   _\/_   `""""`   _\ /_  `-./\.-'  _\'.    `""""""""`    .'`\
-(__/    '|    \ _)_|           |_)_/            \__)|        '       |   |
-  |_____'|_____|   \__________/   |              | `_________'________`;-'
-   '----------'    '----------'   '--------------'`--------------------`  
-]],
-        -- Dashboard keys without LazyVim dependencies
-        keys = {
-          {
-            icon = ' ',
-            key = 'f',
-            desc = 'Find File',
-            action = function()
-              if vim.fn.exists ':Telescope' == 2 then
-                vim.cmd 'Telescope find_files'
-              elseif vim.fn.exists ':FzfLua' == 2 then
-                vim.cmd 'FzfLua files'
-              else
-                vim.cmd 'edit .'
-              end
-            end,
-          },
-          { icon = ' ', key = 'n', desc = 'New File', action = ':ene | startinsert' },
-          {
-            icon = ' ',
-            key = 'g',
-            desc = 'Find Text',
-            action = function()
-              if vim.fn.exists ':Telescope' == 2 then
-                vim.cmd 'Telescope live_grep'
-              elseif vim.fn.exists ':FzfLua' == 2 then
-                vim.cmd 'FzfLua live_grep'
-              else
-                vim.cmd 'grep '
-              end
-            end,
-          },
-          {
-            icon = ' ',
-            key = 'r',
-            desc = 'Recent Files',
-            action = function()
-              if vim.fn.exists ':Telescope' == 2 then
-                vim.cmd 'Telescope oldfiles'
-              elseif vim.fn.exists ':FzfLua' == 2 then
-                vim.cmd 'FzfLua oldfiles'
-              else
-                vim.cmd 'browse oldfiles'
-              end
-            end,
-          },
-          {
-            icon = ' ',
-            key = 'c',
-            desc = 'Config',
-            action = function()
-              local config_dir = vim.fn.stdpath 'config'
-              if vim.fn.exists ':Telescope' == 2 then
-                vim.cmd('Telescope find_files cwd=' .. config_dir)
-              elseif vim.fn.exists ':FzfLua' == 2 then
-                vim.cmd('FzfLua files cwd=' .. config_dir)
-              else
-                vim.cmd('edit ' .. config_dir)
-              end
-            end,
-          },
-          {
-            icon = '󰒲 ',
-            key = 'l',
-            desc = 'Lazy',
-            action = function()
-              if vim.fn.exists ':Lazy' == 2 then
-                vim.cmd 'Lazy'
-              else
-                print 'Lazy.nvim not available'
-              end
-            end,
-          },
-          { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
-        },
-      },
-    },
-  },
-  -- Key mappings
-  keys = {
-    {
-      '<leader>nn',
-      function()
-        local snacks = require 'snacks'
-        if snacks.picker and snacks.picker.enabled then
-          snacks.picker.notifications()
-        else
-          snacks.notifier.show_history()
-        end
-      end,
-      desc = 'Notification History',
-    },
-    {
-      '<leader>nd',
-      function()
-        require('snacks').notifier.hide()
-      end,
-      desc = 'Dismiss All Notifications',
-    },
-    {
-      '<leader>gg',
-      function()
-        require('snacks').lazygit()
-      end,
-      desc = 'Lazygit',
-    },
-    {
-      '<leader>gb',
-      function()
-        require('snacks').git.blame_line()
-      end,
-      desc = 'Git Blame Line',
-    },
-    {
-      '<leader>gB',
-      function()
-        require('snacks').gitbrowse()
-      end,
-      desc = 'Git Browse',
-    },
-    {
-      '<leader>gf',
-      function()
-        require('snacks').lazygit.log_file()
-      end,
-      desc = 'Lazygit Current File History',
-    },
-    {
-      '<leader>gl',
-      function()
-        require('snacks').lazygit.log()
-      end,
-      desc = 'Lazygit Log (cwd)',
-    },
-    {
-      '<c-/>',
-      function()
-        require('snacks').terminal()
-      end,
-      desc = 'Toggle Terminal',
-    },
-    {
-      '<c-_>',
-      function()
-        require('snacks').terminal()
-      end,
-      desc = 'which_key_ignore',
-    },
-  },
-  init = function()
-    vim.api.nvim_create_autocmd('User', {
-      pattern = 'VeryLazy',
-      callback = function()
-        local dashboard_blue = '#89B4FA'
-        vim.api.nvim_set_hl(0, 'SnacksDashboardHeader', {
-          fg = dashboard_blue,
-          bold = true,
-        })
-        -- Setup some globals for easier access
-        _G.dd = function(...)
-          require('snacks').debug.inspect(...)
-        end
-        _G.bt = function()
-          require('snacks').debug.backtrace()
-        end
-        vim.print = _G.dd -- Override print to use snacks for `:=` command
-      end,
-    })
-  end,
+		-- Visual indentation guides with scope highlighting
+		indent = { enabled = true },
+		-- Enhanced input dialogs with better UX
+		input = { enabled = true },
+		-- Beautiful notification system with animations
+		notifier = { enabled = true },
+		-- Scope-aware operations and highlighting
+		scope = { enabled = true },
+		-- Smooth scrolling animations
+		scroll = { enabled = true },
+		-- Advanced status column (disabled - set in options.lua)
+		statuscolumn = { enabled = false },
+		-- Word movement and selection enhancements
+		words = { enabled = true },
+
+		-- ═══════════════════════════════════════════════════════════════
+		-- 🔍 SEARCH & PICKER SYSTEM (Telescope Replacement)
+		-- ═══════════════════════════════════════════════════════════════
+		-- Universal fuzzy finder - replaces Telescope entirely
+		picker = {
+			enabled = true,
+			-- Enhanced matcher for better fuzzy finding
+			matcher = {
+				fuzzy = true,
+				smartcase = true,
+				ignorecase = true,
+				filename_bonus = true,
+				file_pos = true,
+				sort_empty = false,
+			},
+		},
+
+		-- ═══════════════════════════════════════════════════════════════
+		-- 📁 FILE MANAGEMENT & NAVIGATION
+		-- ═══════════════════════════════════════════════════════════════
+		-- File tree explorer - replaces Neo-tree
+		explorer = {
+			enabled = true,
+			layout = { layout = { position = "right" } },
+			tree = true,
+			git_status = true,
+			diagnostics = true,
+			follow_file = true,
+			auto_close = false,
+		},
+
+		-- Smart file/symbol renaming with LSP integration
+		rename = { enabled = true },
+
+		-- Fast file operations and quick access
+		quickfile = { enabled = true },
+
+		-- Large file handling and optimization
+		bigfile = { enabled = true },
+
+		-- ═══════════════════════════════════════════════════════════════
+		-- 💻 TERMINAL & DEVELOPMENT TOOLS
+		-- ═══════════════════════════════════════════════════════════════
+
+		-- Integrated terminal with session management
+		terminal = { enabled = true },
+
+		-- Lazygit integration for Git workflow
+		lazygit = { enabled = true },
+
+		-- Repository browsing and remote Git operations
+		gitbrowse = { enabled = true },
+
+		-- Git blame and history integration
+		git = { enabled = true },
+
+		-- ═══════════════════════════════════════════════════════════════
+		-- ⚡ PRODUCTIVITY & WORKFLOW
+		-- ═══════════════════════════════════════════════════════════════
+
+		-- Distraction-free writing mode
+		zen = { enabled = true },
+
+		-- Quick scratch buffers for notes and experiments
+		scratch = { enabled = true },
+
+		-- Feature toggles and quick settings
+		toggle = { enabled = true },
+
+		-- Debug tools and inspection utilities
+		debug = { enabled = true },
+
+		-- Buffer deletion without disrupting layout
+		bufdelete = { enabled = true },
+
+		-- Smart file/symbol renaming with LSP integration
+		rename = { enabled = true },
+
+		-- Large file handling and optimization
+		bigfile = { enabled = true },
+
+		-- Quick file operations and access
+		quickfile = { enabled = true },
+
+		-- Word movement and selection enhancements with LSP references
+		words = { enabled = true },
+
+		-- ═══════════════════════════════════════════════════════════════
+		-- 🏠 DASHBOARD CONFIGURATION
+		-- ═══════════════════════════════════════════════════════════════
+		dashboard = {
+			enabled = true,
+			preset = {
+				width = 80,
+				sections = {
+					{
+						section = "header",
+						width = 40,
+						padding = 1,
+					},
+					{
+						section = "keys",
+						height = 5,
+						padding = 1,
+					},
+					{ icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+					{ icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+				},
+				-- Dashboard quick action keys (using Snacks picker)
+				keys = {
+					{
+						icon = " ",
+						key = "f",
+						desc = "Find File",
+						action = function()
+							require("snacks").picker.files()
+						end,
+					},
+					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+					{
+						icon = " ",
+						key = "g",
+						desc = "Find Text",
+						action = function()
+							require("snacks").picker.grep()
+						end,
+					},
+					{
+						icon = " ",
+						key = "r",
+						desc = "Recent Files",
+						action = function()
+							require("snacks").picker.recent()
+						end,
+					},
+					{
+						icon = " ",
+						key = "c",
+						desc = "Config",
+						action = function()
+							require("snacks").picker.files({ cwd = "~/.local/share/chezmoi/dot_config/nvim" })
+						end,
+					},
+					{
+						icon = "󰒲 ",
+						key = "l",
+						desc = "Lazy",
+						action = function()
+							if vim.fn.exists(":Lazy") == 2 then
+								vim.cmd("Lazy")
+							else
+								print("Lazy.nvim not available")
+							end
+						end,
+					},
+					{ icon = " ", key = "q", desc = "Quit", action = ":qa" },
+				},
+			},
+		},
+	},
+	-- ═══════════════════════════════════════════════════════════════
+	-- ⌨️  COMPREHENSIVE KEYMAPS FOR ALL SNACKS FEATURES
+	-- ═══════════════════════════════════════════════════════════════
+	keys = {
+		-- ────────────────────────────────────────────────────────────
+		-- 📁 FILE EXPLORER & MANAGEMENT
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>e",
+			function()
+				require("snacks").explorer()
+			end,
+			desc = "File Explorer",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- 🔍 PICKER SYSTEM (Telescope replacement)
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>ff",
+			function()
+				require("snacks").picker.files()
+			end,
+			desc = "Find Files",
+		},
+		{
+			"<leader>fl", -- Changed from fg to match your telescope config
+			function()
+				require("snacks").picker.grep()
+			end,
+			desc = "Find by Grep (Live)",
+		},
+		{
+			"<leader>fb",
+			function()
+				require("snacks").picker.buffers()
+			end,
+			desc = "Find Buffers",
+		},
+		{
+			"<leader>fd",
+			function()
+				require("snacks").picker.diagnostics()
+			end,
+			desc = "Find Diagnostics",
+		},
+		{
+			"<leader>fD",
+			function()
+				require("snacks").picker.diagnostics({ severity = vim.diagnostic.severity.ERROR })
+			end,
+			desc = "Find Errors Only",
+		},
+		{
+			"<leader><leader>", -- Matching your telescope config
+			function()
+				require("snacks").picker.buffers()
+			end,
+			desc = "Find existing buffers",
+		},
+		{
+			"<leader>f.", -- Matching your telescope oldfiles
+			function()
+				require("snacks").picker.recent()
+			end,
+			desc = "Find Recent Files",
+		},
+		{
+			"<leader>fh",
+			function()
+				require("snacks").picker.help()
+			end,
+			desc = "Find Help",
+		},
+		{
+			"<leader>fk",
+			function()
+				require("snacks").picker.keymaps()
+			end,
+			desc = "Search Keymaps",
+		},
+		{
+			"<leader>fc",
+			function()
+				require("snacks").picker.files({ cwd = vim.fn.stdpath("config") })
+			end,
+			desc = "Find Config Files",
+		},
+		{
+			"<leader>fw",
+			function()
+				require("snacks").picker.grep_word()
+			end,
+			desc = "Find current Word",
+		},
+		{
+			"<leader>fs",
+			function()
+				require("snacks").picker.lsp_symbols()
+			end,
+			desc = "LSP Symbols",
+		},
+		{
+			"<leader>fu",
+			function()
+				require("snacks").picker.undo()
+			end,
+			desc = "Undo History",
+		},
+		-- Git related pickers (matching your telescope git keymaps)
+		{
+			"<leader>fgf",
+			function()
+				require("snacks").picker.git_files()
+			end,
+			desc = "Find Git Files",
+		},
+		{
+			"<leader>fgb",
+			function()
+				require("snacks").picker.git_branches()
+			end,
+			desc = "Checkout Git Branch",
+		},
+		{
+			"<leader>fgc",
+			function()
+				require("snacks").picker.git_log()
+			end,
+			desc = "Checkout Commit (Git Log)",
+		},
+		-- Search in current buffer (matching your telescope config)
+		{
+			"<leader>/",
+			function()
+				require("snacks").picker.lines()
+			end,
+			desc = "Fuzzily search in current buffer",
+		},
+		-- Grep in open files (matching your telescope config)
+		{
+			"<leader>f/",
+			function()
+				require("snacks").picker.grep_buffers()
+			end,
+			desc = "Grep in Open Files",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- 📋 NOTIFICATIONS & DEBUG
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>nn",
+			function()
+				require("snacks").notifier.show_history()
+			end,
+			desc = "Notification History",
+		},
+		{
+			"<leader>nd",
+			function()
+				require("snacks").notifier.hide()
+			end,
+			desc = "Dismiss All Notifications",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- 🌿 GIT INTEGRATION
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>gg",
+			function()
+				require("snacks").lazygit()
+			end,
+			desc = "Lazygit",
+		},
+		{
+			"<leader>gf",
+			function()
+				require("snacks").lazygit.log_file()
+			end,
+			desc = "Lazygit Current File History",
+		},
+		{
+			"<leader>gl",
+			function()
+				require("snacks").lazygit.log()
+			end,
+			desc = "Lazygit Log (cwd)",
+		},
+		{
+			"<leader>gb",
+			function()
+				require("snacks").git.blame_line()
+			end,
+			desc = "Git Blame Line",
+		},
+		{
+			"<leader>gB",
+			function()
+				require("snacks").gitbrowse()
+			end,
+			desc = "Git Browse (Open in Browser)",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- 💻 TERMINAL & DEVELOPMENT
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>T",
+			function()
+				require("snacks").terminal()
+			end,
+			desc = "Terminal",
+		},
+		{
+			"<c-/>",
+			function()
+				require("snacks").terminal()
+			end,
+			desc = "Toggle Terminal",
+		},
+		{
+			"<c-_>",
+			function()
+				require("snacks").terminal()
+			end,
+			desc = "which_key_ignore",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- ⚡ PRODUCTIVITY & WORKFLOW
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>z",
+			function()
+				require("snacks").zen()
+			end,
+			desc = "Zen Mode (Distraction-free)",
+		},
+		{
+			"<leader>S.",
+			function()
+				require("snacks").scratch()
+			end,
+			desc = "Scratch Buffer",
+		},
+		{
+			"<leader>SS",
+			function()
+				require("snacks").scratch.select()
+			end,
+			desc = "Select Scratch Buffer",
+		},
+		{
+			"<leader>bd",
+			function()
+				require("snacks").bufdelete()
+			end,
+			desc = "Delete Buffer (preserve layout)",
+		},
+
+		-- ────────────────────────────────────────────────────────────
+		-- 🔧 TOGGLES & SETTINGS
+		-- ────────────────────────────────────────────────────────────
+		{
+			"<leader>tsn",
+			function()
+				require("snacks").toggle.line_number()
+			end,
+			desc = "Toggle Line Numbers",
+		},
+		{
+			"<leader>tsi",
+			function()
+				require("snacks").toggle.indent()
+			end,
+			desc = "Toggle Indent Guides",
+		},
+		{
+			"<leader>tst",
+			function()
+				require("treesitter-context").toggle()
+			end,
+			desc = "Toggle Treesitter Context",
+		},
+	},
+	init = function()
+		-- ═══════════════════════════════════════════════════════════════
+		-- 🚀 INITIALIZATION & AUTO-SETUP
+		-- ═══════════════════════════════════════════════════════════════
+
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "VeryLazy",
+			callback = function()
+				-- ────────────────────────────────────────────────────────────
+				-- 🎨 UI CUSTOMIZATION
+				-- ────────────────────────────────────────────────────────────
+				local dashboard_blue = "#89B4FA"
+				vim.api.nvim_set_hl(0, "SnacksDashboardHeader", {
+					fg = dashboard_blue,
+					bold = true,
+				})
+
+				-- Override print to use snacks for `:=` command
+				vim.print = _G.dd
+			end,
+		})
+	end,
 }
