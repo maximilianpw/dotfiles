@@ -1,8 +1,8 @@
 return {
 	{
-		'pmizio/typescript-tools.nvim',
-		dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-		ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+		"pmizio/typescript-tools.nvim",
+		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+		ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 		config = function()
 			-- Get capabilities for blink.cmp integration
 			local function get_capabilities()
@@ -13,7 +13,7 @@ return {
 				end
 				return capabilities
 			end
-			
+
 			require("typescript-tools").setup({
 				capabilities = get_capabilities(),
 				settings = {
@@ -37,13 +37,13 @@ return {
 		end,
 	},
 	{
-		'folke/ts-comments.nvim',
-		event = 'VeryLazy',
+		"folke/ts-comments.nvim",
+		event = "VeryLazy",
 		opts = {},
 	},
 	{
-		'dmmulroy/ts-error-translator.nvim',
-		ft = { 'typescript', 'typescriptreact' },
+		"dmmulroy/ts-error-translator.nvim",
+		ft = { "typescript", "typescriptreact" },
 		opts = {},
 	},
 }

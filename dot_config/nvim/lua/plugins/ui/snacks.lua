@@ -19,8 +19,6 @@ return {
 		scroll = { enabled = true },
 		-- Advanced status column (disabled - set in options.lua)
 		statuscolumn = { enabled = false },
-		-- Word movement and selection enhancements
-		words = { enabled = true },
 
 		-- ═══════════════════════════════════════════════════════════════
 		-- 🔍 SEARCH & PICKER SYSTEM (Telescope Replacement)
@@ -45,22 +43,13 @@ return {
 		-- File tree explorer - replaces Neo-tree
 		explorer = {
 			enabled = true,
-			layout = { layout = { position = "right" } },
 			tree = true,
 			git_status = true,
 			diagnostics = true,
 			follow_file = true,
-			auto_close = false,
+			auto_close = true,
+			replace_netrw = true,
 		},
-
-		-- Smart file/symbol renaming with LSP integration
-		rename = { enabled = true },
-
-		-- Fast file operations and quick access
-		quickfile = { enabled = true },
-
-		-- Large file handling and optimization
-		bigfile = { enabled = true },
 
 		-- ═══════════════════════════════════════════════════════════════
 		-- 💻 TERMINAL & DEVELOPMENT TOOLS
@@ -208,18 +197,11 @@ return {
 			desc = "Find Files",
 		},
 		{
-			"<leader>fl", -- Changed from fg to match your telescope config
+			"<leader>fl",
 			function()
 				require("snacks").picker.grep()
 			end,
 			desc = "Find by Grep (Live)",
-		},
-		{
-			"<leader>fb",
-			function()
-				require("snacks").picker.buffers()
-			end,
-			desc = "Find Buffers",
 		},
 		{
 			"<leader>fd",
@@ -236,14 +218,14 @@ return {
 			desc = "Find Errors Only",
 		},
 		{
-			"<leader><leader>", -- Matching your telescope config
+			"<leader><leader>",
 			function()
 				require("snacks").picker.buffers()
 			end,
 			desc = "Find existing buffers",
 		},
 		{
-			"<leader>f.", -- Matching your telescope oldfiles
+			"<leader>f.",
 			function()
 				require("snacks").picker.recent()
 			end,
@@ -266,7 +248,7 @@ return {
 		{
 			"<leader>fc",
 			function()
-				require("snacks").picker.files({ cwd = vim.fn.stdpath("config") })
+				require("snacks").picker.files({ cwd = "~/.local/share/chezmoi/dot_config/nvim" })
 			end,
 			desc = "Find Config Files",
 		},
@@ -404,13 +386,6 @@ return {
 			end,
 			desc = "Toggle Terminal",
 		},
-		{
-			"<c-_>",
-			function()
-				require("snacks").terminal()
-			end,
-			desc = "which_key_ignore",
-		},
 
 		-- ────────────────────────────────────────────────────────────
 		-- ⚡ PRODUCTIVITY & WORKFLOW
@@ -442,31 +417,6 @@ return {
 				require("snacks").bufdelete()
 			end,
 			desc = "Delete Buffer (preserve layout)",
-		},
-
-		-- ────────────────────────────────────────────────────────────
-		-- 🔧 TOGGLES & SETTINGS
-		-- ────────────────────────────────────────────────────────────
-		{
-			"<leader>tsn",
-			function()
-				require("snacks").toggle.line_number()
-			end,
-			desc = "Toggle Line Numbers",
-		},
-		{
-			"<leader>tsi",
-			function()
-				require("snacks").toggle.indent()
-			end,
-			desc = "Toggle Indent Guides",
-		},
-		{
-			"<leader>tst",
-			function()
-				require("treesitter-context").toggle()
-			end,
-			desc = "Toggle Treesitter Context",
 		},
 	},
 	init = function()

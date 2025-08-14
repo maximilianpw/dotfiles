@@ -65,10 +65,7 @@ return {
 					prefix = "",
 					format = function(diagnostic)
 						local severity = vim.diagnostic.severity[diagnostic.severity]
-						return string.format("%s [%s] %s", 
-							severity, 
-							diagnostic.source or "LSP", 
-							diagnostic.message)
+						return string.format("%s [%s] %s", severity, diagnostic.source or "LSP", diagnostic.message)
 					end,
 				},
 				signs = {
@@ -126,7 +123,7 @@ return {
 					-- Show hover information (documentation, type info, errors)
 					-- Custom hover handler that prioritizes typescript-tools
 					map("K", function()
-						local clients = vim.lsp.get_clients({bufnr = event.buf})
+						local clients = vim.lsp.get_clients({ bufnr = event.buf })
 						local ts_client = nil
 						for _, client in ipairs(clients) do
 							if client.name == "typescript-tools" then
@@ -134,7 +131,7 @@ return {
 								break
 							end
 						end
-						
+
 						if ts_client then
 							-- If typescript-tools is available, use it exclusively for hover
 							local params = vim.lsp.util.make_position_params()
@@ -143,12 +140,12 @@ return {
 									vim.notify("Hover error: " .. vim.inspect(err), vim.log.levels.ERROR)
 									return
 								end
-								
+
 								if result and result.contents then
 									-- Handle different content formats
 									local contents = result.contents
 									local lines = {}
-									
+
 									if type(contents) == "table" then
 										for _, content in ipairs(contents) do
 											if type(content) == "string" and content ~= "" then
@@ -160,7 +157,7 @@ return {
 									elseif type(contents) == "string" then
 										lines = { contents }
 									end
-									
+
 									-- Only show if we have actual content
 									if #lines > 0 then
 										vim.lsp.util.open_floating_preview(lines, "markdown", {
@@ -241,13 +238,13 @@ return {
 			-- Function to get capabilities with blink.cmp integration
 			local function get_capabilities()
 				local capabilities = vim.lsp.protocol.make_client_capabilities()
-				
+
 				-- Add blink.cmp capabilities if available
 				local ok, blink = pcall(require, "blink.cmp")
 				if ok then
 					capabilities = vim.tbl_deep_extend("force", capabilities, blink.get_lsp_capabilities())
 				end
-				
+
 				return capabilities
 			end
 
@@ -275,7 +272,7 @@ return {
 				-- ts_ls = {
 				-- 	-- TypeScript LSP should take priority over Angular in most cases
 				-- 	root_dir = util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
-				-- },	
+				-- },
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -323,7 +320,8 @@ return {
 				handlers = {
 					function(server_name)
 						local server = servers[server_name] or {}
-						server.capabilities = vim.tbl_deep_extend("force", {}, get_capabilities(), server.capabilities or {})
+						server.capabilities =
+							vim.tbl_deep_extend("force", {}, get_capabilities(), server.capabilities or {})
 						require("lspconfig")[server_name].setup(server)
 					end,
 				},
