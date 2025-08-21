@@ -256,23 +256,9 @@ return {
 				dockerls = {},
 				tailwindcss = {},
 				angularls = {
-					-- Only activate Angular LSP in actual Angular projects with angular.json
 					root_dir = util.root_pattern("angular.json"),
-					-- Disable for standalone TypeScript files without Angular context
 					filetypes = { "typescript", "html", "typescriptreact", "typescript.tsx" },
-					on_attach = function(client, bufnr)
-						-- Disable angularls hover if not in an Angular project
-						local angular_json = vim.fn.findfile("angular.json", ".;")
-						if angular_json == "" then
-							client.server_capabilities.hoverProvider = false
-						end
-					end,
 				},
-				-- ts_ls disabled when typescript-tools.nvim is available
-				-- ts_ls = {
-				-- 	-- TypeScript LSP should take priority over Angular in most cases
-				-- 	root_dir = util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
-				-- },
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -315,16 +301,8 @@ return {
 				capabilities = get_capabilities(),
 			})
 			require("mason-lspconfig").setup({
-				ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+				ensure_installed = {},
 				automatic_installation = false,
-				handlers = {
-					function(server_name)
-						local server = servers[server_name] or {}
-						server.capabilities =
-							vim.tbl_deep_extend("force", {}, get_capabilities(), server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
-					end,
-				},
 			})
 		end,
 	},
