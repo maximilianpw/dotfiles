@@ -38,20 +38,6 @@ return {
 		},
 
 		-- ═══════════════════════════════════════════════════════════════
-		-- 📁 FILE MANAGEMENT & NAVIGATION
-		-- ═══════════════════════════════════════════════════════════════
-		-- File tree explorer - replaces Neo-tree
-		explorer = {
-			enabled = true,
-			tree = true,
-			git_status = true,
-			diagnostics = true,
-			follow_file = true,
-			auto_close = true,
-			replace_netrw = true,
-		},
-
-		-- ═══════════════════════════════════════════════════════════════
 		-- 💻 TERMINAL & DEVELOPMENT TOOLS
 		-- ═══════════════════════════════════════════════════════════════
 
@@ -175,17 +161,6 @@ return {
 	-- ⌨️  COMPREHENSIVE KEYMAPS FOR ALL SNACKS FEATURES
 	-- ═══════════════════════════════════════════════════════════════
 	keys = {
-		-- ────────────────────────────────────────────────────────────
-		-- 📁 FILE EXPLORER & MANAGEMENT
-		-- ────────────────────────────────────────────────────────────
-		{
-			"<leader>e",
-			function()
-				require("snacks").explorer()
-			end,
-			desc = "File Explorer",
-		},
-
 		-- ────────────────────────────────────────────────────────────
 		-- 🔍 PICKER SYSTEM (Telescope replacement)
 		-- ────────────────────────────────────────────────────────────
