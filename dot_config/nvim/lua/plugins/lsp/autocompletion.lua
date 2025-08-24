@@ -32,6 +32,7 @@ return {
 		opts = function()
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
+			require("luasnip.loaders.from_vscode").lazy_load()
 			return {
 				completion = {
 					completeopt = "menu,menuone,noinsert",
