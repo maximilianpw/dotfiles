@@ -16,29 +16,8 @@ return {
 			end
 
 			require("typescript-tools").setup({
-				-- Don't attach in Angular workspaces: nearest package.json must not depend on @angular/core
 				root_dir = function(fname)
-					local nearest_pkg_dir = util.root_pattern("package.json")(fname)
-					if nearest_pkg_dir then
-						local pkg_path = nearest_pkg_dir .. "/package.json"
-						if vim.fn.filereadable(pkg_path) == 1 then
-							local ok_read, lines = pcall(vim.fn.readfile, pkg_path)
-							if ok_read and lines then
-								local text = table.concat(lines, "\n")
-								local decode = (vim.json and vim.json.decode) or vim.fn.json_decode
-								local ok_json, pkg = pcall(decode, text)
-								if ok_json and pkg then
-									local deps = pkg.dependencies or {}
-									local dev = pkg.devDependencies or {}
-									if deps["@angular/core"] or dev["@angular/core"] then
-										-- It's an Angular package: don't attach typescript-tools
-										return nil
-									end
-								end
-							end
-						end
-					end
-					return (util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git")(fname))
+					return util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git")(fname)
 				end,
 				single_file_support = false,
 				capabilities = get_capabilities(),

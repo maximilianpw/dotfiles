@@ -121,62 +121,8 @@ return {
 					map("gD", vim.lsp.buf.declaration, "Goto Declaration")
 
 					-- Show hover information (documentation, type info, errors)
-					-- Prefer Angular LS in Angular projects, otherwise typescript-tools
 					map("K", function()
-						local clients = vim.lsp.get_clients({ bufnr = event.buf })
-						local preferred = nil
-						for _, client in ipairs(clients) do
-							if client.name == "angularls" then
-								preferred = client
-								break
-							end
-						end
-						if not preferred then
-							for _, client in ipairs(clients) do
-								if client.name == "typescript-tools" then
-									preferred = client
-									break
-								end
-							end
-						end
-
-						if preferred then
-							local params = vim.lsp.util.make_position_params()
-							preferred.request("textDocument/hover", params, function(err, result)
-								if err then
-									vim.notify("Hover error: " .. vim.inspect(err), vim.log.levels.ERROR)
-									return
-								end
-
-								if result and result.contents then
-									local contents = result.contents
-									local lines = {}
-
-									if type(contents) == "table" then
-										for _, content in ipairs(contents) do
-											if type(content) == "string" and content ~= "" then
-												table.insert(lines, content)
-											elseif type(content) == "table" and content.value then
-												table.insert(lines, content.value)
-											end
-										end
-									elseif type(contents) == "string" then
-										lines = { contents }
-									end
-
-									if #lines > 0 then
-										vim.lsp.util.open_floating_preview(lines, "markdown", {
-											border = "rounded",
-											max_width = 80,
-											max_height = 20,
-											focusable = false,
-										})
-									end
-								end
-							end, event.buf)
-						else
-							vim.lsp.buf.hover()
-						end
+						vim.lsp.buf.hover()
 					end, "Hover Documentation")
 
 					-- Show signature help when inside function parameters
@@ -259,37 +205,6 @@ return {
 				rust_analyzer = {},
 				dockerls = {},
 				tailwindcss = {},
-				angularls = {
-					-- Attach only when the nearest package depends on Angular and there's an angular.json up the tree
-					root_dir = function(fname)
-						local nearest_pkg_dir = util.root_pattern("package.json")(fname)
-						if not nearest_pkg_dir then
-							return nil
-						end
-						local pkg_path = nearest_pkg_dir .. "/package.json"
-						if vim.fn.filereadable(pkg_path) == 1 then
-							local ok_read, lines = pcall(vim.fn.readfile, pkg_path)
-							if ok_read and lines then
-								local text = table.concat(lines, "\n")
-								local decode = (vim.json and vim.json.decode) or vim.fn.json_decode
-								local ok_json, pkg = pcall(decode, text)
-								if ok_json and pkg then
-									local deps = pkg.dependencies or {}
-									local dev = pkg.devDependencies or {}
-									if deps["@angular/core"] or dev["@angular/core"] then
-										local workspace_root = util.root_pattern("angular.json")(fname)
-										if workspace_root then
-											return workspace_root
-										end
-									end
-								end
-							end
-						end
-						return nil
-					end,
-					single_file_support = false,
-					filetypes = { "typescript", "html", "typescriptreact", "typescript.tsx" },
-				},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -322,7 +237,6 @@ return {
 				"prettier", -- Used to format JavaScript/TypeScript code
 				"prettierd", -- Faster prettier daemon
 				"eslint_d", -- Faster version of eslint
-				"angular-language-server", -- Ensure Angular LS is installed by Mason
 			})
 
 			-- Error handling for Mason Tool Installer
