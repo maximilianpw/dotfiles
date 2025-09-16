@@ -39,6 +39,9 @@ return { -- Autoformat
 			graphql = { "prettierd", "prettier" },
 			python = { "isort", "black" },
 			nix = { "alejandra" },
+			elixir = { "lsp" },
+			heex = { "lsp" },
+			eex = { "lsp" },
 
 			-- Add C/C++ formatting via clang-format
 			c = { "clang_format" },

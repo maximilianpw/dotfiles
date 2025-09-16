@@ -410,9 +410,6 @@ return {
 					fg = dashboard_blue,
 					bold = true,
 				})
-
-				-- Override print to use snacks for `:=` command
-				vim.print = _G.dd
 			end,
 		})
 	end,

@@ -110,10 +110,8 @@ require("lazy").setup({
 			require("mini.snippets").setup()
 		end,
 	},
-	{ import = "plugins.coding" },
 	{ import = "plugins.editor" },
 	{ import = "plugins.git" },
-	{ import = "plugins.java" },
 	{ import = "plugins.lsp" },
 	{ import = "plugins.style" },
 	{ import = "plugins.testing" },
