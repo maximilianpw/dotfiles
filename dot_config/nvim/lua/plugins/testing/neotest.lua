@@ -19,38 +19,33 @@ return {
 			},
 		})
 
-		vim.keymap.set("n", "<leader>tr", function()
-			require("neotest").run.run({
-				suite = false,
-				testify = true,
-			})
-		end, { desc = "Debug: Running Nearest Test" })
-
-		vim.keymap.set("n", "<leader>tv", function()
-			require("neotest").summary.toggle()
-		end, { desc = "Debug: Summary Toggle" })
-
-		vim.keymap.set("n", "<leader>tR", function()
-			require("neotest").run.run({
-				suite = true,
-				testify = true,
-			})
-		end, { desc = "Debug: Running Nearest Test Suite" })
-
-		vim.keymap.set("n", "<leader>td", function()
-			require("neotest").run.run({
-				suite = false,
-				testify = true,
-				strategy = "dap",
-			})
-		end, { desc = "Debug: Debug Nearest Test" })
-
-		vim.keymap.set("n", "<leader>to", function()
-			require("neotest").output.open()
-		end, { desc = "Debug: Open test output" })
-
-		vim.keymap.set("n", "<leader>ta", function()
+		-- Unified <leader>t* test keymaps
+		local map = function(lhs, rhs, desc)
+			vim.keymap.set("n", lhs, rhs, { desc = desc })
+		end
+		map("<leader>tn", function()
+			require("neotest").run.run()
+		end, "Test: Run nearest")
+		map("<leader>tf", function()
+			require("neotest").run.run(vim.fn.expand("%"))
+		end, "Test: Run file")
+		map("<leader>tF", function()
 			require("neotest").run.run(vim.fn.getcwd())
-		end, { desc = "Debug: Open test output" })
+		end, "Test: Run project")
+		map("<leader>ts", function()
+			require("neotest").summary.toggle()
+		end, "Test: Toggle summary")
+		map("<leader>to", function()
+			require("neotest").output.open({ enter = true })
+		end, "Test: Open output")
+		map("<leader>tO", function()
+			require("neotest").output_panel.toggle()
+		end, "Test: Toggle output panel")
+		map("<leader>td", function()
+			require("neotest").run.run({ strategy = "dap" })
+		end, "Test: Debug nearest (DAP)")
+		map("<leader>tS", function()
+			require("neotest").run.run({ suite = true })
+		end, "Test: Run suite (nearest root)")
 	end,
 }

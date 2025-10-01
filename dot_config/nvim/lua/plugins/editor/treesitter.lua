@@ -23,10 +23,18 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		main = "nvim-treesitter.configs",
-		lazy = false,
 		opts = {
-			ensure_installed = { "bash", "html", "lua", "markdown", "vim", "elixir", "eex", "heex" },
-			auto_install = true,
+			ensure_installed = {
+				"bash",
+				"html",
+				"lua",
+				"markdown",
+				"vim",
+				"elixir", "eex", "heex",
+				"javascript", "typescript", "tsx", "json", "css",
+				"go", "gomod", "gosum", "gotmpl",
+			},
+			auto_install = false,
 			sync_install = false,
 			ignore_install = { "php" },
 			highlight = {

@@ -9,35 +9,14 @@ return {
 		},
 	},
 	{
-		"saghen/blink.nvim",
-		lazy = false,
-		version = "1.*",
-		opts = {
-			sources = {
-				default = { "lazydev", "lsp", "path", "snippets", "buffer" },
-				providers = {
-					lazydev = {
-						name = "LazyDev",
-						module = "lazydev.integrations.blink",
-						score_offset = 100,
-					},
-				},
-			},
-		},
-	},
-	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			{ "williamboman/mason.nvim", opts = {} },
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			{ "j-hui/fidget.nvim", opts = {} },
-			"saghen/blink.nvim",
 		},
 		config = function()
-			local util = require("lspconfig.util")
-			local lspconfig = require("lspconfig")
-
 			if vim.fn.has("nvim-0.9") == 1 then
 				vim.loader.enable()
 			end
@@ -69,7 +48,7 @@ return {
 				severity_sort = true,
 			})
 
-			-- on-attach goodies (yours unchanged)
+			-- on-attach goodies
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
@@ -94,8 +73,6 @@ return {
 					end, "Hover Documentation")
 					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 					map("<leader>Q", vim.diagnostic.open_float, "Show line diagnostics")
-					map("[d", vim.diagnostic.goto_prev, "Prev diagnostic")
-					map("]d", vim.diagnostic.goto_next, "Next diagnostic")
 
 					local function supports(client, method, bufnr)
 						if vim.fn.has("nvim-0.11") == 1 then
@@ -131,46 +108,103 @@ return {
 				end,
 			})
 
-			-- cache capabilities once
+			-- capabilities
 			local caps = (function()
 				local c = vim.lsp.protocol.make_client_capabilities()
-				local ok, blink = pcall(require, "blink.cmp")
+				local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
 				if ok then
-					c = vim.tbl_deep_extend("force", c, blink.get_lsp_capabilities())
+					c = cmp_lsp.default_capabilities(c)
 				end
 				return c
 			end)()
 
-			-- ElixirLS via Mason (direct to server script)
+			-- Helper function to check if executable exists
+			local function executable_exists(name)
+				return vim.fn.executable(name) == 1
+			end
+
+			-- Mason paths / helpers
+			local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
 			local mason_ls = vim.fn.stdpath("data") .. "/mason/packages/elixir-ls/language_server.sh"
 
-			local servers = {
-				clangd = {},
-				pyright = {},
-				rust_analyzer = {},
-				dockerls = {},
-				elixirls = {
+			-- Define servers ONCE - only include servers that are available
+			local servers = {}
+
+			-- Only add servers if their executables exist
+			if executable_exists("clangd") then
+				servers.clangd = { cmd = { "clangd" } }
+			end
+
+			-- Check for Mason-installed or system pyright
+			if vim.fn.filereadable(mason_bin .. "/pyright-langserver") == 1 then
+				servers.pyright = { cmd = { mason_bin .. "/pyright-langserver", "--stdio" } }
+			elseif executable_exists("pyright-langserver") then
+				servers.pyright = { cmd = { "pyright-langserver", "--stdio" } }
+			end
+
+			if executable_exists("rust-analyzer") then
+				servers.rust_analyzer = { cmd = { "rust-analyzer" } }
+			end
+
+			-- Check for Mason-installed or system docker-langserver
+			if vim.fn.filereadable(mason_bin .. "/docker-langserver") == 1 then
+				servers.dockerls = { cmd = { mason_bin .. "/docker-langserver", "--stdio" } }
+			elseif executable_exists("docker-langserver") then
+				servers.dockerls = { cmd = { "docker-langserver", "--stdio" } }
+			end
+
+			-- Check for Elixir LS
+			if vim.fn.filereadable(mason_ls) == 1 then
+				servers.elixirls = {
 					cmd = { mason_ls },
-					root_dir = util.root_pattern("mix.exs", ".git"),
+					root_markers = { "mix.exs", ".git" },
 					settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false } },
-				},
-				lua_ls = {
+				}
+			end
+
+			-- Check for Mason-installed or system lua-language-server
+			if vim.fn.filereadable(mason_bin .. "/lua-language-server") == 1 then
+				servers.lua_ls = {
+					cmd = { mason_bin .. "/lua-language-server" },
 					settings = { Lua = { completion = { callSnippet = "Replace" } } },
-				},
-			}
+				}
+			elseif executable_exists("lua-language-server") then
+				servers.lua_ls = {
+					cmd = { "lua-language-server" },
+					settings = { Lua = { completion = { callSnippet = "Replace" } } },
+				}
+			end
 
 			if vim.fn.findfile("Gemfile", ".;") ~= "" then
-				servers.ruby_lsp = { root_dir = util.root_pattern("Gemfile") }
+				servers.ruby_lsp = { root_markers = { "Gemfile" } }
 			end
 
-			-- actually set up servers
-			for name, cfg in pairs(servers) do
-				cfg.capabilities = caps
-				lspconfig[name].setup(cfg)
+			local is_new = vim.fn.has("nvim-0.11") == 1 and vim.lsp and vim.lsp.config and vim.lsp.enable
+
+			if is_new then
+				--  New API: register + enable, no lspconfig required
+				for name, cfg in pairs(servers) do
+					local cfg_with_caps = vim.tbl_deep_extend("force", { capabilities = caps }, cfg)
+					vim.lsp.config(name, cfg_with_caps)
+					vim.lsp.enable(name)
+				end
+			else
+				--  Legacy fallback for < 0.11
+				local util = require("lspconfig.util")
+				local lspconfig = require("lspconfig")
+
+				-- Map root_markers -> root_dir when needed
+				for name, cfg in pairs(servers) do
+					if cfg.root_markers and not cfg.root_dir then
+						cfg.root_dir = util.root_pattern(unpack(cfg.root_markers))
+					end
+					cfg.capabilities = caps
+					lspconfig[name].setup(cfg)
+				end
 			end
 
-			-- tools (formatters/linters) only; NOT servers
-			local tools = { "stylua", "prettier", "prettierd", "eslint_d" }
+			-- tools (formatters/linters/debuggers) only; NOT servers
+			local tools = { "stylua", "prettier", "prettierd", "eslint_d", "golangci-lint", "delve" }
 			local ok_mti, mti = pcall(require, "mason-tool-installer")
 			if ok_mti then
 				mti.setup({ ensure_installed = tools })
@@ -178,18 +212,32 @@ return {
 				vim.notify("Failed to load mason-tool-installer", vim.log.levels.ERROR)
 			end
 
-			-- nushell
-			lspconfig.nushell.setup({
+			-- Nushell example (same pattern as above)
+			local nushell_cfg = {
 				cmd = { "nu", "--lsp" },
 				filetypes = { "nu" },
-				root_dir = util.root_pattern(".git"),
+				root_markers = { ".git" },
 				capabilities = caps,
-			})
+			}
 
-			-- if you want mason-lspconfig to also auto-install servers, do it here:
+			if is_new then
+				vim.lsp.config("nushell", nushell_cfg)
+				vim.lsp.enable("nushell")
+			else
+				local util = require("lspconfig.util")
+				nushell_cfg.root_dir = util.root_pattern(".git")
+				require("lspconfig").nushell.setup(nushell_cfg)
+			end
+
+			-- mason-lspconfig (auto-install language servers)
 			require("mason-lspconfig").setup({
-				ensure_installed = {}, -- e.g. { "pyright", "rust_analyzer" }
-				automatic_installation = false, -- you’re setting cmd manually for Elixir
+				ensure_installed = {
+					"lua_ls",
+					"pyright", 
+					"dockerls",
+					"elixirls"
+				},
+				automatic_installation = true,
 			})
 		end,
 	},

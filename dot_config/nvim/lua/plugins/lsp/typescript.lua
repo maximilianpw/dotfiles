@@ -7,12 +7,12 @@ return {
 			local util = require("lspconfig.util")
 			-- Get capabilities for blink.cmp integration
 			local function get_capabilities()
-				local capabilities = vim.lsp.protocol.make_client_capabilities()
-				local ok, blink = pcall(require, "blink.cmp")
+				local c = vim.lsp.protocol.make_client_capabilities()
+				local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
 				if ok then
-					capabilities = vim.tbl_deep_extend("force", capabilities, blink.get_lsp_capabilities())
+					c = cmp_lsp.default_capabilities(c)
 				end
-				return capabilities
+				return c
 			end
 
 			require("typescript-tools").setup({
@@ -28,14 +28,14 @@ return {
 					-- Ensure proper TypeScript/JavaScript file handling
 					expose_as_code_action = "all",
 					tsserver_file_preferences = {
-						-- Improve IntelliSense
-						includeInlayParameterNameHints = "all",
+						-- Disable inlay hints to prevent errors
+						includeInlayParameterNameHints = "none",
 						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-						includeInlayFunctionParameterTypeHints = true,
+						includeInlayFunctionParameterTypeHints = false,
 						includeInlayVariableTypeHints = false,
-						includeInlayPropertyDeclarationTypeHints = true,
-						includeInlayFunctionLikeReturnTypeHints = true,
-						includeInlayEnumMemberValueHints = true,
+						includeInlayPropertyDeclarationTypeHints = false,
+						includeInlayFunctionLikeReturnTypeHints = false,
+						includeInlayEnumMemberValueHints = false,
 					},
 				},
 			})
