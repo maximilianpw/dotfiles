@@ -18,6 +18,7 @@ return {
 		-- Add your own debuggers here
 		"leoluz/nvim-dap-go",
 		"mfussenegger/nvim-dap-python",
+		"mxsdev/nvim-dap-vscode-js", 
 	},
 	keys = {
 		-- Debug keymaps using <leader>d prefix
@@ -296,6 +297,82 @@ return {
 		end
 		dap.listeners.before.event_exited["dapui_config"] = function()
 			dapui.close()
+		end
+
+		-- Configure TypeScript/JavaScript debugging
+		local ok_dap_vscode_js, dap_vscode_js = pcall(require, "dap-vscode-js")
+		if ok_dap_vscode_js then
+			-- Mason path for js-debug-adapter
+			local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
+			local js_debug_path = mason_path .. "packages/js-debug-adapter"
+			
+			dap_vscode_js.setup({
+				-- Path to vscode-js-debug installation.
+				debugger_path = js_debug_path,
+				-- Path to vscode-js-debug executable
+				debugger_cmd = { "js-debug-adapter" },
+				-- which adapters to register in nvim-dap
+				adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' },
+			})
+
+			-- TypeScript/JavaScript configurations
+			for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
+				dap.configurations[language] = {
+					{
+						type = "pwa-node",
+						request = "launch",
+						name = "Launch file",
+						program = "${file}",
+						cwd = "${workspaceFolder}",
+						sourceMaps = true,
+						skipFiles = { "<node_internals>/**" },
+					},
+					{
+						type = "pwa-node",
+						request = "attach",
+						name = "Attach",
+						processId = require('dap.utils').pick_process,
+						cwd = "${workspaceFolder}",
+						sourceMaps = true,
+						skipFiles = { "<node_internals>/**" },
+					},
+					{
+						type = "pwa-chrome",
+						request = "launch",
+						name = "Start Chrome with \"localhost\"",
+						url = "http://localhost:3000",
+						webRoot = "${workspaceFolder}",
+						skipFiles = { "<node_internals>/**/*.js" },
+					},
+					{
+						type = "pwa-node",
+						request = "launch",
+						name = "Launch TypeScript file",
+						program = "${file}",
+						cwd = "${workspaceFolder}",
+						runtimeExecutable = "npx",
+						runtimeArgs = { "tsx" },
+						sourceMaps = true,
+						skipFiles = { "<node_internals>/**" },
+					},
+					{
+						type = "pwa-node",
+						request = "launch",
+						name = "Launch Jest Tests",
+						-- trace = true, -- include debugger info
+						runtimeExecutable = "node",
+						runtimeArgs = {
+							"./node_modules/jest/bin/jest.js",
+							"--runInBand",
+						},
+						rootPath = "${workspaceFolder}",
+						cwd = "${workspaceFolder}",
+						console = "integratedTerminal",
+						internalConsoleOptions = "neverOpen",
+						skipFiles = { "<node_internals>/**", "node_modules/**" },
+					},
+				}
+			end
 		end
 	end,
 }

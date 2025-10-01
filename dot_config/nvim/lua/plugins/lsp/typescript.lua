@@ -39,16 +39,6 @@ return {
 					},
 				},
 			})
-
-			-- Add a helper command to restart the typescript-tools client cleanly
-			vim.api.nvim_create_user_command("TSToolsRestart", function()
-				for _, client in ipairs(vim.lsp.get_active_clients({ name = "typescript-tools" })) do
-					client.stop(true)
-				end
-				vim.defer_fn(function()
-					vim.cmd("edit")
-				end, 50)
-			end, { desc = "Restart typescript-tools LSP client" })
 		end,
 	},
 	{
@@ -61,4 +51,28 @@ return {
 		ft = { "typescript", "typescriptreact" },
 		opts = {},
 	},
+	{
+		-- Package.json management
+		"vuki656/package-info.nvim",
+		dependencies = "MunifTanjim/nui.nvim",
+		ft = "json",
+		config = function()
+			require("package-info").setup({
+				colors = {
+					up_to_date = "#3C4048",
+					outdated = "#fc514e",
+				},
+				icons = {
+					enable = true,
+					style = {
+						up_to_date = "|  ",
+						outdated = "|  ",
+					},
+				},
+				autostart = true,
+				hide_up_to_date = false,
+				hide_unstable_versions = false,
+			})
+		end,
+	}
 }
