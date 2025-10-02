@@ -26,6 +26,11 @@ return {
       end
 
       -- Diagnostics UI
+      local diag_signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+      for type, icon in pairs(diag_signs) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+      end
       vim.diagnostic.config({
         virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
         float = {
@@ -38,15 +43,7 @@ return {
             return string.format("%s [%s] %s", sev, d.source or "LSP", d.message)
           end,
         },
-        signs = {
-          severity = { min = vim.diagnostic.severity.HINT },
-          text = {
-            [vim.diagnostic.severity.ERROR] = " ",
-            [vim.diagnostic.severity.WARN]  = " ",
-            [vim.diagnostic.severity.INFO]  = " ",
-            [vim.diagnostic.severity.HINT]  = " ",
-          },
-        },
+        signs = { severity = { min = vim.diagnostic.severity.HINT } },
         underline = true,
         update_in_insert = false,
         severity_sort = true,
@@ -60,15 +57,45 @@ return {
             mode = mode or "n"
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
-          map("gd", function() require("snacks").picker.lsp_definitions() end,       "Goto Definition")
-          map("gr", function() require("snacks").picker.lsp_references() end,        "Goto References")
-          map("gI", function() require("snacks").picker.lsp_implementations() end,   "Goto Implementation")
+          local has_snacks, snacks = pcall(require, "snacks")
+          local function picker(name, fallback)
+            if has_snacks and snacks.picker and snacks.picker[name] then
+              return function() snacks.picker[name]() end
+            end
+            return fallback
+          end
+
+          map("gd", picker("lsp_definitions", vim.lsp.buf.definition),            "Goto Definition")
+          map("gr", picker("lsp_references", vim.lsp.buf.references),             "Goto References")
+          map("gI", picker("lsp_implementations", vim.lsp.buf.implementation),    "Goto Implementation")
           map("<leader>cr", vim.lsp.buf.rename,                                     "Rename")
           map("<leader>ca", vim.lsp.buf.code_action,                                "Code Action", { "n", "x" })
           map("gD", vim.lsp.buf.declaration,                                        "Goto Declaration")
           map("K",  function() vim.lsp.buf.hover() end,                             "Hover Documentation")
           map("<C-k>", vim.lsp.buf.signature_help,                                  "Signature Documentation")
           map("<leader>Q", vim.diagnostic.open_float,                               "Show line diagnostics")
+          map("<leader>cf", function() vim.lsp.buf.format({ async = true }) end,    "Format Document")
+
+          if vim.lsp.inlay_hint and (vim.lsp.inlay_hint.is_enabled or vim.fn.has("nvim-0.10") == 1) then
+            map("<leader>ci", function()
+              local ih = vim.lsp.inlay_hint
+              if type(ih) == "table" and ih.is_enabled and ih.enable then
+                local enabled = false
+                local ok, res = pcall(ih.is_enabled, ih, event.buf)
+                if not ok then
+                  ok, res = pcall(ih.is_enabled, ih, { bufnr = event.buf })
+                end
+                if ok then enabled = res end
+                local ok_enable = pcall(ih.enable, ih, event.buf, not enabled)
+                if not ok_enable then
+                  pcall(ih.enable, ih, { bufnr = event.buf, enabled = not enabled })
+                end
+              elseif type(ih) == "function" then
+                local enabled = ih.is_enabled and ih.is_enabled(event.buf)
+                ih(event.buf, not enabled)
+              end
+            end, "Toggle Inlay Hints")
+          end
 
           local function supports(client, method, bufnr)
             if vim.fn.has("nvim-0.11") == 1 then
@@ -99,12 +126,16 @@ return {
       })
 
       -- Capabilities (cmp integration if present)
-      local caps = (function()
-        local c = vim.lsp.protocol.make_client_capabilities()
+      local function get_capabilities()
+        local capabilities = vim.lsp.protocol.make_client_capabilities()
         local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-        if ok then c = cmp_lsp.default_capabilities(c) end
-        return c
-      end)()
+        if ok then
+          capabilities = cmp_lsp.default_capabilities(capabilities)
+        end
+        return capabilities
+      end
+
+      local caps = get_capabilities()
 
       -- Mason core
       local ok_mason, mason = pcall(require, "mason")
@@ -114,18 +145,38 @@ return {
       end
       mason.setup({})
 
+      local ensure_servers = {
+        "bashls",
+        "cssls",
+        "dockerls",
+        "elixirls",
+        "eslint",
+        "gopls",
+        "graphql",
+        "html",
+        "jsonls",
+        "lua_ls",
+        "prismals",
+        "pyright",
+        "rust_analyzer",
+        "tailwindcss",
+        "taplo",
+        "yamlls",
+      }
+
       -- Keep LSPs + tools installed/up to date
       local ok_mti, mti = pcall(require, "mason-tool-installer")
       if ok_mti then
         mti.setup({
-          ensure_installed = {
-            -- LSP servers (Mason package IDs or lspconfig names are accepted)
-            "lua_ls", "pyright", "rust_analyzer", "dockerls", "jsonls",
-            "yamlls", "html", "cssls", "bashls", "gopls", "taplo",
-            "elixirls", "graphql", "prismals", "eslint", "tailwindcss",
+          ensure_installed = vim.list_extend(vim.deepcopy(ensure_servers), {
             -- Formatters / linters / debuggers
-            "stylua", "prettier", "prettierd", "eslint_d", "golangci-lint", "delve",
-          },
+            "delve",
+            "eslint_d",
+            "golangci-lint",
+            "prettier",
+            "prettierd",
+            "stylua",
+          }),
           auto_update = false,
           run_on_start = true,
         })
@@ -139,24 +190,6 @@ return {
         vim.notify("mason-lspconfig not found", vim.log.levels.ERROR)
         return
       end
-
-      mlc.setup({
-        ensure_installed = {
-          "lua_ls",
-          "pyright",
-          "rust_analyzer",
-          "dockerls",
-          "jsonls",
-          "yamlls",
-          "html",
-          "cssls",
-          "bashls",
-          "gopls",
-          "taplo",
-          "elixirls",
-        },
-        automatic_installation = true,
-      })
 
       -- Per-server overrides (applied on top of defaults)
       local server_overrides = {
@@ -185,27 +218,35 @@ return {
         return
       end
 
+      local util = lspconfig.util or require("lspconfig.util")
+
+      local function default_handler(server_name)
+        if not lspconfig[server_name] then
+          vim.notify(string.format("lspconfig missing server %s", server_name), vim.log.levels.WARN)
+          return
+        end
+
+        local override = server_overrides[server_name]
+        if type(override) == "function" then
+          override = override()
+        end
+
+        local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
+        lspconfig[server_name].setup(opts)
+      end
+
       mlc.setup({
-        ensure_installed = {
-          "lua_ls","pyright","rust_analyzer","dockerls","jsonls",
-          "yamlls","html","cssls","bashls","gopls","taplo","elixirls",
-          -- keep tsserver out if you use pmizio/typescript-tools.nvim
-        },
+        ensure_installed = ensure_servers,
         automatic_installation = true,
-        handlers = {
-          -- default handler
-          function(server_name) default_handler(server_name) end,
-          -- per-server handler examples (override defaults if you want)
-          -- ["jsonls"] = function() ... end,
-        },
+        handlers = { default_handler },
       })
 
       -- Nushell LSP (not in mason-lspconfig by default)
       local nushell_cfg = {
         cmd = { "nu", "--lsp" },
         filetypes = { "nu" },
-        root_dir = require("lspconfig.util").root_pattern(".git"),
-        capabilities = caps,
+        root_dir = util.root_pattern(".git"),
+        capabilities = vim.deepcopy(caps),
       }
       if lspconfig.nushell then
         lspconfig.nushell.setup(nushell_cfg)
