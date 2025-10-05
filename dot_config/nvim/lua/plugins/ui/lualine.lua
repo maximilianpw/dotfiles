@@ -30,7 +30,7 @@ return {
         globalstatus = vim.o.laststatus == 3,
         component_separators = { left = '', right = '' },
         section_separators = { left = '', right = '' },
-        disabled_filetypes = { statusline = { 'dashboard', 'alpha', 'ministarter', 'neo-tree' } },
+        disabled_filetypes = { statusline = { 'dashboard', 'alpha', 'ministarter', 'snacks_dashboard' } },
       },
       sections = {
         lualine_a = { 'mode' },
@@ -150,7 +150,7 @@ return {
           },
         },
       } or {},
-      extensions = { 'neo-tree', 'lazy', 'fzf' },
+      extensions = { 'lazy' },
     }
 
     if package.loaded['trouble'] then

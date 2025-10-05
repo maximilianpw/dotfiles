@@ -11,14 +11,9 @@ return {
 		-- Virtual text support for variables
 		"theHamsta/nvim-dap-virtual-text",
 
-		-- Installs the debug adapters for you
-		"williamboman/mason.nvim",
-		"jay-babu/mason-nvim-dap.nvim",
-
 		-- Add your own debuggers here
 		"leoluz/nvim-dap-go",
-		"mfussenegger/nvim-dap-python",
-		"mxsdev/nvim-dap-vscode-js", 
+		"mxsdev/nvim-dap-vscode-js",
 	},
 	keys = {
 		-- Debug keymaps using <leader>d prefix
@@ -105,43 +100,6 @@ return {
 		local dap = require("dap")
 		local dapui = require("dapui")
 
-		require("mason-nvim-dap").setup({
-			-- Makes a best effort to setup the various debuggers with
-			-- reasonable debug configurations
-			automatic_installation = true,
-
-			-- You can provide additional configuration to the handlers,
-			-- see mason-nvim-dap README for more information
-			handlers = {},
-
-			-- Install debuggers for common languages
-			ensure_installed = {
-				"node2", -- Node.js
-				"chrome", -- Chrome/JS debugging
-			},
-		})
-
-		dap.adapters.chrome = {
-			type = "executable",
-			command = "node",
-			args = {
-				vim.fn.stdpath("data") .. "/mason/packages/chrome-debug-adapter/out/src/chromeDebug.js",
-			},
-		}
-
-		dap.configurations.javascript = {
-			{
-				type = "chrome",
-				request = "attach",
-				name = "Attach to Chrome",
-				program = "${file}",
-				cwd = vim.fn.getcwd(),
-				sourceMaps = true,
-				protocol = "inspector",
-				port = 9222, -- << your desired port here
-				webRoot = "${workspaceFolder}",
-			},
-		}
 
 		-- Dap UI setup
 		-- For more information, see |:help nvim-dap-ui|
@@ -300,16 +258,11 @@ return {
 		end
 
 		-- Configure TypeScript/JavaScript debugging
+		-- Note: On NixOS, install debuggers via system packages or nix-shell
 		local ok_dap_vscode_js, dap_vscode_js = pcall(require, "dap-vscode-js")
 		if ok_dap_vscode_js then
-			-- Mason path for js-debug-adapter
-			local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
-			local js_debug_path = mason_path .. "packages/js-debug-adapter"
-			
 			dap_vscode_js.setup({
-				-- Path to vscode-js-debug installation.
-				debugger_path = js_debug_path,
-				-- Path to vscode-js-debug executable
+				-- Use system-installed js-debug-adapter
 				debugger_cmd = { "js-debug-adapter" },
 				-- which adapters to register in nvim-dap
 				adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' },
@@ -340,7 +293,7 @@ return {
 						type = "pwa-chrome",
 						request = "launch",
 						name = "Start Chrome with \"localhost\"",
-						url = "http://localhost:3000",
+						url = "http://localhost:9229",
 						webRoot = "${workspaceFolder}",
 						skipFiles = { "<node_internals>/**/*.js" },
 					},

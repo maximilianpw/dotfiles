@@ -1,0 +1,89 @@
+# Quick Import Instructions for Home Manager
+
+## Option 1: Direct Import (Recommended)
+
+Add this to your home-manager configuration (home.nix or wherever you manage imports):
+
+```nix
+{ config, pkgs, ... }:
+
+{
+  imports = [
+    ./dot_config/nvim/neovim.nix
+    # ... your other imports
+  ];
+
+  # Rest of your config...
+}
+```
+
+## Option 2: From Home Manager Flake
+
+If using flakes, add to your flake.nix:
+
+```nix
+{
+  outputs = { self, nixpkgs, home-manager, ... }: {
+    homeConfigurations."yourusername" = home-manager.lib.homeManagerConfiguration {
+      modules = [
+        ./home.nix
+        ./dot_config/nvim/neovim.nix
+      ];
+    };
+  };
+}
+```
+
+## Option 3: Relative Path from Chezmoi
+
+If your home-manager config is elsewhere:
+
+```nix
+imports = [
+  "${config.home.homeDirectory}/.local/share/chezmoi/dot_config/nvim/neovim.nix"
+];
+```
+
+## After Import
+
+1. Test the configuration:
+   ```bash
+   home-manager switch --dry-run
+   ```
+
+2. Apply the configuration:
+   ```bash
+   home-manager switch
+   ```
+
+3. Verify Neovim:
+   ```bash
+   nvim --version
+   which nvim
+   ```
+
+4. Check installed LSPs:
+   ```bash
+   which lua-language-server
+   which gopls
+   which rust-analyzer
+   ```
+
+## Troubleshooting Import
+
+If you get import errors:
+
+1. Check the path is correct:
+   ```bash
+   ls -la ~/.local/share/chezmoi/dot_config/nvim/neovim.nix
+   ```
+
+2. Ensure chezmoi has applied the file:
+   ```bash
+   chezmoi apply
+   ```
+
+3. Use absolute path if relative doesn't work:
+   ```nix
+   imports = [ /home/yourusername/.local/share/chezmoi/dot_config/nvim/neovim.nix ];
+   ```

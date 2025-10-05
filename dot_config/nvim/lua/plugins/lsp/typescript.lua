@@ -10,8 +10,6 @@ return {
 				return
 			end
 
-			local util = require("lspconfig.util")
-
 			local function get_capabilities()
 				local capabilities = vim.lsp.protocol.make_client_capabilities()
 				local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
@@ -22,7 +20,9 @@ return {
 			end
 
 			typescript_tools.setup({
+				-- Use built-in root_dir pattern detection
 				root_dir = function(fname)
+					local util = require("lspconfig.util")
 					return util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git")(fname)
 				end,
 				single_file_support = false,

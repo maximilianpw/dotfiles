@@ -6,7 +6,7 @@ local function should_disable(lang, buf)
 		return true
 	end
 	-- 2) Skip files over 200 KB
-	local ok, stat = pcall(vim.loop.fs_stat, name)
+	local ok, stat = pcall((vim.uv or vim.loop).fs_stat, name)
 	if ok and stat and stat.size > 200 * 1024 then
 		return true
 	end
@@ -23,6 +23,9 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		main = "nvim-treesitter.configs",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter-textobjects",
+		},
 		opts = {
 			ensure_installed = {
 				"bash",
@@ -64,7 +67,6 @@ return {
 					},
 				},
 			},
-			playground = { enable = true },
 		},
 	},
 	-- Treesitter context companion plugin

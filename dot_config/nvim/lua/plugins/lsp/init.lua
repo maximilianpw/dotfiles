@@ -1,3 +1,25 @@
+--[[
+  LSP Configuration - Hybrid Setup (Mason on macOS, System LSPs on NixOS)
+
+  ADDING A NEW LANGUAGE:
+
+  1. NixOS Setup (required on NixOS):
+     - Add the LSP package to ~/nix-config/users/maxpw/neovim.nix
+     - Example: pkgs.nodePackages.typescript-language-server
+     - Run: sudo nixos-rebuild switch
+
+  2. Neovim Config (required on both platforms):
+     - Add the server name to the `ensure_servers` list below (around line 161)
+     - Example: "tsserver" for TypeScript
+     - Optional: Add server-specific settings to `server_overrides` (around line 181)
+
+  3. macOS Only:
+     - Mason will automatically install the LSP when you restart Neovim
+     - No additional steps needed
+
+  Server names reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+--]]
+
 return {
   -- Lua dev ergonomics (luv/vim types for better completion)
   {
@@ -10,16 +32,36 @@ return {
     },
   },
 
-  -- Core LSP stack (Mason-first)
+  -- Core LSP stack (Hybrid: Mason on macOS, system LSPs on NixOS)
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      { "williamboman/mason.nvim", opts = {} },
-      "williamboman/mason-lspconfig.nvim",
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
+      -- Conditionally load Mason only on non-NixOS systems
+      {
+        "williamboman/mason.nvim",
+        cond = function()
+          return vim.fn.filereadable("/etc/NIXOS") ~= 1
+        end,
+        opts = {}
+      },
+      {
+        "williamboman/mason-lspconfig.nvim",
+        cond = function()
+          return vim.fn.filereadable("/etc/NIXOS") ~= 1
+        end,
+      },
+      {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        cond = function()
+          return vim.fn.filereadable("/etc/NIXOS") ~= 1
+        end,
+      },
       { "j-hui/fidget.nvim", opts = {} },
     },
     config = function()
+      -- Platform detection
+      local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
+
       -- Optional: speed up Lua module loading
       if vim.fn.has("nvim-0.9") == 1 then
         vim.loader.enable()
@@ -137,14 +179,7 @@ return {
 
       local caps = get_capabilities()
 
-      -- Mason core
-      local ok_mason, mason = pcall(require, "mason")
-      if not ok_mason then
-        vim.notify("mason not found", vim.log.levels.ERROR)
-        return
-      end
-      mason.setup({})
-
+      -- LSP servers list (shared between Mason and NixOS)
       local ensure_servers = {
         "bashls",
         "cssls",
@@ -163,33 +198,6 @@ return {
         "taplo",
         "yamlls",
       }
-
-      -- Keep LSPs + tools installed/up to date
-      local ok_mti, mti = pcall(require, "mason-tool-installer")
-      if ok_mti then
-        mti.setup({
-          ensure_installed = vim.list_extend(vim.deepcopy(ensure_servers), {
-            -- Formatters / linters / debuggers
-            "delve",
-            "eslint_d",
-            "golangci-lint",
-            "prettier",
-            "prettierd",
-            "stylua",
-          }),
-          auto_update = false,
-          run_on_start = true,
-        })
-      else
-        vim.notify("mason-tool-installer not found", vim.log.levels.WARN)
-      end
-
-      -- mason-lspconfig: install + configure LSP servers
-      local ok_mlc, mlc = pcall(require, "mason-lspconfig")
-      if not ok_mlc then
-        vim.notify("mason-lspconfig not found", vim.log.levels.ERROR)
-        return
-      end
 
       -- Per-server overrides (applied on top of defaults)
       local server_overrides = {
@@ -211,7 +219,7 @@ return {
         -- yamlls = { settings = { yaml = { schemaStore = { enable = true } } } },
       }
 
-      -- Wire everything through lspconfig
+      -- Wire everything through lspconfig (nvim 0.11+ compatible)
       local ok_lspconfig, lspconfig = pcall(require, "lspconfig")
       if not ok_lspconfig then
         vim.notify("nvim-lspconfig not found", vim.log.levels.ERROR)
@@ -221,25 +229,81 @@ return {
       local util = lspconfig.util or require("lspconfig.util")
 
       local function default_handler(server_name)
-        if not lspconfig[server_name] then
-          vim.notify(string.format("lspconfig missing server %s", server_name), vim.log.levels.WARN)
+        -- Check if nvim 0.11+ to use vim.lsp.config API
+        if vim.fn.has("nvim-0.11") == 1 and vim.lsp.config and vim.lsp.config[server_name] then
+          local override = server_overrides[server_name]
+          if type(override) == "function" then
+            override = override()
+          end
+          local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
+          -- Use new API for nvim 0.11+
+          vim.lsp.enable(server_name, opts)
+        else
+          -- Fallback to lspconfig for nvim < 0.11
+          if not lspconfig[server_name] then
+            vim.notify(string.format("lspconfig missing server %s", server_name), vim.log.levels.WARN)
+            return
+          end
+
+          local override = server_overrides[server_name]
+          if type(override) == "function" then
+            override = override()
+          end
+
+          local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
+          lspconfig[server_name].setup(opts)
+        end
+      end
+
+      -- HYBRID SETUP: Mason on macOS, system LSPs on NixOS
+      if is_nixos then
+        -- On NixOS: use system-provided LSPs
+        vim.notify("NixOS detected: using system LSPs", vim.log.levels.INFO)
+        for _, server_name in ipairs(ensure_servers) do
+          default_handler(server_name)
+        end
+      else
+        -- On macOS/other: use Mason to manage LSPs
+        local ok_mason, mason = pcall(require, "mason")
+        if not ok_mason then
+          vim.notify("mason not found", vim.log.levels.ERROR)
+          return
+        end
+        mason.setup({})
+
+        -- Keep LSPs + tools installed/up to date
+        local ok_mti, mti = pcall(require, "mason-tool-installer")
+        if ok_mti then
+          mti.setup({
+            ensure_installed = vim.list_extend(vim.deepcopy(ensure_servers), {
+              -- Formatters / linters / debuggers
+              "delve",
+              "eslint_d",
+              "golangci-lint",
+              "prettier",
+              "prettierd",
+              "stylua",
+            }),
+            auto_update = false,
+            run_on_start = true,
+          })
+        else
+          vim.notify("mason-tool-installer not found", vim.log.levels.WARN)
+        end
+
+        -- mason-lspconfig: install + configure LSP servers
+        local ok_mlc, mlc = pcall(require, "mason-lspconfig")
+        if not ok_mlc then
+          vim.notify("mason-lspconfig not found", vim.log.levels.ERROR)
           return
         end
 
-        local override = server_overrides[server_name]
-        if type(override) == "function" then
-          override = override()
-        end
-
-        local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
-        lspconfig[server_name].setup(opts)
+        mlc.setup({
+          ensure_installed = ensure_servers,
+          automatic_installation = true,
+          handlers = { default_handler },
+        })
       end
-
-      mlc.setup({
-        ensure_installed = ensure_servers,
-        automatic_installation = true,
-        handlers = { default_handler },
-      })
 
       -- Nushell LSP (not in mason-lspconfig by default)
       local nushell_cfg = {
@@ -248,7 +312,9 @@ return {
         root_dir = util.root_pattern(".git"),
         capabilities = vim.deepcopy(caps),
       }
-      if lspconfig.nushell then
+      if vim.fn.has("nvim-0.11") == 1 and vim.lsp.config and vim.lsp.config.nushell then
+        vim.lsp.enable("nushell", nushell_cfg)
+      elseif lspconfig.nushell then
         lspconfig.nushell.setup(nushell_cfg)
       end
     end,
