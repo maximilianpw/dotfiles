@@ -84,8 +84,8 @@ return {
 		-- Word movement and selection enhancements with LSP references
 		words = { enabled = true },
 
-		-- File explorer integration
-		explorer = { enabled = true },
+		-- File explorer integration (disabled in favor of neo-tree)
+		explorer = { enabled = false },
 
 		-- ═══════════════════════════════════════════════════════════════
 		-- 🏠 DASHBOARD CONFIGURATION
@@ -395,21 +395,6 @@ return {
 				require("snacks").bufdelete()
 			end,
 			desc = "Delete Buffer (preserve layout)",
-		},
-		-- File explorer using Snacks explorer
-		{
-			"<leader>e",
-			function()
-				require("snacks").explorer()
-			end,
-			desc = "Toggle File Explorer",
-		},
-		{
-			"<leader>o",
-			function()
-				require("snacks").explorer({ toggle = false })
-			end,
-			desc = "Focus File Explorer",
 		},
 	},
 	init = function()
