@@ -49,7 +49,6 @@ return { -- Autoformat
 
 			-- Rust, Go, Terraform support
 			rust = { "rustfmt" },
-			go = { "gofmt" },
 			terraform = { "terraform_fmt" },
 		},
 	},
