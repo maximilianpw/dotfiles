@@ -11,6 +11,9 @@ return {
 		-- Virtual text support for variables
 		"theHamsta/nvim-dap-virtual-text",
 
+		-- Persistent breakpoints across sessions
+		"Weissle/persistent-breakpoints.nvim",
+
 		-- Add your own debuggers here
 		"leoluz/nvim-dap-go",
 		"mxsdev/nvim-dap-vscode-js",
@@ -95,6 +98,42 @@ return {
 			desc = "Debug: Evaluate Expression",
 			mode = { "n", "v" },
 		},
+		{
+			"<leader>dR",
+			function()
+				require("dap").restart()
+			end,
+			desc = "Debug: Restart",
+		},
+		{
+			"<leader>dC",
+			function()
+				require("dap").run_to_cursor()
+			end,
+			desc = "Debug: Run to Cursor",
+		},
+		{
+			"<leader>dh",
+			function()
+				require("dap.ui.widgets").hover()
+			end,
+			desc = "Debug: Hover Variables",
+			mode = { "n", "v" },
+		},
+		{
+			"<leader>dj",
+			function()
+				require("dap").down()
+			end,
+			desc = "Debug: Down Stack Frame",
+		},
+		{
+			"<leader>dk",
+			function()
+				require("dap").up()
+			end,
+			desc = "Debug: Up Stack Frame",
+		},
 	},
 	config = function()
 		local dap = require("dap")
@@ -174,45 +213,62 @@ return {
 			},
 		})
 
-		-- Change breakpoint icons and highlights
-		vim.api.nvim_set_hl(0, "DapBreak", { fg = "#e51400" })
-		vim.api.nvim_set_hl(0, "DapStop", { fg = "#ffcc00" })
+		-- VSCode-like breakpoint colors and highlights
+		vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "#e51400" })
+		vim.api.nvim_set_hl(0, "DapBreakpointCondition", { fg = "#f89c1c" })
+		vim.api.nvim_set_hl(0, "DapBreakpointRejected", { fg = "#848484" })
+		vim.api.nvim_set_hl(0, "DapLogPoint", { fg = "#61afef" })
+		vim.api.nvim_set_hl(0, "DapStopped", { fg = "#ffcc00" })
+		vim.api.nvim_set_hl(0, "DapStoppedLine", { bg = "#555530" })
 
-		-- Set DAP signs using the modern approach
+		-- VSCode-like breakpoint icons with circles
 		local breakpoint_icons = vim.g.have_nerd_font
 				and {
-					Breakpoint = "",
-					BreakpointCondition = "",
-					BreakpointRejected = "",
-					LogPoint = "",
-					Stopped = "",
+					Breakpoint = "󰝥",          -- Filled circle (red)
+					BreakpointCondition = "󰟃", -- Circle with dot (orange)
+					BreakpointRejected = "",  -- Hollow circle (gray)
+					LogPoint = "󰛿",           -- Diamond (blue)
+					Stopped = "",            -- Arrow (yellow)
 				}
 			or {
 				Breakpoint = "●",
-				BreakpointCondition = "⊜",
-				BreakpointRejected = "⊘",
+				BreakpointCondition = "◉",
+				BreakpointRejected = "○",
 				LogPoint = "◆",
-				Stopped = "⭔",
+				Stopped = "▶",
 			}
 
-		-- Configure DAP signs
-		dap.defaults.fallback.sign = {
-			DapBreakpoint = { text = breakpoint_icons.Breakpoint, texthl = "DapBreak", linehl = "", numhl = "DapBreak" },
-			DapBreakpointCondition = {
-				text = breakpoint_icons.BreakpointCondition,
-				texthl = "DapBreak",
-				linehl = "",
-				numhl = "DapBreak",
-			},
-			DapBreakpointRejected = {
-				text = breakpoint_icons.BreakpointRejected,
-				texthl = "DapBreak",
-				linehl = "",
-				numhl = "DapBreak",
-			},
-			DapLogPoint = { text = breakpoint_icons.LogPoint, texthl = "DapBreak", linehl = "", numhl = "DapBreak" },
-			DapStopped = { text = breakpoint_icons.Stopped, texthl = "DapStop", linehl = "", numhl = "DapStop" },
-		}
+		-- Configure DAP signs with VSCode-like styling
+		vim.fn.sign_define("DapBreakpoint", {
+			text = breakpoint_icons.Breakpoint,
+			texthl = "DapBreakpoint",
+			linehl = "",
+			numhl = "DapBreakpoint",
+		})
+		vim.fn.sign_define("DapBreakpointCondition", {
+			text = breakpoint_icons.BreakpointCondition,
+			texthl = "DapBreakpointCondition",
+			linehl = "",
+			numhl = "DapBreakpointCondition",
+		})
+		vim.fn.sign_define("DapBreakpointRejected", {
+			text = breakpoint_icons.BreakpointRejected,
+			texthl = "DapBreakpointRejected",
+			linehl = "",
+			numhl = "DapBreakpointRejected",
+		})
+		vim.fn.sign_define("DapLogPoint", {
+			text = breakpoint_icons.LogPoint,
+			texthl = "DapLogPoint",
+			linehl = "",
+			numhl = "DapLogPoint",
+		})
+		vim.fn.sign_define("DapStopped", {
+			text = breakpoint_icons.Stopped,
+			texthl = "DapStopped",
+			linehl = "DapStoppedLine",
+			numhl = "DapStopped",
+		})
 
 		-- Configure DAP virtual text
 		local ok_virtual_text, nvim_dap_virtual_text = pcall(require, "nvim-dap-virtual-text")
@@ -256,6 +312,51 @@ return {
 		dap.listeners.before.event_exited["dapui_config"] = function()
 			dapui.close()
 		end
+
+		-- Configure C# debugging using netcoredbg
+		-- Note: On NixOS, install netcoredbg via system packages or nix-shell
+		dap.adapters.coreclr = {
+			type = "executable",
+			command = "netcoredbg",
+			args = { "--interpreter=vscode" },
+		}
+
+		dap.configurations.cs = {
+			{
+				type = "coreclr",
+				name = "launch - netcoredbg",
+				request = "launch",
+				program = function()
+					-- Try to find the most recent DLL in bin/Debug or bin/Release
+					local cwd = vim.fn.getcwd()
+					local dll_patterns = {
+						cwd .. "/bin/Debug/**/*.dll",
+						cwd .. "/bin/Release/**/*.dll",
+						cwd .. "/**/bin/Debug/**/*.dll",
+					}
+
+					for _, pattern in ipairs(dll_patterns) do
+						local dlls = vim.fn.glob(pattern, false, true)
+						if #dlls > 0 then
+							-- Return the most recently modified DLL
+							table.sort(dlls, function(a, b)
+								return vim.fn.getftime(a) > vim.fn.getftime(b)
+							end)
+							return vim.fn.input("Path to dll: ", dlls[1], "file")
+						end
+					end
+
+					-- Fallback to manual input if no DLL found
+					return vim.fn.input("Path to dll: ", cwd .. "/bin/Debug/", "file")
+				end,
+			},
+			{
+				type = "coreclr",
+				name = "attach - netcoredbg",
+				request = "attach",
+				processId = require("dap.utils").pick_process,
+			},
+		}
 
 		-- Configure TypeScript/JavaScript debugging
 		-- Note: On NixOS, install debuggers via system packages or nix-shell
@@ -326,6 +427,46 @@ return {
 					},
 				}
 			end
+		end
+
+		-- Configure Go debugging
+		-- Note: On NixOS, install delve via system packages or nix-shell
+		local ok_dap_go, dap_go = pcall(require, "dap-go")
+		if ok_dap_go then
+			dap_go.setup({
+				-- Additional dap configurations can be added here
+				dap_configurations = {
+					{
+						type = "go",
+						name = "Attach remote",
+						mode = "remote",
+						request = "attach",
+					},
+				},
+				-- delve configurations
+				delve = {
+					-- Path to delve (use system-installed)
+					path = "dlv",
+					-- Default port for delve
+					initialize_timeout_sec = 20,
+					port = "${port}",
+					args = {},
+					build_flags = "",
+				},
+			})
+		end
+
+		-- Setup persistent breakpoints
+		local ok_persistent_breakpoints, persistent_breakpoints = pcall(require, "persistent-breakpoints")
+		if ok_persistent_breakpoints then
+			persistent_breakpoints.setup({
+				-- Save breakpoints to project directory
+				save_dir = vim.fn.stdpath("data") .. "/breakpoints",
+				-- Load breakpoints when opening buffer
+				load_breakpoints_event = { "BufReadPost" },
+				-- Automatically save breakpoints
+				perf_record = false,
+			})
 		end
 	end,
 }

@@ -64,7 +64,7 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
 
 ## Included Packages
 
-### LSP Servers (18 languages)
+### LSP Servers (19 languages)
 - `bash-language-server` - Bash/Shell
 - `vscode-langservers-extracted` - CSS, HTML, JSON, ESLint
 - `dockerfile-language-server-nodejs` - Docker
@@ -73,6 +73,7 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
 - `graphql-language-service-cli` - GraphQL
 - `lua-language-server` - Lua
 - `nil` / `nixd` - Nix (choose one)
+- `omnisharp` - C#
 - `prisma` - Prisma ORM
 - `pyright` - Python
 - `rust-analyzer` - Rust
@@ -80,13 +81,14 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
 - `taplo` - TOML
 - `yaml-language-server` - YAML
 
-### Formatters (9 tools)
+### Formatters (10 tools)
 - `prettier` / `prettierd` - JS/TS/CSS/HTML/JSON/YAML/Markdown
 - `stylua` - Lua
 - `black` + `isort` - Python
 - `rustfmt` - Rust
 - `nixpkgs-fmt` / `alejandra` - Nix
 - `gofmt` (via go.nvim) - Go
+- `csharpier` - C#
 
 ### Linters (6 tools)
 - `eslint_d` - JavaScript/TypeScript
@@ -117,6 +119,8 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
    extraPackages = with pkgs; [
      # ... existing packages
      my-new-lsp-server
+     # Example for C#:
+     # omnisharp-roslyn
    ];
    ```
 
@@ -125,10 +129,16 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
    local ensure_servers = {
      -- ... existing servers
      "my_new_server",
+     -- Example: "omnisharp" for C#
    }
    ```
 
-3. Rebuild: `home-manager switch`
+3. **Optional**: For complex server setup, create a dedicated plugin file:
+   - See `lua/plugins/lsp/csharp.lua` for C# example
+   - See `lua/plugins/lsp/go.lua` for Go example
+   - See `lua/plugins/lsp/typescript.lua` for TypeScript example
+
+4. Rebuild: `home-manager switch`
 
 ### Choosing Nix Formatters
 

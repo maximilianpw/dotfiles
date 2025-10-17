@@ -47,6 +47,10 @@ return { -- Autoformat
 			c = { "clang_format" },
 			cpp = { "clang_format" },
 
+			-- C# formatting via LSP (omnisharp)
+			cs = { "lsp" },
+			csharp = { "lsp" },
+
 			-- Rust, Go, Terraform support
 			rust = { "rustfmt" },
 			terraform = { "terraform_fmt" },

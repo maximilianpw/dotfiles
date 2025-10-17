@@ -100,6 +100,10 @@ require("lazy").setup({
 		opts = { signs = false },
 	},
 	{
+		"b0o/schemastore.nvim",
+		lazy = true,
+	},
+	{
 		"echasnovski/mini.nvim",
 		version = false,
 		config = function()

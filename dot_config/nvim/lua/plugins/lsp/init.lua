@@ -5,13 +5,14 @@
 
   1. NixOS Setup (required on NixOS):
      - Add the LSP package to ~/nix-config/users/maxpw/neovim.nix
-     - Example: pkgs.nodePackages.typescript-language-server
+     - Example: pkgs.nodePackages.typescript-language-server or pkgs.omnisharp-roslyn
      - Run: sudo nixos-rebuild switch
 
   2. Neovim Config (required on both platforms):
-     - Add the server name to the `ensure_servers` list below (around line 161)
-     - Example: "tsserver" for TypeScript
-     - Optional: Add server-specific settings to `server_overrides` (around line 181)
+     - Add the server name to the `ensure_servers` list below (around line 183)
+     - Example: "tsserver" for TypeScript, "omnisharp" for C#
+     - Optional: Add server-specific settings to `server_overrides` (around line 203)
+     - Optional: Create a dedicated plugin file in lua/plugins/lsp/ for complex setups
 
   3. macOS Only:
      - Mason will automatically install the LSP when you restart Neovim
@@ -191,6 +192,7 @@ return {
         "html",
         "jsonls",
         "lua_ls",
+        "omnisharp",
         "prismals",
         "pyright",
         "rust_analyzer",
@@ -214,9 +216,40 @@ return {
             },
           },
         },
-        -- Example: add schema support later if you include schemastore.nvim
-        -- jsonls = { settings = { json = { schemas = require("schemastore").json.schemas(), validate = { enable = true } } } },
-        -- yamlls = { settings = { yaml = { schemaStore = { enable = true } } } },
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = {
+                enable = false, -- Disable built-in, use schemastore.nvim
+                url = "",
+              },
+              schemas = require("schemastore").yaml.schemas(),
+            },
+          },
+        },
+        omnisharp = {
+          handlers = {
+            ["textDocument/definition"] = function(...)
+              local ok, omnisharp_extended = pcall(require, "omnisharp_extended")
+              if ok then
+                return omnisharp_extended.handler(...)
+              end
+              return vim.lsp.handlers["textDocument/definition"](...)
+            end,
+          },
+          cmd = { "omnisharp" },
+          enable_roslyn_analyzers = true,
+          organize_imports_on_format = true,
+          enable_import_completion = true,
+        },
       }
 
       -- Wire everything through lspconfig (nvim 0.11+ compatible)
@@ -277,6 +310,7 @@ return {
           mti.setup({
             ensure_installed = vim.list_extend(vim.deepcopy(ensure_servers), {
               -- Formatters / linters / debuggers
+              "csharpier",
               "delve",
               "eslint_d",
               "golangci-lint",
