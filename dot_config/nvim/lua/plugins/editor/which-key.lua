@@ -54,6 +54,7 @@ return {
 			{ "<leader>gf", desc = "Git File History" },
 			{ "<leader>gl", desc = "Git Log" },
 			{ "<leader>gg", desc = "Lazygit" },
+			{ "<leader>D", desc = "Lazydocker" },
 			{ "<leader>gh", group = "Git Hunk" },
 			{ "<leader>e", group = "Explorer" },
 			{ "<leader>s", group = "Search/Format" },

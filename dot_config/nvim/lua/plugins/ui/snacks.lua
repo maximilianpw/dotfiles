@@ -319,6 +319,13 @@ return {
 			desc = "Lazygit",
 		},
 		{
+			"<leader>D",
+			function()
+				require("snacks").terminal("lazydocker")
+			end,
+			desc = "Lazydocker",
+		},
+		{
 			"<leader>gf",
 			function()
 				require("snacks").lazygit.log_file()
