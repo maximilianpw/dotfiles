@@ -30,7 +30,6 @@ return {
 		enable_git_status = true,
 		enable_diagnostics = true,
 		open_files_do_not_replace_types = { "terminal", "trouble", "qf" },
-		sort_case_insensitive = false,
 
 		default_component_configs = {
 			container = {
@@ -126,7 +125,7 @@ return {
 				["x"] = "cut_to_clipboard",
 				["p"] = "paste_from_clipboard",
 				["c"] = "copy",
-				["m"] = "move",
+				["m"] = { "move", config = { show_path = "relative" } },
 				["q"] = "close_window",
 				["R"] = "refresh",
 				["?"] = "show_help",
@@ -135,19 +134,11 @@ return {
 				["i"] = "show_file_details",
 			},
 		},
-
-		nesting_rules = {},
-
 		filesystem = {
 			filtered_items = {
 				visible = false,
 				hide_dotfiles = false,
-				hide_gitignored = false,
 				hide_hidden = true,
-				hide_by_pattern = {},
-				always_show = {},
-				never_show = {},
-				never_show_by_pattern = {},
 			},
 			follow_current_file = {
 				enabled = true,
@@ -199,28 +190,6 @@ return {
 					["bd"] = "buffer_delete",
 					["<bs>"] = "navigate_up",
 					["."] = "set_root",
-					["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
-					["oc"] = { "order_by_created", nowait = false },
-					["od"] = { "order_by_diagnostics", nowait = false },
-					["om"] = { "order_by_modified", nowait = false },
-					["on"] = { "order_by_name", nowait = false },
-					["os"] = { "order_by_size", nowait = false },
-					["ot"] = { "order_by_type", nowait = false },
-				},
-			},
-		},
-
-		git_status = {
-			window = {
-				position = "float",
-				mappings = {
-					["A"] = "git_add_all",
-					["gu"] = "git_unstage_file",
-					["ga"] = "git_add_file",
-					["gr"] = "git_revert_file",
-					["gc"] = "git_commit",
-					["gp"] = "git_push",
-					["gg"] = "git_commit_and_push",
 					["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
 					["oc"] = { "order_by_created", nowait = false },
 					["od"] = { "order_by_diagnostics", nowait = false },
