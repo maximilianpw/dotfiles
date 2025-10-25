@@ -67,6 +67,25 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
+-- Performance: Large file optimizations
+vim.api.nvim_create_autocmd("BufReadPost", {
+	desc = "Disable expensive features for large files",
+	group = vim.api.nvim_create_augroup("large-file-optimizations", { clear = true }),
+	callback = function()
+		local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(0))
+		if ok and stat and stat.size > 100 * 1024 then -- 100KB+
+			-- Reduce UI update frequency
+			vim.opt_local.updatetime = 1000
+			-- Disable expensive visual features
+			vim.opt_local.cursorline = false
+			vim.opt_local.relativenumber = false
+			vim.opt_local.scrolloff = 3
+			-- Mark buffer as large file for other plugins to check
+			vim.b.large_file = true
+		end
+	end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -107,11 +126,11 @@ require("lazy").setup({
 		"echasnovski/mini.nvim",
 		version = false,
 		config = function()
-			require("mini.ai").setup({ n_lines = 500 })
+			require("mini.ai").setup({ n_lines = 250 }) -- Reduced from 500 for performance
 			require("mini.move").setup()
 			require("mini.surround").setup()
 			require("mini.pairs").setup()
-			require("mini.snippets").setup()
+			-- mini.snippets removed (using LuaSnip for better cmp integration)
 		end,
 	},
 	{ import = "plugins.editor" },

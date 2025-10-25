@@ -6,6 +6,14 @@ return {
     cond = function()
       return is_modern
     end,
+    enabled = function()
+      -- Disable completion for large files (performance optimization)
+      local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(0))
+      if ok and stat and stat.size > 150 * 1024 then
+        return false
+      end
+      return true
+    end,
     event = "InsertEnter",
     dependencies = {
       { "L3MON4D3/LuaSnip", lazy = true },

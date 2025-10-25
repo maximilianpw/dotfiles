@@ -8,6 +8,12 @@ return { -- Autoformat
 
 		-- format on save, with per-filetype lsp fallback control
 		format_on_save = function(bufnr)
+			-- Skip formatting for large files (performance optimization)
+			local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(bufnr))
+			if ok and stat and stat.size > 200 * 1024 then
+				return nil -- Skip formatting for files >200KB
+			end
+
 			local ft = vim.bo[bufnr].filetype
 
 			-- disable LSP formatting for C/C++

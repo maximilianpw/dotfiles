@@ -6,7 +6,7 @@ return {
 		"nvim-tree/nvim-web-devicons",
 		"MunifTanjim/nui.nvim",
 	},
-	lazy = false,
+	lazy = true, -- Changed from false for performance (lazy loaded via cmd and keys)
 	cmd = "Neotree",
 	keys = {
 		{

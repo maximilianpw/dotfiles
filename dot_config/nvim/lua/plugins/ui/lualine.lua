@@ -15,13 +15,49 @@ return {
       diagnostics = { Error = '󰅚 ', Warn = '󰀪 ', Info = '󰋽 ', Hint = '󰌶 ' },
       git = { added = '+', modified = '~', removed = '-' },
     }
+
+    -- Cache git root for performance (avoid repeated git calls)
+    local cached_root = nil
+    local cached_cwd = nil
+
     local function get_root()
+      local cwd = vim.fn.getcwd()
+      if cached_cwd == cwd and cached_root then
+        return cached_root
+      end
+
       local git_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
       if git_root and #git_root > 0 then
-        return vim.fn.fnamemodify(git_root, ':~')
+        cached_root = vim.fn.fnamemodify(git_root, ':~')
+      else
+        cached_root = vim.fn.fnamemodify(cwd, ':~')
       end
-      return vim.fn.fnamemodify(vim.fn.getcwd(), ':~')
+      cached_cwd = cwd
+      return cached_root
     end
+
+    -- Clear cache on directory change
+    vim.api.nvim_create_autocmd("DirChanged", {
+      callback = function()
+        cached_root = nil
+        cached_cwd = nil
+      end,
+    })
+
+    -- Cache plugin states for performance (check every 1 second instead of every render)
+    local check_plugins_interval = 1000
+    local last_check = 0
+    local plugin_states = {}
+
+    local function should_check_plugins()
+      local now = (vim.uv or vim.loop).now()
+      if now - last_check > check_plugins_interval then
+        last_check = now
+        return true
+      end
+      return false
+    end
+
     vim.o.laststatus = vim.g.lualine_laststatus
 
     local opts = {
@@ -88,11 +124,14 @@ return {
           },
           {
             function()
-              local ls = require 'lazy.status'
-              return ls.has_updates() and ls.updates() or ''
+              if should_check_plugins() and package.loaded['lazy'] then
+                local ls = require('lazy.status')
+                plugin_states.lazy_updates = ls.has_updates() and ls.updates() or ''
+              end
+              return plugin_states.lazy_updates or ''
             end,
             cond = function()
-              return package.loaded['lazy'] and require('lazy.status').has_updates()
+              return package.loaded['lazy']
             end,
             color = function()
               return { fg = package.loaded['snacks'] and require('snacks').util.color 'Special' or '#ff9e64' }

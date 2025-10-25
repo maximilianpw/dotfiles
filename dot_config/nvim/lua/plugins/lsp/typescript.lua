@@ -27,10 +27,20 @@ return {
 				end,
 				single_file_support = false,
 				capabilities = get_capabilities(),
+				handlers = {
+					["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
+						-- Skip semantic tokens for large files (performance optimization)
+						if vim.b.large_file then
+							return nil
+						end
+						return vim.lsp.handlers["textDocument/semanticTokens/full"](err, result, ctx, config)
+					end,
+				},
 				settings = {
 					separate_diagnostic_server = true,
 					publish_diagnostic_on = "insert_leave",
 					expose_as_code_action = "all",
+					debounce_text_changes = 300, -- Debounce to reduce server load
 					tsserver_file_preferences = {
 						includeInlayParameterNameHints = "none",
 						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
@@ -41,6 +51,20 @@ return {
 						includeInlayEnumMemberValueHints = false,
 					},
 				},
+			})
+
+			-- TypeScript-specific large file handling
+			vim.api.nvim_create_autocmd("BufReadPost", {
+				pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+				callback = function(args)
+					local ok, stat = pcall((vim.uv or vim.loop).fs_stat, args.file)
+					if ok and stat and stat.size > 150 * 1024 then -- 150KB+
+						vim.notify("Large TS file: some LSP features disabled", vim.log.levels.WARN)
+						vim.b.large_file = true
+						vim.opt_local.syntax = "off"
+						vim.diagnostic.enable(false, { bufnr = args.buf })
+					end
+				end,
 			})
 		end,
 	},

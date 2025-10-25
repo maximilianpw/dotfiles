@@ -149,6 +149,12 @@ return {
           end
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+          -- Skip document highlighting for large files (performance optimization)
+          if vim.b.large_file then
+            return
+          end
+
           if client and supports(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local grp = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {

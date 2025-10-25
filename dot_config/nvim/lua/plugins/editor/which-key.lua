@@ -3,7 +3,7 @@ return {
 	"folke/which-key.nvim",
 	event = "VimEnter", -- Sets the loading event to 'VimEnter'
 	opts = {
-		delay = 0,
+		delay = 200, -- Changed from 0 for better performance (shows after 200ms)
 		icons = {
 			mappings = vim.g.have_nerd_font,
 			keys = vim.g.have_nerd_font and {} or {
