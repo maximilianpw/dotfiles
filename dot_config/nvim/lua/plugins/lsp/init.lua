@@ -156,31 +156,37 @@ return {
 						end
 					end
 
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
+					local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-          -- Skip document highlighting for large files (performance optimization)
-          if vim.b.large_file then
-            return
-          end
+					-- Skip document highlighting for large files (performance optimization)
+					if vim.b.large_file then
+						return
+					end
 
-          if client and supports(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local grp = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-              buffer = event.buf, group = grp, callback = vim.lsp.buf.document_highlight,
-            })
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-              buffer = event.buf, group = grp, callback = vim.lsp.buf.clear_references,
-            })
-            vim.api.nvim_create_autocmd("LspDetach", {
-              group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
-              callback = function(ev)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = ev.buf })
-              end,
-            })
-          end
-        end,
-      })
+					if
+						client and supports(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf)
+					then
+						local grp = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+							buffer = event.buf,
+							group = grp,
+							callback = vim.lsp.buf.document_highlight,
+						})
+						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+							buffer = event.buf,
+							group = grp,
+							callback = vim.lsp.buf.clear_references,
+						})
+						vim.api.nvim_create_autocmd("LspDetach", {
+							group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+							callback = function(ev)
+								vim.lsp.buf.clear_references()
+								vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = ev.buf })
+							end,
+						})
+					end
+				end,
+			})
 
 			-- Capabilities (cmp integration if present)
 			local function get_capabilities()
@@ -199,15 +205,12 @@ return {
 				"bashls",
 				"cssls",
 				"dockerls",
-				"elixirls",
 				"eslint",
 				"gopls",
-				"graphql",
 				"html",
 				"jsonls",
 				"lua_ls",
 				"omnisharp",
-				"prismals",
 				"pyright",
 				"rust_analyzer",
 				"tailwindcss",
@@ -263,6 +266,19 @@ return {
 					enable_roslyn_analyzers = true,
 					organize_imports_on_format = true,
 					enable_import_completion = true,
+				},
+
+				eslint = {
+					settings = {
+						workingDirectories = { mode = "auto" },
+					},
+					on_attach = function(client, bufnr)
+						-- Auto-fix on save
+						vim.api.nvim_create_autocmd("BufWritePre", {
+							buffer = bufnr,
+							command = "EslintFixAll",
+						})
+					end,
 				},
 			}
 
