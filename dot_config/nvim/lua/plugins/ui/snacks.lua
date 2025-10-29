@@ -41,12 +41,6 @@ return {
 		-- 💻 TERMINAL & DEVELOPMENT TOOLS
 		-- ═══════════════════════════════════════════════════════════════
 
-		-- Integrated terminal with session management
-		terminal = { enabled = true },
-
-		-- Lazygit integration for Git workflow
-		lazygit = { enabled = true },
-
 		-- Repository browsing and remote Git operations
 		gitbrowse = { enabled = true },
 
@@ -314,28 +308,29 @@ return {
 		{
 			"<leader>gg",
 			function()
-				require("snacks").lazygit()
+				vim.cmd("terminal lazygit")
 			end,
 			desc = "Lazygit",
 		},
 		{
 			"<leader>D",
 			function()
-				require("snacks").terminal("lazydocker")
+				vim.cmd("terminal lazydocker")
 			end,
 			desc = "Lazydocker",
 		},
 		{
 			"<leader>gf",
 			function()
-				require("snacks").lazygit.log_file()
+				local file = vim.fn.expand("%:p")
+				vim.cmd("terminal lazygit log " .. vim.fn.shellescape(file))
 			end,
 			desc = "Lazygit Current File History",
 		},
 		{
 			"<leader>gl",
 			function()
-				require("snacks").lazygit.log()
+				vim.cmd("terminal lazygit log")
 			end,
 			desc = "Lazygit Log (cwd)",
 		},
@@ -355,24 +350,6 @@ return {
 		},
 
 		-- ────────────────────────────────────────────────────────────
-		-- 💻 TERMINAL & DEVELOPMENT
-		-- ────────────────────────────────────────────────────────────
-		{
-			"<leader>T",
-			function()
-				require("snacks").terminal()
-			end,
-			desc = "Terminal",
-		},
-		{
-			"<c-/>",
-			function()
-				require("snacks").terminal()
-			end,
-			desc = "Toggle Terminal",
-		},
-
-		-- ────────────────────────────────────────────────────────────
 		-- ⚡ PRODUCTIVITY & WORKFLOW
 		-- ────────────────────────────────────────────────────────────
 		{
@@ -381,20 +358,6 @@ return {
 				require("snacks").zen()
 			end,
 			desc = "Zen Mode (Distraction-free)",
-		},
-		{
-			"<leader>S.",
-			function()
-				require("snacks").scratch()
-			end,
-			desc = "Scratch Buffer",
-		},
-		{
-			"<leader>SS",
-			function()
-				require("snacks").scratch.select()
-			end,
-			desc = "Select Scratch Buffer",
 		},
 		{
 			"<leader>bd",

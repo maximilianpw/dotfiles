@@ -74,8 +74,6 @@ return {
 			{ "]b", desc = "Next Buffer" },
 			{ "[B", desc = "Move Buffer Left" },
 			{ "]B", desc = "Move Buffer Right" },
-			-- Terminal
-			{ "<c-/>", desc = "Toggle Terminal" },
 			-- Noice scrolling
 			{ "<c-f>", desc = "Scroll Forward (LSP)", mode = { "i", "n", "s" } },
 			{ "<c-b>", desc = "Scroll Backward (LSP)", mode = { "i", "n", "s" } },
