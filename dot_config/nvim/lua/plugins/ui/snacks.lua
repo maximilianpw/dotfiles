@@ -47,15 +47,12 @@ return {
 		-- Git blame and history integration
 		git = { enabled = true },
 
+		-- lazygit
+		lazygit = { enabled = true },
+
 		-- ═══════════════════════════════════════════════════════════════
 		-- ⚡ PRODUCTIVITY & WORKFLOW
 		-- ═══════════════════════════════════════════════════════════════
-
-		-- Distraction-free writing mode
-		zen = { enabled = true },
-
-		-- Quick scratch buffers for notes and experiments
-		scratch = { enabled = true },
 
 		-- Feature toggles and quick settings
 		toggle = { enabled = true },
@@ -308,7 +305,7 @@ return {
 		{
 			"<leader>gg",
 			function()
-				vim.cmd("terminal lazygit")
+				require("snacks").lazygit.open()
 			end,
 			desc = "Lazygit",
 		},
@@ -322,15 +319,14 @@ return {
 		{
 			"<leader>gf",
 			function()
-				local file = vim.fn.expand("%:p")
-				vim.cmd("terminal lazygit log " .. vim.fn.shellescape(file))
+				require("snacks").lazygit.log_file()
 			end,
 			desc = "Lazygit Current File History",
 		},
 		{
 			"<leader>gl",
 			function()
-				vim.cmd("terminal lazygit log")
+				require("snacks").lazygit.log()
 			end,
 			desc = "Lazygit Log (cwd)",
 		},
@@ -352,13 +348,6 @@ return {
 		-- ────────────────────────────────────────────────────────────
 		-- ⚡ PRODUCTIVITY & WORKFLOW
 		-- ────────────────────────────────────────────────────────────
-		{
-			"<leader>z",
-			function()
-				require("snacks").zen()
-			end,
-			desc = "Zen Mode (Distraction-free)",
-		},
 		{
 			"<leader>bd",
 			function()
