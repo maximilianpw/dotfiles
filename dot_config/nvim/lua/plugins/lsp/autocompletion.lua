@@ -55,6 +55,17 @@ return {
         return current:sub(col, col):match("%s") == nil
       end
 
+      -- Disable buffer source for large files (performance optimization)
+      local function get_bufnrs()
+        local max_buffer_size = 1024 * 1024 -- 1 Megabyte max
+        local buf = vim.api.nvim_get_current_buf()
+        local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+        if byte_size > max_buffer_size then
+          return {}
+        end
+        return { buf }
+      end
+
       return {
         completion = {
           completeopt = "menu,menuone,noinsert",
@@ -135,7 +146,13 @@ return {
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
           { name = "luasnip" },
-          { name = "buffer" },
+          {
+            name = "buffer",
+            option = {
+              get_bufnrs = get_bufnrs,
+              indexing_interval = 1000,
+            },
+          },
           { name = "calc" },
         }, {
           { name = "path" },

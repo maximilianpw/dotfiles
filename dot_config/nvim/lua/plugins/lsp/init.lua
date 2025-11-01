@@ -167,10 +167,24 @@ return {
 						client and supports(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf)
 					then
 						local grp = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+
+						-- Debounce timer for document highlight (performance optimization)
+						local highlight_timer = nil
+
 						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 							buffer = event.buf,
 							group = grp,
-							callback = vim.lsp.buf.document_highlight,
+							callback = function()
+								if highlight_timer then
+									highlight_timer:stop()
+								end
+								highlight_timer = (vim.uv or vim.loop).new_timer()
+								highlight_timer:start(100, 0, function()
+									vim.schedule(function()
+										vim.lsp.buf.document_highlight()
+									end)
+								end)
+							end,
 						})
 						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
 							buffer = event.buf,
@@ -180,6 +194,9 @@ return {
 						vim.api.nvim_create_autocmd("LspDetach", {
 							group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
 							callback = function(ev)
+								if highlight_timer then
+									highlight_timer:stop()
+								end
 								vim.lsp.buf.clear_references()
 								vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = ev.buf })
 							end,

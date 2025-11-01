@@ -73,12 +73,11 @@ return {
 
       local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 
-      -- Light, responsive lint on leaving insert mode & text changes (debounced)
-      local debounced_light = debounce(250, run_light_linters)
-      vim.api.nvim_create_autocmd({ 'InsertLeave', 'TextChanged', 'TextChangedI' }, {
+      -- Light, responsive lint on leaving insert mode (removed TextChanged for performance)
+      vim.api.nvim_create_autocmd('InsertLeave', {
         group = lint_augroup,
         callback = function(ev)
-          debounced_light(ev.buf)
+          run_light_linters(ev.buf)
         end,
       })
 
