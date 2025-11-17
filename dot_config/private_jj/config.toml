@@ -24,6 +24,14 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 # Rebase the current branch onto the trunk.
 retrunk = ["rebase", "-d", "trunk()"]
 
+[git]
+push-new-bookmarks = true
+
+[templates]
+git_push_bookmark = '"maximilianpw/push-" ++ change_id.short()'
+# Prevent pushing work in progress or anything explicitly labeled "private"
+private-commits = "description(glob:'wip:*') | description(glob:'private:*')"
+
 [revset-aliases]
 "closest_bookmark(to)" = "heads(::to & bookmarks())"
 "fork_history(to, from)" = "fork_point(to | from)..@"

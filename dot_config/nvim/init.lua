@@ -2,6 +2,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.have_nerd_font = true
+-- used to use copilot in repos with version 20.04
+vim.g.node_host_prog = vim.fn.expand("~/.nix-profile/bin/node")
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
