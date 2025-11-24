@@ -24,8 +24,8 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 # Rebase the current branch onto the trunk.
 retrunk = ["rebase", "-d", "trunk()"]
 
-[git]
-push-new-bookmarks = true
+[remotes.origin]
+auto-track-bookmarks = "glob:*"
 
 [templates]
 git_push_bookmark = '"maximilianpw/push-" ++ change_id.short()'
