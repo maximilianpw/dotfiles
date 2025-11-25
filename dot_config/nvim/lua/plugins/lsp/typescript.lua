@@ -42,7 +42,7 @@ return {
 					expose_as_code_action = "all",
 					debounce_text_changes = 300, -- Debounce to reduce server load
 					tsserver_file_preferences = {
-						includeInlayParameterNameHints = "none",
+						includeInlayParameterNameHints = "literals",
 						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
 						includeInlayFunctionParameterTypeHints = false,
 						includeInlayVariableTypeHints = false,
@@ -58,7 +58,7 @@ return {
 				pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
 				callback = function(args)
 					local ok, stat = pcall((vim.uv or vim.loop).fs_stat, args.file)
-					if ok and stat and stat.size > 150 * 1024 then -- 150KB+
+					if ok and stat and stat.size > vim.g.max_file_size * 1024 then
 						vim.notify("Large TS file: some LSP features disabled", vim.log.levels.WARN)
 						vim.b.large_file = true
 						vim.opt_local.syntax = "off"

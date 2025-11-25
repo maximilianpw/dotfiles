@@ -5,6 +5,11 @@ vim.g.have_nerd_font = true
 -- used to use copilot in repos with version 20.04
 vim.g.node_host_prog = vim.fn.expand("~/.nix-profile/bin/node")
 
+-- Performance thresholds for large files (in KB)
+vim.g.large_file_size = 100 -- Disable expensive features
+vim.g.max_file_size = 150 -- Disable more features (treesitter, completion buffer)
+vim.g.huge_file_size = 200 -- Disable formatting
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -75,7 +80,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	group = vim.api.nvim_create_augroup("large-file-optimizations", { clear = true }),
 	callback = function()
 		local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(0))
-		if ok and stat and stat.size > 100 * 1024 then -- 100KB+
+		if ok and stat and stat.size > vim.g.large_file_size * 1024 then
 			-- Reduce UI update frequency
 			vim.opt_local.updatetime = 1000
 			-- Disable expensive visual features
@@ -119,6 +124,34 @@ require("lazy").setup({
 		event = "VimEnter",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = { signs = false },
+	},
+	{
+		"folke/persistence.nvim",
+		event = "BufReadPre",
+		opts = {},
+		keys = {
+			{
+				"<leader>qs",
+				function()
+					require("persistence").load()
+				end,
+				desc = "Restore Session",
+			},
+			{
+				"<leader>ql",
+				function()
+					require("persistence").load({ last = true })
+				end,
+				desc = "Restore Last Session",
+			},
+			{
+				"<leader>qd",
+				function()
+					require("persistence").stop()
+				end,
+				desc = "Don't Save Current Session",
+			},
+		},
 	},
 	{
 		"b0o/schemastore.nvim",

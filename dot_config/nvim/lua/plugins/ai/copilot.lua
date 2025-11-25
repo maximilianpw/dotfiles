@@ -6,7 +6,9 @@ return {
 		opts = {
 			panel = { enabled = false },
 			suggestion = { enabled = false },
-			copilot_node_command = "/opt/homebrew/bin/node",
+			copilot_node_command = vim.fn.filereadable("/etc/NIXOS") == 1
+				and vim.g.node_host_prog
+				or "/opt/homebrew/bin/node",
 		},
 	},
 	{

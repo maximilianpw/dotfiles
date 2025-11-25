@@ -9,7 +9,7 @@ return {
 		enabled = function()
 			-- Disable completion for large files (performance optimization)
 			local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(0))
-			if ok and stat and stat.size > 150 * 1024 then
+			if ok and stat and stat.size > vim.g.max_file_size * 1024 then
 				return false
 			end
 			return true
@@ -145,18 +145,19 @@ return {
 					},
 				},
 				sources = cmp.config.sources({
-					{ name = "copilot", group_index = 2 },
-					{ name = "nvim_lsp", group_index = 2 },
-					{ name = "luasnip", group_index = 2 },
+					{ name = "nvim_lsp", group_index = 1, priority = 1000 },
+					{ name = "luasnip", group_index = 2, priority = 750 },
+					{ name = "copilot", group_index = 2, priority = 500 },
 					{
 						name = "buffer",
 						group_index = 2,
+						priority = 250,
 						option = {
 							get_bufnrs = get_bufnrs,
 							indexing_interval = 1000,
 						},
 					},
-					{ name = "calc", group_index = 2 },
+					{ name = "calc", group_index = 2, priority = 100 },
 				}, {
 					{ name = "path" },
 					{ name = "nvim_lsp_signature_help" },
