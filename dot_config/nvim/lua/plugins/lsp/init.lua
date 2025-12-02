@@ -218,6 +218,7 @@ return {
 			local caps = get_capabilities()
 
 			-- LSP servers list (shared between Mason and NixOS)
+			-- Note: rust_analyzer is excluded here because it's managed by rustaceanvim plugin
 			local ensure_servers = {
 				"bashls",
 				"cssls",
@@ -229,7 +230,6 @@ return {
 				"lua_ls",
 				"omnisharp",
 				"pyright",
-				"rust_analyzer",
 				"tailwindcss",
 				"taplo",
 				"yamlls",

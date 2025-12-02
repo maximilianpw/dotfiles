@@ -8,7 +8,6 @@ return {
       lint.linters_by_ft = {
         markdown = { 'vale' },
         dockerfile = { 'hadolint' },
-        json = { 'jsonlint' },
         terraform = { 'tflint' },
         text = { 'vale' },
         javascript = { 'eslint_d' },
@@ -19,6 +18,7 @@ return {
         java = { 'checkstyle' },
         nix = { 'nix' },
         go = { 'golangcilint' },
+        rust = { 'clippy' },
       }
 
       -- Debounce helper (per buffer) to avoid hammering linters while typing
