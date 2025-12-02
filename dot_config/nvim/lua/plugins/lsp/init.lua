@@ -113,6 +113,7 @@ return {
 					map("gd", picker("lsp_definitions", vim.lsp.buf.definition), "Goto Definition")
 					map("gr", picker("lsp_references", vim.lsp.buf.references), "Goto References")
 					map("gI", picker("lsp_implementations", vim.lsp.buf.implementation), "Goto Implementation")
+					map("gt", picker("lsp_type_definitions", vim.lsp.buf.type_definition), "Goto Type Definition")
 					map("<leader>cr", vim.lsp.buf.rename, "Rename")
 					map("<leader>ca", vim.lsp.buf.code_action, "Code Action", { "n", "x" })
 					map("gD", vim.lsp.buf.declaration, "Goto Declaration")
@@ -125,26 +126,12 @@ return {
 						vim.lsp.buf.format({ async = true })
 					end, "Format Document")
 
-					if vim.lsp.inlay_hint and (vim.lsp.inlay_hint.is_enabled or vim.fn.has("nvim-0.10") == 1) then
+					if vim.lsp.inlay_hint and vim.fn.has("nvim-0.10") == 1 then
 						map("<leader>ci", function()
-							local ih = vim.lsp.inlay_hint
-							if type(ih) == "table" and ih.is_enabled and ih.enable then
-								local enabled = false
-								local ok, res = pcall(ih.is_enabled, ih, event.buf)
-								if not ok then
-									ok, res = pcall(ih.is_enabled, ih, { bufnr = event.buf })
-								end
-								if ok then
-									enabled = res
-								end
-								local ok_enable = pcall(ih.enable, ih, event.buf, not enabled)
-								if not ok_enable then
-									pcall(ih.enable, ih, { bufnr = event.buf, enabled = not enabled })
-								end
-							elseif type(ih) == "function" then
-								local enabled = ih.is_enabled and ih.is_enabled(event.buf)
-								ih(event.buf, not enabled)
-							end
+							vim.lsp.inlay_hint.enable(
+								not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }),
+								{ bufnr = event.buf }
+							)
 						end, "Toggle Inlay Hints")
 					end
 
@@ -230,6 +217,7 @@ return {
 				"lua_ls",
 				"omnisharp",
 				"pyright",
+				"rust_analyzer",
 				"tailwindcss",
 				"taplo",
 				"yamlls",

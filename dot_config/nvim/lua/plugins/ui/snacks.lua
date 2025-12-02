@@ -19,6 +19,8 @@ return {
 		scroll = { enabled = true },
 		-- Advanced status column (disabled - set in options.lua)
 		statuscolumn = { enabled = false },
+		-- Quick scratch buffers for temporary notes
+		scratch = { enabled = true },
 
 		-- ═══════════════════════════════════════════════════════════════
 		-- 🔍 SEARCH & PICKER SYSTEM (Telescope Replacement)
@@ -354,6 +356,20 @@ return {
 				require("snacks").bufdelete()
 			end,
 			desc = "Delete Buffer (preserve layout)",
+		},
+		{
+			"<leader>.",
+			function()
+				require("snacks").scratch()
+			end,
+			desc = "Toggle Scratch Buffer",
+		},
+		{
+			"<leader>S",
+			function()
+				require("snacks").scratch.select()
+			end,
+			desc = "Select Scratch Buffer",
 		},
 	},
 	init = function()

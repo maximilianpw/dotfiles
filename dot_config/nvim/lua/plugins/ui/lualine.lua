@@ -26,8 +26,15 @@ return {
 				return cached_root
 			end
 
-			local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-			if git_root and #git_root > 0 then
+			-- Use vim.fs.find for faster .git detection
+			local git_dir = vim.fs.find(".git", {
+				upward = true,
+				path = cwd,
+				type = "directory",
+			})[1]
+
+			if git_dir then
+				local git_root = vim.fn.fnamemodify(git_dir, ":h")
 				cached_root = vim.fn.fnamemodify(git_root, ":~")
 			else
 				cached_root = vim.fn.fnamemodify(cwd, ":~")

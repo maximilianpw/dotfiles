@@ -10,8 +10,8 @@ return { -- Autoformat
 		format_on_save = function(bufnr)
 			-- Skip formatting for large files (performance optimization)
 			local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(bufnr))
-			if ok and stat and stat.size > 200 * 1024 then
-				return nil -- Skip formatting for files >200KB
+			if ok and stat and stat.size > vim.g.huge_file_size * 1024 then
+				return nil -- Skip formatting for files larger than huge_file_size
 			end
 
 			local ft = vim.bo[bufnr].filetype
@@ -43,7 +43,6 @@ return { -- Autoformat
 			yaml = { "prettierd", "prettier" },
 			markdown = { "prettierd", "prettier" },
 			graphql = { "prettierd", "prettier" },
-			python = { "isort", "black" },
 			nix = { "alejandra" },
 			elixir = { "lsp" },
 			heex = { "lsp" },

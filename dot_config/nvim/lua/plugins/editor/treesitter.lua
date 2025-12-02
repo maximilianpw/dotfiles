@@ -5,9 +5,9 @@ local function should_disable(lang, buf)
 	if name:match("/node_modules/") or name:match("/vendor/") then
 		return true
 	end
-	-- 2) Skip files over 150 KB (reduced from 200KB for better TS performance)
+	-- 2) Skip files over max_file_size threshold
 	local ok, stat = pcall((vim.uv or vim.loop).fs_stat, name)
-	if ok and stat and stat.size > 150 * 1024 then
+	if ok and stat and stat.size > vim.g.max_file_size * 1024 then
 		return true
 	end
 	-- 3) Skip Ruby indent highlighting if you still want regex indent
@@ -44,6 +44,7 @@ return {
 				"lua",
 				"markdown",
 				"nix",
+				"rust",
 				"toml",
 				"vim",
 				"yaml",
@@ -97,7 +98,7 @@ return {
 			-- Disable context for large files (performance optimization)
 			disable = function(_, buf)
 				local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(buf))
-				return ok and stat and stat.size > 150 * 1024
+				return ok and stat and stat.size > vim.g.max_file_size * 1024
 			end,
 		},
 		keys = {

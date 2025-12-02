@@ -73,14 +73,5 @@ return {
         end)
       end,
     })
-
-    vim.keymap.set('n', '<leader>bd', function()
-      local ok, snacks = pcall(require, 'snacks')
-      if ok and snacks.bufdelete then
-        snacks.bufdelete(0)
-      else
-        vim.api.nvim_buf_delete(0, { force = false })
-      end
-    end, { desc = 'Delete Buffer' })
   end,
 }
