@@ -1,12 +1,16 @@
 return {
 	{
 		"pmizio/typescript-tools.nvim",
-		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"neovim/nvim-lspconfig",
+			"hrsh7th/cmp-nvim-lsp", -- Ensure cmp-nvim-lsp loads before typescript-tools
+		},
 		ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 		config = function()
 			local ok_ts, typescript_tools = pcall(require, "typescript-tools")
 			if not ok_ts then
-				vim.notify("typescript-tools.nvim not found", vim.log.levels.WARN)
+				vim.notify("typescript-tools.nvim not found: " .. tostring(typescript_tools), vim.log.levels.ERROR)
 				return
 			end
 
@@ -19,13 +23,10 @@ return {
 				return capabilities
 			end
 
-			typescript_tools.setup({
-				-- Use built-in root_dir pattern detection
-				root_dir = function(fname)
-					local util = require("lspconfig.util")
-					return util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git")(fname)
-				end,
-				single_file_support = false,
+			local setup_opts = {
+				-- typescript-tools handles root_dir automatically
+				-- It looks for: tsconfig.json, jsconfig.json, package.json, .git
+				single_file_support = true, -- Enable single file support
 				capabilities = get_capabilities(),
 				handlers = {
 					["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
@@ -51,7 +52,9 @@ return {
 						includeInlayEnumMemberValueHints = false,
 					},
 				},
-			})
+			}
+
+			typescript_tools.setup(setup_opts)
 
 			-- TypeScript-specific large file handling
 			vim.api.nvim_create_autocmd("BufReadPost", {
