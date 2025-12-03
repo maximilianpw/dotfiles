@@ -3,7 +3,14 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.have_nerd_font = true
 -- used to use copilot in repos with version 20.04
-vim.g.node_host_prog = vim.fn.expand("~/.nix-profile/bin/node")
+-- Auto-detect node path based on system
+if vim.fn.filereadable("/etc/profiles/per-user/maxpw/bin/node") == 1 then
+	vim.g.node_host_prog = "/etc/profiles/per-user/maxpw/bin/node"
+elseif vim.fn.filereadable("/opt/homebrew/bin/node") == 1 then
+	vim.g.node_host_prog = "/opt/homebrew/bin/node"
+else
+	vim.g.node_host_prog = vim.fn.expand("~/.nix-profile/bin/node")
+end
 
 -- Performance thresholds for large files (in KB)
 vim.g.large_file_size = 100 -- Disable expensive features
