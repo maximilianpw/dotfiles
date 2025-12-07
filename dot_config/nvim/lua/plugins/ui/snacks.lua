@@ -108,7 +108,7 @@ return {
 						key = "f",
 						desc = "Find File",
 						action = function()
-							require("snacks").picker.files()
+							require("fff").find_files()
 						end,
 					},
 					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
@@ -126,14 +126,6 @@ return {
 						desc = "Recent Files",
 						action = function()
 							require("snacks").picker.recent()
-						end,
-					},
-					{
-						icon = " ",
-						key = "c",
-						desc = "Config",
-						action = function()
-							require("snacks").picker.files({ cwd = "~/.local/share/chezmoi/dot_config/nvim" })
 						end,
 					},
 					{
@@ -160,13 +152,7 @@ return {
 		-- ────────────────────────────────────────────────────────────
 		-- 🔍 PICKER SYSTEM (Telescope replacement)
 		-- ────────────────────────────────────────────────────────────
-		{
-			"<leader>ff",
-			function()
-				require("snacks").picker.files()
-			end,
-			desc = "Find Files",
-		},
+		-- NOTE: <leader>ff is handled by fff.nvim for file finding
 		{
 			"<leader>fl",
 			function()
@@ -216,13 +202,7 @@ return {
 			end,
 			desc = "Search Keymaps",
 		},
-		{
-			"<leader>fc",
-			function()
-				require("snacks").picker.files({ cwd = "~/.local/share/chezmoi/dot_config/nvim" })
-			end,
-			desc = "Find Config Files",
-		},
+		-- NOTE: <leader>fc is handled by fff.nvim for config files
 		{
 			"<leader>fw",
 			function()
