@@ -205,7 +205,7 @@ return {
 			local caps = get_capabilities()
 
 			-- LSP servers list (shared between Mason and NixOS)
-			-- Note: rust_analyzer is excluded here because it's managed by rustaceanvim plugin
+			-- Note: rust_analyzer is only added on macOS; on NixOS it's managed by rustaceanvim
 			local ensure_servers = {
 				"bashls",
 				"cssls",
@@ -217,11 +217,15 @@ return {
 				"lua_ls",
 				"omnisharp",
 				"pyright",
-				"rust_analyzer",
 				"tailwindcss",
 				"taplo",
 				"yamlls",
 			}
+
+			-- Add rust_analyzer only on macOS (rustaceanvim manages it on NixOS)
+			if not is_nixos then
+				table.insert(ensure_servers, "rust_analyzer")
+			end
 
 			-- Per-server overrides (applied on top of defaults)
 			local server_overrides = {
