@@ -5,13 +5,13 @@ return {
 		{
 			"<leader>ff",
 			function()
-				require("fff").find()
+				require("fff").find_files()
 			end,
 			desc = "Find Files (fff)",
 		},
 	},
 	opts = {
-		prompt = "> ",
+		prompt = "❯ ",
 		title = "Find Files",
 	},
 }
