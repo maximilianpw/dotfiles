@@ -222,10 +222,7 @@ return {
 				"yamlls",
 			}
 
-			-- Add rust_analyzer only on macOS (rustaceanvim manages it on NixOS)
-			if not is_nixos then
-				table.insert(ensure_servers, "rust_analyzer")
-			end
+			-- rust_analyzer is installed system-wide, managed by rustaceanvim
 
 			-- Per-server overrides (applied on top of defaults)
 			local server_overrides = {
