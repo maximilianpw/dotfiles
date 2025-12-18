@@ -18,7 +18,6 @@ return {
         java = { 'checkstyle' },
         nix = { 'nix' },
         go = { 'golangcilint' },
-        rust = { 'clippy' },
       }
 
       -- Debounce helper (per buffer) to avoid hammering linters while typing
