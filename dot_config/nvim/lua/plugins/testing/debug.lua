@@ -456,6 +456,69 @@ return {
 			})
 		end
 
+		-- Configure Rust debugging using CodeLLDB
+		-- Install: brew install llvm (macOS) or install codelldb via Mason/system
+		dap.adapters.codelldb = {
+			type = "server",
+			port = "${port}",
+			executable = {
+				command = "codelldb",
+				args = { "--port", "${port}" },
+			},
+		}
+
+		dap.configurations.rust = {
+			{
+				name = "Launch file",
+				type = "codelldb",
+				request = "launch",
+				program = function()
+					-- Try to find the executable in target/debug
+					local cwd = vim.fn.getcwd()
+					local cargo_toml = vim.fn.glob(cwd .. "/Cargo.toml")
+					if cargo_toml ~= "" then
+						-- Get the package name from Cargo.toml
+						local lines = vim.fn.readfile(cargo_toml)
+						for _, line in ipairs(lines) do
+							local name = line:match('^name%s*=%s*"([^"]+)"')
+							if name then
+								local binary = cwd .. "/target/debug/" .. name
+								if vim.fn.filereadable(binary) == 1 then
+									return vim.fn.input("Path to executable: ", binary, "file")
+								end
+							end
+						end
+					end
+					return vim.fn.input("Path to executable: ", cwd .. "/target/debug/", "file")
+				end,
+				cwd = "${workspaceFolder}",
+				stopOnEntry = false,
+				args = {},
+			},
+			{
+				name = "Launch file with args",
+				type = "codelldb",
+				request = "launch",
+				program = function()
+					local cwd = vim.fn.getcwd()
+					return vim.fn.input("Path to executable: ", cwd .. "/target/debug/", "file")
+				end,
+				cwd = "${workspaceFolder}",
+				stopOnEntry = false,
+				args = function()
+					local args_string = vim.fn.input("Arguments: ")
+					return vim.split(args_string, " +")
+				end,
+			},
+			{
+				name = "Attach to process",
+				type = "codelldb",
+				request = "attach",
+				pid = require("dap.utils").pick_process,
+				args = {},
+			},
+		}
+
 		-- Setup persistent breakpoints
 		local ok_persistent_breakpoints, persistent_breakpoints = pcall(require, "persistent-breakpoints")
 		if ok_persistent_breakpoints then
