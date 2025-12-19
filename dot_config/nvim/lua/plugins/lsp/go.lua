@@ -10,39 +10,10 @@ return {
 		"nvim-neotest/neotest-go",
 	},
 	opts = {
-		lsp_cfg = {
-			settings = {
-				gopls = {
-					staticcheck = true,
-					gofumpt = true,
-					analyses = {
-						unusedparams = true,
-						nilness = true,
-						shadow = true,
-						unusedwrite = true,
-						useany = true,
-					},
-					hints = {
-						assignVariableTypes = false,
-						compositeLiteralFields = false,
-						compositeLiteralTypes = false,
-						constantValues = false,
-						parameterNames = true,
-						rangeVariableTypes = false,
-					},
-					codelenses = {
-						gc_details = false,
-						generate = true,
-						regenerate_cgo = true,
-						test = true,
-						tidy = true,
-						upgrade_dependency = true,
-						vendor = true,
-					},
-				},
-			},
-		},
-		lsp_inlay_hints = { enable = true },
+		-- Disable go.nvim's LSP handling (use native lspconfig instead)
+		lsp_cfg = false,
+		lsp_gofumpt = false,
+		lsp_inlay_hints = { enable = false },
 		trouble = false,
 		luasnip = true,
 		dap_debug = true,

@@ -64,12 +64,13 @@ return {
 			end
 
 			-- Enable all LSP servers (configs loaded from lsp/ directory)
-			-- Note: gopls is managed by go.nvim, rust-analyzer by rustaceanvim
+			-- Note: rust-analyzer is managed by rustaceanvim
 			local servers = {
 				"bashls",
 				"cssls",
 				"dockerls",
 				"eslint",
+				"gopls",
 				"html",
 				"jsonls",
 				"lua_ls",
@@ -82,17 +83,12 @@ return {
 			}
 			vim.lsp.enable(servers)
 
-			-- LspAttach autocmd for keybindings and native completion
+			-- LspAttach autocmd for keybindings (completion handled by blink.cmp)
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
 				callback = function(event)
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
 					local bufnr = event.buf
-
-					-- Enable native completion for this buffer
-					if client and client:supports_method("textDocument/completion") then
-						vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
-					end
 
 					-- Keymaps
 					local map = function(keys, func, desc, mode)

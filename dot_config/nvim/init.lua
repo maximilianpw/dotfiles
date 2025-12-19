@@ -55,8 +55,8 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 -- buffer setup
 vim.opt.termguicolors = true
 
--- Native completion settings (Neovim 0.11+)
-vim.opt.completeopt = "menu,menuone,noselect,popup,fuzzy"
+-- Completion settings (for blink.cmp)
+vim.opt.completeopt = "menu,menuone,noselect"
 
 -- [[ Basic Keymaps ]]
 -- Clear highlights on search when pressing <Esc> in normal mode
@@ -95,32 +95,6 @@ vim.keymap.set({ "n", "v" }, "<leader>yd", function()
 	vim.fn.setreg("+", text)
 	vim.notify("Copied: " .. text, vim.log.levels.INFO)
 end, { desc = "Copy file path with line number/range" })
-
--- Native completion keymaps (Neovim 0.11+)
-vim.keymap.set({ "i", "s" }, "<Tab>", function()
-	if vim.snippet.active({ direction = 1 }) then
-		return "<cmd>lua vim.snippet.jump(1)<cr>"
-	end
-	return "<Tab>"
-end, { expr = true, desc = "Snippet jump forward or Tab" })
-
-vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
-	if vim.snippet.active({ direction = -1 }) then
-		return "<cmd>lua vim.snippet.jump(-1)<cr>"
-	end
-	return "<S-Tab>"
-end, { expr = true, desc = "Snippet jump backward or S-Tab" })
-
-vim.keymap.set("i", "<C-Space>", function()
-	vim.lsp.completion.get()
-end, { desc = "Trigger LSP completion" })
-
-vim.keymap.set("i", "<CR>", function()
-	if vim.fn.pumvisible() == 1 then
-		return "<C-y>"
-	end
-	return "<CR>"
-end, { expr = true, desc = "Accept completion or Enter" })
 
 -- [[ Basic Autocommands ]]
 -- Highlight when yanking (copying) text
