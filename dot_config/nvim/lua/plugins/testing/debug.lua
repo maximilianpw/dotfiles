@@ -456,21 +456,17 @@ return {
 			})
 		end
 
-		-- Configure Rust debugging using CodeLLDB
-		-- Install: brew install llvm (macOS) or install codelldb via Mason/system
-		dap.adapters.codelldb = {
-			type = "server",
-			port = "${port}",
-			executable = {
-				command = "codelldb",
-				args = { "--port", "${port}" },
-			},
+		-- Configure Rust debugging using lldb-dap (comes with LLVM)
+		dap.adapters.lldb = {
+			type = "executable",
+			command = "lldb-dap",
+			name = "lldb",
 		}
 
 		dap.configurations.rust = {
 			{
 				name = "Launch file",
-				type = "codelldb",
+				type = "lldb",
 				request = "launch",
 				program = function()
 					-- Try to find the executable in target/debug
@@ -497,7 +493,7 @@ return {
 			},
 			{
 				name = "Launch file with args",
-				type = "codelldb",
+				type = "lldb",
 				request = "launch",
 				program = function()
 					local cwd = vim.fn.getcwd()
@@ -512,7 +508,7 @@ return {
 			},
 			{
 				name = "Attach to process",
-				type = "codelldb",
+				type = "lldb",
 				request = "attach",
 				pid = require("dap.utils").pick_process,
 				args = {},
