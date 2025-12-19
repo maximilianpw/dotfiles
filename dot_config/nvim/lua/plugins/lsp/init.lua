@@ -1,20 +1,3 @@
---[[
-  Native LSP Configuration - Neovim 0.11+
-
-  ADDING A NEW LANGUAGE:
-
-  1. Nix Setup:
-     - Add the LSP package to your Nix config
-     - Rebuild: darwin-rebuild switch / nixos-rebuild switch
-
-  2. Neovim Config:
-     - Create a new file in lsp/ directory (e.g., lsp/mylsp.lua)
-     - Return a table with: cmd, filetypes, root_markers, and optional settings
-     - Add the server name to the `servers` list below
-
-  Server configs: ~/.config/nvim/lsp/*.lua
---]]
-
 return {
 	-- Lua dev ergonomics (luv/vim types for better completion)
 	{

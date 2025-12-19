@@ -7,9 +7,6 @@ return {
 		vim.g.rustaceanvim = {
 			-- LSP configuration
 			server = {
-				on_attach = function(client, bufnr)
-					-- Use default LSP keybindings from init.lua
-				end,
 				default_settings = {
 					["rust-analyzer"] = {
 						cargo = {
