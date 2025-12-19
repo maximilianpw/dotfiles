@@ -1,24 +1,18 @@
 --[[
-  LSP Configuration - Hybrid Setup (Mason on macOS, System LSPs on NixOS)
+  Native LSP Configuration - Neovim 0.11+
 
   ADDING A NEW LANGUAGE:
 
-  1. NixOS Setup (required on NixOS):
-     - Add the LSP package to ~/nix-config/users/maxpw/neovim.nix
-     - Example: pkgs.nodePackages.typescript-language-server or pkgs.omnisharp-roslyn
-     - Run: sudo nixos-rebuild switch
+  1. Nix Setup:
+     - Add the LSP package to your Nix config
+     - Rebuild: darwin-rebuild switch / nixos-rebuild switch
 
-  2. Neovim Config (required on both platforms):
-     - Add the server name to the `ensure_servers` list below (around line 183)
-     - Example: "tsserver" for TypeScript, "omnisharp" for C#
-     - Optional: Add server-specific settings to `server_overrides` (around line 203)
-     - Optional: Create a dedicated plugin file in lua/plugins/lsp/ for complex setups
+  2. Neovim Config:
+     - Create a new file in lsp/ directory (e.g., lsp/mylsp.lua)
+     - Return a table with: cmd, filetypes, root_markers, and optional settings
+     - Add the server name to the `servers` list below
 
-  3. macOS Only:
-     - Mason will automatically install the LSP when you restart Neovim
-     - No additional steps needed
-
-  Server names reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+  Server configs: ~/.config/nvim/lsp/*.lua
 --]]
 
 return {
@@ -33,58 +27,33 @@ return {
 		},
 	},
 
-	-- Core LSP stack (Hybrid: Mason on macOS, system LSPs on NixOS)
-	{
-		"neovim/nvim-lspconfig",
-		dependencies = {
-			-- Conditionally load Mason only on non-NixOS systems
-			{
-				"williamboman/mason.nvim",
-				cond = function()
-					return vim.fn.filereadable("/etc/NIXOS") ~= 1
-				end,
-				opts = {},
-			},
-			{
-				"williamboman/mason-lspconfig.nvim",
-				cond = function()
-					return vim.fn.filereadable("/etc/NIXOS") ~= 1
-				end,
-			},
-			{
-				"WhoIsSethDaniel/mason-tool-installer.nvim",
-				cond = function()
-					return vim.fn.filereadable("/etc/NIXOS") ~= 1
-				end,
-			},
-			{ "j-hui/fidget.nvim", opts = {} },
-		},
-		config = function()
-			-- Platform detection
-			local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
+	-- Fidget for LSP progress
+	{ "j-hui/fidget.nvim", opts = {} },
 
-			-- Optional: speed up Lua module loading
-			if vim.fn.has("nvim-0.9") == 1 then
+	-- Native LSP setup (loaded via lazy.nvim's config mechanism)
+	{
+		dir = vim.fn.stdpath("config"),
+		name = "native-lsp-setup",
+		config = function()
+			-- Speed up Lua module loading
+			if vim.loader then
 				vim.loader.enable()
 			end
 
 			-- Diagnostics UI
-			local diag_signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+			local diag_signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 			for type, icon in pairs(diag_signs) do
 				local hl = "DiagnosticSign" .. type
 				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 			end
+
 			vim.diagnostic.config({
 				virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
 				float = {
-					source = "always",
+					source = true,
 					border = "rounded",
 					header = "",
 					prefix = "",
-					format = function(d)
-						local sev = vim.diagnostic.severity[d.severity]
-						return string.format("%s [%s] %s", sev, d.source or "LSP", d.message)
-					end,
 				},
 				signs = { severity = { min = vim.diagnostic.severity.HINT } },
 				underline = true,
@@ -92,14 +61,62 @@ return {
 				severity_sort = true,
 			})
 
-			-- On-attach goodies (your mappings preserved)
+			-- Inject schemastore schemas into jsonls/yamlls
+			local ok_schema, schemastore = pcall(require, "schemastore")
+			if ok_schema then
+				vim.lsp.config("jsonls", {
+					settings = {
+						json = {
+							schemas = schemastore.json.schemas(),
+						},
+					},
+				})
+				vim.lsp.config("yamlls", {
+					settings = {
+						yaml = {
+							schemas = schemastore.yaml.schemas(),
+						},
+					},
+				})
+			end
+
+			-- Enable all LSP servers (configs loaded from lsp/ directory)
+			-- Note: gopls is managed by go.nvim, rust-analyzer by rustaceanvim
+			local servers = {
+				"bashls",
+				"cssls",
+				"dockerls",
+				"eslint",
+				"html",
+				"jsonls",
+				"lua_ls",
+				"nushell",
+				"omnisharp",
+				"pyright",
+				"tailwindcss",
+				"taplo",
+				"yamlls",
+			}
+			vim.lsp.enable(servers)
+
+			-- LspAttach autocmd for keybindings and native completion
 			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+				group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
 				callback = function(event)
+					local client = vim.lsp.get_client_by_id(event.data.client_id)
+					local bufnr = event.buf
+
+					-- Enable native completion for this buffer
+					if client and client:supports_method("textDocument/completion") then
+						vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
+					end
+
+					-- Keymaps
 					local map = function(keys, func, desc, mode)
 						mode = mode or "n"
-						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+						vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
 					end
+
 					local has_snacks, snacks = pcall(require, "snacks")
 					local function picker(name, fallback)
 						if has_snacks and snacks.picker and snacks.picker[name] then
@@ -117,49 +134,43 @@ return {
 					map("<leader>cr", vim.lsp.buf.rename, "Rename")
 					map("<leader>ca", vim.lsp.buf.code_action, "Code Action", { "n", "x" })
 					map("gD", vim.lsp.buf.declaration, "Goto Declaration")
-					map("K", function()
-						vim.lsp.buf.hover()
-					end, "Hover Documentation")
+					map("K", vim.lsp.buf.hover, "Hover Documentation")
 					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 					map("<leader>Q", vim.diagnostic.open_float, "Show line diagnostics")
 					map("<leader>cf", function()
 						vim.lsp.buf.format({ async = true })
 					end, "Format Document")
 
-					if vim.lsp.inlay_hint and vim.fn.has("nvim-0.10") == 1 then
+					-- Inlay hints toggle
+					if vim.lsp.inlay_hint then
 						map("<leader>ci", function()
 							vim.lsp.inlay_hint.enable(
-								not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }),
-								{ bufnr = event.buf }
+								not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
+								{ bufnr = bufnr }
 							)
 						end, "Toggle Inlay Hints")
 					end
 
-					local function supports(client, method, bufnr)
-						if vim.fn.has("nvim-0.11") == 1 then
-							return client:supports_method(method, bufnr)
-						else
-							return client:supports_method(method, { bufnr = bufnr })
-						end
+					-- ESLint auto-fix on save
+					if client and client.name == "eslint" then
+						vim.api.nvim_create_autocmd("BufWritePre", {
+							buffer = bufnr,
+							command = "LspEslintFixAll",
+						})
 					end
 
-					local client = vim.lsp.get_client_by_id(event.data.client_id)
-
-					-- Skip document highlighting for large files (performance optimization)
+					-- Skip document highlighting for large files
 					if vim.b.large_file then
 						return
 					end
 
-					if
-						client and supports(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf)
-					then
-						local grp = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-
-						-- Debounce timer for document highlight (performance optimization)
+					-- Document highlight on cursor hold
+					if client and client:supports_method("textDocument/documentHighlight") then
+						local grp = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
 						local highlight_timer = nil
 
 						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-							buffer = event.buf,
+							buffer = bufnr,
 							group = grp,
 							callback = function()
 								if highlight_timer then
@@ -174,219 +185,23 @@ return {
 							end,
 						})
 						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-							buffer = event.buf,
+							buffer = bufnr,
 							group = grp,
 							callback = vim.lsp.buf.clear_references,
 						})
 						vim.api.nvim_create_autocmd("LspDetach", {
-							group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+							group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
 							callback = function(ev)
 								if highlight_timer then
 									highlight_timer:stop()
 								end
 								vim.lsp.buf.clear_references()
-								vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = ev.buf })
+								vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = ev.buf })
 							end,
 						})
 					end
 				end,
 			})
-
-			-- Capabilities (cmp integration if present)
-			local function get_capabilities()
-				local capabilities = vim.lsp.protocol.make_client_capabilities()
-				local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-				if ok then
-					capabilities = cmp_lsp.default_capabilities(capabilities)
-				end
-				return capabilities
-			end
-
-			local caps = get_capabilities()
-
-			-- LSP servers list (shared between Mason and NixOS)
-			-- Note: rust_analyzer is only added on macOS; on NixOS it's managed by rustaceanvim
-			local ensure_servers = {
-				"bashls",
-				"cssls",
-				"dockerls",
-				"eslint",
-				"gopls",
-				"html",
-				"jsonls",
-				"lua_ls",
-				"omnisharp",
-				"pyright",
-				"tailwindcss",
-				"taplo",
-				"yamlls",
-			}
-
-			-- rust_analyzer is installed system-wide, managed by rustaceanvim
-
-			-- Per-server overrides (applied on top of defaults)
-			local server_overrides = {
-				lua_ls = {
-					settings = {
-						Lua = {
-							runtime = { version = "LuaJIT" },
-							diagnostics = { globals = { "vim" } },
-							completion = { callSnippet = "Replace" },
-							workspace = {
-								checkThirdParty = false,
-								library = vim.api.nvim_get_runtime_file("", true),
-							},
-						},
-					},
-				},
-				jsonls = {
-					settings = {
-						json = {
-							schemas = require("schemastore").json.schemas(),
-							validate = { enable = true },
-						},
-					},
-				},
-				yamlls = {
-					settings = {
-						yaml = {
-							schemaStore = {
-								enable = false, -- Disable built-in, use schemastore.nvim
-								url = "",
-							},
-							schemas = require("schemastore").yaml.schemas(),
-						},
-					},
-				},
-				omnisharp = {
-					handlers = {
-						["textDocument/definition"] = function(...)
-							local ok, omnisharp_extended = pcall(require, "omnisharp_extended")
-							if ok then
-								return omnisharp_extended.handler(...)
-							end
-							return vim.lsp.handlers["textDocument/definition"](...)
-						end,
-					},
-					cmd = { "omnisharp" },
-					enable_roslyn_analyzers = true,
-					organize_imports_on_format = true,
-					enable_import_completion = true,
-				},
-
-				eslint = {
-					settings = {
-						workingDirectories = { mode = "auto" },
-					},
-					on_attach = function(client, bufnr)
-						-- Auto-fix on save
-						vim.api.nvim_create_autocmd("BufWritePre", {
-							buffer = bufnr,
-							command = "EslintFixAll",
-						})
-					end,
-				},
-			}
-
-			-- Wire everything through lspconfig (nvim 0.11+ compatible)
-			local ok_lspconfig, lspconfig = pcall(require, "lspconfig")
-			if not ok_lspconfig then
-				vim.notify("nvim-lspconfig not found", vim.log.levels.ERROR)
-				return
-			end
-
-			local util = lspconfig.util or require("lspconfig.util")
-
-			local function default_handler(server_name)
-				-- Check if nvim 0.11+ to use vim.lsp.config API
-				if vim.fn.has("nvim-0.11") == 1 and vim.lsp.config and vim.lsp.config[server_name] then
-					local override = server_overrides[server_name]
-					if type(override) == "function" then
-						override = override()
-					end
-					local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
-					-- Use new API for nvim 0.11+
-					vim.lsp.enable(server_name, opts)
-				else
-					-- Fallback to lspconfig for nvim < 0.11
-					if not lspconfig[server_name] then
-						vim.notify(string.format("lspconfig missing server %s", server_name), vim.log.levels.WARN)
-						return
-					end
-
-					local override = server_overrides[server_name]
-					if type(override) == "function" then
-						override = override()
-					end
-
-					local opts = vim.tbl_deep_extend("force", { capabilities = vim.deepcopy(caps) }, override or {})
-					lspconfig[server_name].setup(opts)
-				end
-			end
-
-			-- HYBRID SETUP: Mason on macOS, system LSPs on NixOS
-			if is_nixos then
-				-- On NixOS: use system-provided LSPs
-				vim.notify("NixOS detected: using system LSPs", vim.log.levels.INFO)
-				for _, server_name in ipairs(ensure_servers) do
-					default_handler(server_name)
-				end
-			else
-				-- On macOS/other: use Mason to manage LSPs
-				local ok_mason, mason = pcall(require, "mason")
-				if not ok_mason then
-					vim.notify("mason not found", vim.log.levels.ERROR)
-					return
-				end
-				mason.setup({})
-
-				-- Keep LSPs + tools installed/up to date
-				local ok_mti, mti = pcall(require, "mason-tool-installer")
-				if ok_mti then
-					mti.setup({
-						ensure_installed = vim.list_extend(vim.deepcopy(ensure_servers), {
-							-- Formatters / linters / debuggers
-							"csharpier",
-							"delve",
-							"eslint_d",
-							"golangci-lint",
-							"prettier",
-							"prettierd",
-							"stylua",
-						}),
-						auto_update = false,
-						run_on_start = true,
-					})
-				else
-					vim.notify("mason-tool-installer not found", vim.log.levels.WARN)
-				end
-
-				-- mason-lspconfig: install + configure LSP servers
-				local ok_mlc, mlc = pcall(require, "mason-lspconfig")
-				if not ok_mlc then
-					vim.notify("mason-lspconfig not found", vim.log.levels.ERROR)
-					return
-				end
-
-				mlc.setup({
-					ensure_installed = ensure_servers,
-					automatic_installation = true,
-					handlers = { default_handler },
-				})
-			end
-
-			-- Nushell LSP (not in mason-lspconfig by default)
-			local nushell_cfg = {
-				cmd = { "nu", "--lsp" },
-				filetypes = { "nu" },
-				root_dir = util.root_pattern(".git"),
-				capabilities = vim.deepcopy(caps),
-			}
-			if vim.fn.has("nvim-0.11") == 1 and vim.lsp.config and vim.lsp.config.nushell then
-				vim.lsp.enable("nushell", nushell_cfg)
-			elseif lspconfig.nushell then
-				lspconfig.nushell.setup(nushell_cfg)
-			end
 		end,
 	},
 }

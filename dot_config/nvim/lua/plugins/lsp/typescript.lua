@@ -3,8 +3,6 @@ return {
 		"pmizio/typescript-tools.nvim",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"neovim/nvim-lspconfig",
-			"hrsh7th/cmp-nvim-lsp", -- Ensure cmp-nvim-lsp loads before typescript-tools
 		},
 		ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 		config = function()
@@ -14,20 +12,11 @@ return {
 				return
 			end
 
-			local function get_capabilities()
-				local capabilities = vim.lsp.protocol.make_client_capabilities()
-				local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-				if ok then
-					capabilities = cmp_lsp.default_capabilities(capabilities)
-				end
-				return capabilities
-			end
-
 			local setup_opts = {
 				-- typescript-tools handles root_dir automatically
 				-- It looks for: tsconfig.json, jsconfig.json, package.json, .git
-				single_file_support = true, -- Enable single file support
-				capabilities = get_capabilities(),
+				single_file_support = true,
+				capabilities = vim.lsp.protocol.make_client_capabilities(),
 				handlers = {
 					["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
 						-- Skip semantic tokens for large files (performance optimization)

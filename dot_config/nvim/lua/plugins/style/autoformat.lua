@@ -21,7 +21,7 @@ return { -- Autoformat
 			local lsp_format_opt = disable_filetypes[ft] and "never" or "fallback"
 
 			return {
-				timeout_ms = 1000, -- bump from 500ms to 1s for larger files
+				timeout_ms = 2000,
 				lsp_format = lsp_format_opt,
 			}
 		end,
