@@ -29,11 +29,11 @@ return { -- Autoformat
 		-- map filetypes to formatter names (runs in order)
 		formatters_by_ft = {
 			lua = { "stylua" },
-			javascript = { "prettierd", "prettier" },
-			typescript = { "prettierd", "prettier" },
-			javascriptreact = { "prettierd", "prettier" },
-			typescriptreact = { "prettierd", "prettier" },
-			vue = { "prettierd", "prettier" },
+			javascript = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
+			typescript = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
+			javascriptreact = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
+			typescriptreact = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
+			vue = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
 			css = { "prettierd", "prettier" },
 			scss = { "prettierd", "prettier" },
 			less = { "prettierd", "prettier" },

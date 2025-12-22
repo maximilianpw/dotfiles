@@ -69,7 +69,6 @@ return {
 				"bashls",
 				"cssls",
 				"dockerls",
-				"eslint",
 				"gopls",
 				"html",
 				"jsonls",
@@ -128,14 +127,6 @@ return {
 								{ bufnr = bufnr }
 							)
 						end, "Toggle Inlay Hints")
-					end
-
-					-- ESLint auto-fix on save
-					if client and client.name == "eslint" then
-						vim.api.nvim_create_autocmd("BufWritePre", {
-							buffer = bufnr,
-							command = "LspEslintFixAll",
-						})
 					end
 
 					-- Skip document highlighting for large files
