@@ -1,22 +1,36 @@
-return { -- Autoformat
+return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
 	cmd = { "ConformInfo" },
+	keys = {
+		{
+			"<leader>cF",
+			function()
+				require("conform").format({ async = true, lsp_format = "fallback" })
+			end,
+			mode = { "n", "v" },
+			desc = "Format buffer (Conform)",
+		},
+	},
 	opts = {
-		-- show errors when they happen, so you can catch mis-configs
 		notify_on_error = true,
 
-		-- format on save, with per-filetype lsp fallback control
 		format_on_save = function(bufnr)
-			-- Skip formatting for large files (performance optimization)
+			-- Skip formatting for huge files using consolidated bigfile config
+			local huge_threshold = vim.g.bigfile and vim.g.bigfile.huge or 200 * 1024
 			local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(bufnr))
-			if ok and stat and stat.size > vim.g.huge_file_size * 1024 then
-				return nil -- Skip formatting for files larger than huge_file_size
+			if ok and stat and stat.size > huge_threshold then
+				return nil
+			end
+
+			-- Also check buffer-local bigfile marker
+			if vim.b[bufnr].bigfile_level == "huge" then
+				return nil
 			end
 
 			local ft = vim.bo[bufnr].filetype
 
-			-- disable LSP formatting for C/C++
+			-- Disable LSP formatting for C/C++
 			local disable_filetypes = { c = true, cpp = true }
 			local lsp_format_opt = disable_filetypes[ft] and "never" or "fallback"
 
@@ -26,7 +40,6 @@ return { -- Autoformat
 			}
 		end,
 
-		-- map filetypes to formatter names (runs in order)
 		formatters_by_ft = {
 			lua = { "stylua" },
 			javascript = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
@@ -47,18 +60,18 @@ return { -- Autoformat
 			elixir = { "lsp" },
 			heex = { "lsp" },
 			eex = { "lsp" },
-
-			-- Add C/C++ formatting via clang-format
+			go = { "goimports", "gofmt" },
 			c = { "clang_format" },
 			cpp = { "clang_format" },
-
-			-- C# formatting via LSP (omnisharp)
 			cs = { "lsp" },
 			csharp = { "lsp" },
-
-			-- Rust, Go, Terraform support
 			rust = { "rustfmt" },
 			terraform = { "terraform_fmt" },
+			python = { "ruff_format", "black", stop_after_first = true },
+			sh = { "shfmt" },
+			bash = { "shfmt" },
+			zsh = { "shfmt" },
+			toml = { "taplo" },
 		},
 	},
 }

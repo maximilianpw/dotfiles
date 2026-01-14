@@ -68,8 +68,8 @@ return {
 		-- Smart file/symbol renaming with LSP integration
 		rename = { enabled = true },
 
-		-- Large file handling and optimization
-		bigfile = { enabled = true },
+		-- Large file handling (disabled - using consolidated config/bigfile.lua)
+		bigfile = { enabled = false },
 
 		-- Quick file operations and access
 		quickfile = { enabled = true },

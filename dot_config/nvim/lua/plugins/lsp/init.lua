@@ -10,19 +10,18 @@ return {
 		},
 	},
 
-	-- Fidget for LSP progress
-	{ "j-hui/fidget.nvim", opts = {} },
-
-	-- Native LSP setup (loaded via lazy.nvim's config mechanism)
+	-- Fidget for LSP progress (lazy-loaded on LSP attach)
 	{
-		dir = vim.fn.stdpath("config"),
-		name = "native-lsp-setup",
-		config = function()
-			-- Speed up Lua module loading
-			if vim.loader then
-				vim.loader.enable()
-			end
+		"j-hui/fidget.nvim",
+		event = "LspAttach",
+		opts = {},
+	},
 
+	-- Native LSP configuration
+	{
+		"neovim/nvim-lspconfig",
+		lazy = false,
+		config = function()
 			-- Diagnostics UI
 			local diag_signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 			for type, icon in pairs(diag_signs) do
@@ -82,7 +81,11 @@ return {
 			}
 			vim.lsp.enable(servers)
 
-			-- LspAttach autocmd for keybindings (completion handled by blink.cmp)
+			-- Create augroups once
+			local lsp_highlight_group = vim.api.nvim_create_augroup("lsp-highlight", { clear = true })
+			local lsp_detach_group = vim.api.nvim_create_augroup("lsp-detach", { clear = true })
+
+			-- LspAttach autocmd for keybindings
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
 				callback = function(event)
@@ -113,7 +116,7 @@ return {
 					map("<leader>ca", vim.lsp.buf.code_action, "Code Action", { "n", "x" })
 					map("gD", vim.lsp.buf.declaration, "Goto Declaration")
 					map("K", vim.lsp.buf.hover, "Hover Documentation")
-					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+					map("<leader>cs", vim.lsp.buf.signature_help, "Signature Documentation")
 					map("<leader>Q", vim.diagnostic.open_float, "Show line diagnostics")
 					map("<leader>cf", function()
 						vim.lsp.buf.format({ async = true })
@@ -130,43 +133,36 @@ return {
 					end
 
 					-- Skip document highlighting for large files
-					if vim.b.large_file then
+					if vim.b[bufnr].bigfile then
 						return
 					end
 
-					-- Document highlight on cursor hold
+					-- Document highlight on cursor hold (using vim.defer_fn instead of uv timers)
 					if client and client:supports_method("textDocument/documentHighlight") then
-						local grp = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
-						local highlight_timer = nil
-
 						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+							group = lsp_highlight_group,
 							buffer = bufnr,
-							group = grp,
 							callback = function()
-								if highlight_timer then
-									highlight_timer:stop()
-								end
-								highlight_timer = (vim.uv or vim.loop).new_timer()
-								highlight_timer:start(100, 0, function()
-									vim.schedule(function()
-										vim.lsp.buf.document_highlight()
-									end)
-								end)
+								vim.defer_fn(function()
+									if vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_get_current_buf() == bufnr then
+										pcall(vim.lsp.buf.document_highlight)
+									end
+								end, 100)
 							end,
 						})
+
 						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+							group = lsp_highlight_group,
 							buffer = bufnr,
-							group = grp,
 							callback = vim.lsp.buf.clear_references,
 						})
+
 						vim.api.nvim_create_autocmd("LspDetach", {
-							group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
+							group = lsp_detach_group,
+							buffer = bufnr,
 							callback = function(ev)
-								if highlight_timer then
-									highlight_timer:stop()
-								end
 								vim.lsp.buf.clear_references()
-								vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = ev.buf })
+								vim.api.nvim_clear_autocmds({ group = lsp_highlight_group, buffer = ev.buf })
 							end,
 						})
 					end

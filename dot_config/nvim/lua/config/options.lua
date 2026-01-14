@@ -1,0 +1,59 @@
+-- Basic Neovim options
+-- Must happen before plugins are loaded (otherwise wrong leader will be used)
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.g.have_nerd_font = true
+
+-- Auto-detect node path
+local node = vim.fn.exepath("node")
+if node ~= "" then
+	vim.g.node_host_prog = node
+end
+
+-- Speed up Lua module loading
+if vim.loader then
+	vim.loader.enable()
+end
+
+-- Line numbers
+vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Mouse and mode
+vim.opt.mouse = "a"
+vim.opt.showmode = false
+
+-- Sync clipboard between OS and Neovim
+vim.schedule(function()
+	vim.opt.clipboard = "unnamedplus"
+end)
+
+-- Indentation and editing
+vim.opt.breakindent = true
+vim.opt.undofile = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- UI
+vim.opt.signcolumn = "yes"
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+vim.opt.list = true
+vim.opt.inccommand = "split"
+vim.opt.cursorline = true
+vim.opt.scrolloff = 10
+vim.opt.confirm = true
+
+-- Tabs
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+
+-- Buffer setup
+vim.opt.termguicolors = true
+
+-- Completion settings (for blink.cmp)
+vim.opt.completeopt = "menu,menuone,noselect"
