@@ -50,7 +50,8 @@ return {
 				pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
 				callback = function(args)
 					local ok, stat = pcall((vim.uv or vim.loop).fs_stat, args.file)
-					if ok and stat and stat.size > vim.g.max_file_size * 1024 then
+					local max_size = vim.g.max_file_size or 500 -- default 500KB
+					if ok and stat and stat.size > max_size * 1024 then
 						vim.notify("Large TS file: some LSP features disabled", vim.log.levels.WARN)
 						vim.b.large_file = true
 						vim.opt_local.syntax = "off"
