@@ -33,3 +33,27 @@ vim.keymap.set({ "n", "v" }, "<leader>yd", function()
 	vim.fn.setreg("+", text)
 	vim.notify("Copied: " .. text, vim.log.levels.INFO)
 end, { desc = "Copy file path with line number/range" })
+
+-- Better buffer navigation
+vim.keymap.set("n", "<leader>bf", "<cmd>bfirst<cr>", { desc = "First buffer" })
+vim.keymap.set("n", "<leader>bL", "<cmd>blast<cr>", { desc = "Last buffer" })
+
+-- Diagnostic navigation
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- Quickfix navigation
+vim.keymap.set("n", "[q", "<cmd>cprevious<cr>", { desc = "Previous quickfix" })
+vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix" })
+vim.keymap.set("n", "[Q", "<cmd>cfirst<cr>", { desc = "First quickfix" })
+vim.keymap.set("n", "]Q", "<cmd>clast<cr>", { desc = "Last quickfix" })
+
+-- Better visual indentation (stay in visual mode)
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
+
+-- Window resize with arrows
+vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })

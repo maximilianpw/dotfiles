@@ -10,11 +10,8 @@ return {
         dockerfile = { 'hadolint' },
         terraform = { 'tflint' },
         text = { 'vale' },
-        javascript = { 'eslint_d' },
-        typescript = { 'eslint_d' },
-        javascriptreact = { 'eslint_d' },
-        typescriptreact = { 'eslint_d' },
-        vue = { 'eslint_d' },
+        -- eslint_d removed - already handled by conform.nvim for formatting/fixing
+        -- Diagnostics come from ESLint LSP or conform's eslint_d run
         java = { 'checkstyle' },
         nix = { 'nix' },
         go = { 'golangcilint' },

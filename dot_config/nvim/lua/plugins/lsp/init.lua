@@ -30,17 +30,28 @@ return {
 			end
 
 			vim.diagnostic.config({
-				virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
+				virtual_text = {
+					spacing = 4,
+					source = "if_many",
+					prefix = "●",
+					severity = { min = vim.diagnostic.severity.WARN }, -- Only show warnings+
+				},
 				float = {
 					source = true,
 					border = "rounded",
 					header = "",
 					prefix = "",
+					focusable = true, -- Allow interacting with diagnostic floats
+					max_width = 80,
 				},
-				signs = { severity = { min = vim.diagnostic.severity.HINT } },
+				signs = {
+					severity = { min = vim.diagnostic.severity.HINT },
+					priority = 20, -- Show diagnostics above other signs
+				},
 				underline = true,
 				update_in_insert = false,
 				severity_sort = true,
+				jump = { float = true }, -- Show float when jumping to diagnostic
 			})
 
 			-- Inject schemastore schemas into jsonls/yamlls
@@ -85,12 +96,29 @@ return {
 			local lsp_highlight_group = vim.api.nvim_create_augroup("lsp-highlight", { clear = true })
 			local lsp_detach_group = vim.api.nvim_create_augroup("lsp-detach", { clear = true })
 
+			-- Helper function to format buffer with conform fallback to LSP
+			local function format_buffer()
+				local has_conform, conform = pcall(require, "conform")
+				if has_conform then
+					conform.format({ async = true, lsp_format = "fallback" })
+				else
+					vim.lsp.buf.format({ async = true })
+				end
+			end
+
 			-- LspAttach autocmd for keybindings
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
 				callback = function(event)
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
+					if not client then
+						return
+					end
+
 					local bufnr = event.buf
+
+					-- Enable completion triggered by <c-x><c-o>
+					vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
 
 					-- Keymaps
 					local map = function(keys, func, desc, mode)
@@ -118,9 +146,7 @@ return {
 					map("K", vim.lsp.buf.hover, "Hover Documentation")
 					map("<leader>cs", vim.lsp.buf.signature_help, "Signature Documentation")
 					map("<leader>Q", vim.diagnostic.open_float, "Show line diagnostics")
-					map("<leader>cf", function()
-						vim.lsp.buf.format({ async = true })
-					end, "Format Document")
+					map("<leader>cf", format_buffer, "Format Document")
 
 					-- Inlay hints toggle
 					if vim.lsp.inlay_hint then

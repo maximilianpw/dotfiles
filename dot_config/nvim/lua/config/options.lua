@@ -57,3 +57,28 @@ vim.opt.termguicolors = true
 
 -- Completion settings (for blink.cmp)
 vim.opt.completeopt = "menu,menuone,noselect"
+vim.opt.pumheight = 15 -- Limit completion menu height
+
+-- Additional UI improvements
+vim.opt.virtualedit = "block" -- Allow cursor beyond end of line in visual block mode
+vim.opt.fillchars = { -- Better window separators
+	fold = "⸱",
+	foldopen = "▾",
+	foldclose = "▸",
+	foldsep = " ",
+	diff = "╱",
+	eob = " ",
+}
+vim.opt.smoothscroll = true -- Smooth scrolling for long lines (nvim 0.10+)
+vim.opt.foldlevel = 99 -- Start with folds open
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext = "" -- Use treesitter for fold text
+
+-- Search improvements
+vim.opt.hlsearch = true -- Explicitly enable search highlighting
+vim.opt.incsearch = true -- Show matches as you type
+
+-- Wildmenu improvements
+vim.opt.wildmode = "longest:full,full"
+vim.opt.wildignore:append({ "*.o", "*.obj", ".git", "node_modules", "*.pyc" })
