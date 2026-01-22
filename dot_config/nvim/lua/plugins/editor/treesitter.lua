@@ -4,7 +4,7 @@ return {
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
-			"nvim-treesitter/nvim-treesitter-textobjects",
+			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 		},
 		opts = {
 			ensure_installed = {
@@ -85,7 +85,8 @@ return {
 			},
 		},
 		config = function(_, opts)
-			require("nvim-treesitter.configs").setup(opts)
+			-- nvim-treesitter 1.0+ removed configs module, setup textobjects directly
+			require("nvim-treesitter-textobjects").setup(opts.textobjects or {})
 
 			-- Enable treesitter highlighting for all buffers
 			vim.api.nvim_create_autocmd("FileType", {
