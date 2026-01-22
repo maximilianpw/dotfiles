@@ -38,6 +38,10 @@ return {
 			},
 		},
 	},
+	config = function(_, opts)
+		require("obsidian").setup(opts)
+		vim.opt_local.conceallevel = 2
+	end,
 	keys = {
 		{ "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Note" },
 		{ "<leader>oo", "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },

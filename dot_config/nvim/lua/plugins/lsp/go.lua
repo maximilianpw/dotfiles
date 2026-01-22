@@ -15,7 +15,7 @@ return {
 		lsp_gofumpt = false,
 		lsp_inlay_hints = { enable = false },
 		trouble = false,
-		luasnip = true,
+		luasnip = false,
 		dap_debug = true,
 	},
 	config = function(_, opts)
