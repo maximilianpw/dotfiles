@@ -43,14 +43,14 @@ return {
 		vim.opt_local.conceallevel = 2
 	end,
 	keys = {
-		{ "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Note" },
-		{ "<leader>oo", "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
-		{ "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
-		{ "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Backlinks" },
-		{ "<leader>ot", "<cmd>ObsidianTags<cr>", desc = "Tags" },
-		{ "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Today's Note" },
-		{ "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Note" },
-		{ "<leader>ol", "<cmd>ObsidianLink<cr>", desc = "Link", mode = "v" },
-		{ "<leader>oL", "<cmd>ObsidianLinkNew<cr>", desc = "Link New", mode = "v" },
+		{ "<leader>On", "<cmd>ObsidianNew<cr>", desc = "New Note" },
+		{ "<leader>Oo", "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
+		{ "<leader>Oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
+		{ "<leader>Ob", "<cmd>ObsidianBacklinks<cr>", desc = "Backlinks" },
+		{ "<leader>Ot", "<cmd>ObsidianTags<cr>", desc = "Tags" },
+		{ "<leader>Od", "<cmd>ObsidianToday<cr>", desc = "Today's Note" },
+		{ "<leader>Oy", "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Note" },
+		{ "<leader>Ol", "<cmd>ObsidianLink<cr>", desc = "Link", mode = "v" },
+		{ "<leader>OL", "<cmd>ObsidianLinkNew<cr>", desc = "Link New", mode = "v" },
 	},
 }
