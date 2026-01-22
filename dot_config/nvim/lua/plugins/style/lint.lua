@@ -6,7 +6,6 @@ return {
     config = function()
       local lint = require 'lint'
       lint.linters_by_ft = {
-        markdown = { 'vale' },
         dockerfile = { 'hadolint' },
         terraform = { 'tflint' },
         text = { 'vale' },
