@@ -13,5 +13,7 @@ return {
 	opts = {
 		prompt = "❯ ",
 		title = "Find Files",
+		enabled = true,
+		show_scores = true,
 	},
 }

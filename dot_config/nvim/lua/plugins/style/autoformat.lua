@@ -42,11 +42,11 @@ return {
 
 		formatters_by_ft = {
 			lua = { "stylua" },
-			javascript = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
-			typescript = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
-			javascriptreact = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
-			typescriptreact = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
-			vue = { "eslint_d", "prettierd", "prettier", stop_after_first = false },
+			javascript = { "prettierd", "prettier", stop_after_first = true },
+			typescript = { "prettierd", "prettier", stop_after_first = true },
+			javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+			typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+			vue = { "prettierd", "prettier", stop_after_first = true },
 			css = { "prettierd", "prettier" },
 			scss = { "prettierd", "prettier" },
 			less = { "prettierd", "prettier" },
