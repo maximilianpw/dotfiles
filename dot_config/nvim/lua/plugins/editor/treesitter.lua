@@ -40,8 +40,8 @@ return {
 			incremental_selection = {
 				enable = true,
 				keymaps = {
-					init_selection = "<C-space>",
-					node_incremental = "<C-space>",
+					init_selection = "<M-space>",
+					node_incremental = "<M-space>",
 					scope_incremental = false,
 					node_decremental = "<bs>",
 				},
@@ -86,13 +86,7 @@ return {
 			},
 		},
 		config = function(_, opts)
-			local ts = require("nvim-treesitter")
-			-- nvim-treesitter 1.0+ has setup on main module, older versions use configs
-			if ts.setup then
-				ts.setup(opts)
-			else
-				require("nvim-treesitter.configs").setup(opts)
-			end
+			require("nvim-treesitter").setup(opts)
 		end,
 	},
 }

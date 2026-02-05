@@ -13,8 +13,16 @@ default-command = "log"
 editor = "nvim"
 
 [aliases]
-b = ["branch"]
+b = ["bookmark"]
+c = ["commit"]
+d = ["desc"]
+di = ["diff"]
+e = ["edit"]
+f = ["git", "fetch"]
+l = ["log", "-r", "..@"]
 n = ["new"]
+p = ["git", "push"]
+s = ["status"]
 
 # Move the closest bookmark to the current commit. This is useful when
 # working on a named branch, creating a bunch of commits, and then needing
@@ -24,8 +32,12 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 # Rebase the current branch onto the trunk.
 retrunk = ["rebase", "-d", "trunk()"]
 
+[git]
+# Don't abandon commits that become unreachable after git fetch
+abandon-unreachable-commits = false
+
 [remotes.origin]
-auto-track-bookmarks = "glob:*"
+auto-track-bookmarks = "glob:main"
 
 [templates]
 git_push_bookmark = '"maximilianpw/push-" ++ change_id.short()'

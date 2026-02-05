@@ -16,20 +16,6 @@ return {
         go = { 'golangcilint' },
       }
 
-      -- Debounce helper (per buffer) to avoid hammering linters while typing
-      local function debounce(ms, fn)
-        local timer = (vim.uv or vim.loop).new_timer()
-        return function(...)
-          local argv = { ... }
-          timer:stop()
-            timer:start(ms, 0, function()
-              vim.schedule(function()
-                pcall(fn, unpack(argv))
-              end)
-            end)
-        end
-      end
-
       -- Distinguish heavy linters (need saved state / expensive)
       local heavy = {
         golangcilint = true,

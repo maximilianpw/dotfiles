@@ -16,11 +16,10 @@ return {
 				-- typescript-tools handles root_dir automatically
 				-- It looks for: tsconfig.json, jsconfig.json, package.json, .git
 				single_file_support = true,
-				capabilities = vim.lsp.protocol.make_client_capabilities(),
 				handlers = {
 					["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
 						-- Skip semantic tokens for large files (performance optimization)
-						if vim.b.large_file then
+						if vim.b.bigfile then
 							return nil
 						end
 						return vim.lsp.handlers["textDocument/semanticTokens/full"](err, result, ctx, config)
@@ -45,20 +44,6 @@ return {
 
 			typescript_tools.setup(setup_opts)
 
-			-- TypeScript-specific large file handling
-			vim.api.nvim_create_autocmd("BufReadPost", {
-				pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
-				callback = function(args)
-					local ok, stat = pcall((vim.uv or vim.loop).fs_stat, args.file)
-					local max_size = vim.g.max_file_size or 500 -- default 500KB
-					if ok and stat and stat.size > max_size * 1024 then
-						vim.notify("Large TS file: some LSP features disabled", vim.log.levels.WARN)
-						vim.b.large_file = true
-						vim.opt_local.syntax = "off"
-						vim.diagnostic.enable(false, { bufnr = args.buf })
-					end
-				end,
-			})
 		end,
 	},
 	{
