@@ -1,0 +1,13 @@
+name: rbi
+root: ~/Local/rbi
+
+windows:
+  - editor:
+      panes:
+        - nvim
+  - claude:
+      panes:
+        - c
+  - dev:
+      panes:
+        - docker compose up --build

@@ -1,0 +1,16 @@
+name: rmus
+root: ~/Local/rmus
+
+windows:
+  - editor:
+      panes:
+        - nvim
+  - claude:
+      panes:
+        - c
+  - build:
+      panes:
+        - cargo build
+  - shell:
+      panes:
+        - ''

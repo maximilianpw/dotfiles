@@ -1,0 +1,16 @@
+name: ocpi
+root: ~/Local/Vev Platform Services/ocpi-integration-platform
+
+windows:
+  - editor:
+      panes:
+        - nvim
+  - claude:
+      panes:
+        - c
+  - vcs:
+      panes:
+        - jj log
+  - docker:
+      panes:
+        - docker compose up --build
