@@ -1,4 +1,4 @@
-name: ocpi
+name: ocpi-int-platform
 root: ~/Local/Vev Platform Services/ocpi-integration-platform
 
 windows:

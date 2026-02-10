@@ -8,9 +8,9 @@ windows:
   - claude:
       panes:
         - c
-  - build:
-      panes:
-        - cargo build
   - shell:
       panes:
         - ''
+  - build:
+      panes:
+        - cargo build

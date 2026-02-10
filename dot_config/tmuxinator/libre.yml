@@ -8,9 +8,9 @@ windows:
   - claude:
       panes:
         - c
-  - vcs:
+  - shell:
       panes:
-        - jj log
+        - ''
   - run:
       root: ~/local/librestock/meta
       panes:
