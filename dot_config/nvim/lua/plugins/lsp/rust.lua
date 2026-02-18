@@ -10,16 +10,15 @@ return {
 				default_settings = {
 					["rust-analyzer"] = {
 						cargo = {
-							allFeatures = true,
+							allFeatures = false,
 							loadOutDirsFromCheck = true,
 							buildScripts = {
 								enable = true,
 							},
 						},
-						-- Run clippy on save instead of just cargo check
 						checkOnSave = {
-							command = "clippy",
-							extraArgs = { "--all", "--", "-W", "clippy::all" },
+							command = "check",
+							extraArgs = {},
 						},
 						procMacro = {
 							enable = true,
@@ -32,7 +31,7 @@ return {
 						diagnostics = {
 							enable = true,
 							experimental = {
-								enable = true,
+								enable = false,
 							},
 							disabled = {},
 							warningsAsHint = {},
