@@ -117,7 +117,7 @@ return {
 						key = "g",
 						desc = "Find Text",
 						action = function()
-							require("snacks").picker.grep()
+							require("fff").live_grep()
 						end,
 					},
 					{
@@ -152,14 +152,7 @@ return {
 		-- ────────────────────────────────────────────────────────────
 		-- 🔍 PICKER SYSTEM (Telescope replacement)
 		-- ────────────────────────────────────────────────────────────
-		-- NOTE: <leader>ff is handled by fff.nvim for file finding
-		{
-			"<leader>fl",
-			function()
-				require("snacks").picker.grep()
-			end,
-			desc = "Find by Grep (Live)",
-		},
+		-- NOTE: file finding (ff) and grep (fg/fz) are handled by fff.nvim
 		{
 			"<leader>fd",
 			function()
@@ -202,7 +195,7 @@ return {
 			end,
 			desc = "Search Keymaps",
 		},
-		-- NOTE: <leader>fc is handled by fff.nvim for config files
+		-- NOTE: <leader>fc (config files) and <leader>fg (git root) handled by fff.nvim
 		{
 			"<leader>fw",
 			function()
@@ -225,13 +218,7 @@ return {
 			desc = "Undo History",
 		},
 		-- Git related pickers (matching your telescope git keymaps)
-		{
-			"<leader>fgf",
-			function()
-				require("snacks").picker.git_files()
-			end,
-			desc = "Find Git Files",
-		},
+		-- NOTE: <leader>fg (find in git root) handled by fff.nvim
 		{
 			"<leader>fgb",
 			function()
