@@ -4,6 +4,8 @@ return {
 		require("fff.download").download_or_build_binary()
 	end,
 	opts = {
+		prompt = "❯ ",
+		title = "Find Files",
 		debug = {
 			enabled = true,
 			show_scores = true,
