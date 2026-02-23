@@ -9,11 +9,12 @@ return {
 			server = {
 				default_settings = {
 					["rust-analyzer"] = {
+						numThreads = 4,
 						cargo = {
 							allFeatures = false,
-							loadOutDirsFromCheck = true,
+							loadOutDirsFromCheck = false,
 							buildScripts = {
-								enable = true,
+								enable = false,
 							},
 						},
 						checkOnSave = {
@@ -21,12 +22,7 @@ return {
 							extraArgs = {},
 						},
 						procMacro = {
-							enable = true,
-							ignored = {
-								["async-trait"] = { "async_trait" },
-								["napi-derive"] = { "napi" },
-								["async-recursion"] = { "async_recursion" },
-							},
+							enable = false,
 						},
 						diagnostics = {
 							enable = true,
