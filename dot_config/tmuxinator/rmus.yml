@@ -1,5 +1,5 @@
 name: rmus
-root: ~/Local/rmus
+root: ~/local/rmus
 
 windows:
   - editor:
