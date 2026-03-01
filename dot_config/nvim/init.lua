@@ -17,13 +17,15 @@ require("lazy").setup({
 	{ "tpope/vim-sleuth", event = "VeryLazy" }, -- Detect tabstop and shiftwidth automatically
 
 	{
-		"navarasu/onedark.nvim",
+		"catppuccin/nvim",
+		name = "catppuccin",
 		priority = 1000,
-		config = function()
-			require("onedark").setup({
-				style = "darker",
-			})
-			require("onedark").load()
+		opts = {
+			flavour = "mocha",
+		},
+		config = function(_, opts)
+			require("catppuccin").setup(opts)
+			vim.cmd.colorscheme("catppuccin")
 		end,
 	},
 	{
