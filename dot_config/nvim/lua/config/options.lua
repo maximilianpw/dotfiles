@@ -7,12 +7,12 @@ vim.g.have_nerd_font = true
 -- Auto-detect node path
 local node = vim.fn.exepath("node")
 if node ~= "" then
-	vim.g.node_host_prog = node
+  vim.g.node_host_prog = node
 end
 
 -- Speed up Lua module loading
 if vim.loader then
-	vim.loader.enable()
+  vim.loader.enable()
 end
 
 -- Line numbers
@@ -25,7 +25,7 @@ vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim
 vim.schedule(function()
-	vim.opt.clipboard = "unnamedplus"
+  vim.opt.clipboard = "unnamedplus"
 end)
 
 -- Indentation and editing
@@ -62,12 +62,12 @@ vim.opt.pumheight = 15 -- Limit completion menu height
 -- Additional UI improvements
 vim.opt.virtualedit = "block" -- Allow cursor beyond end of line in visual block mode
 vim.opt.fillchars = { -- Better window separators
-	fold = "⸱",
-	foldopen = "▾",
-	foldclose = "▸",
-	foldsep = " ",
-	diff = "╱",
-	eob = " ",
+  fold = "⸱",
+  foldopen = "▾",
+  foldclose = "▸",
+  foldsep = " ",
+  diff = "╱",
+  eob = " ",
 }
 vim.opt.smoothscroll = true -- Smooth scrolling for long lines (nvim 0.10+)
 vim.opt.foldlevel = 99 -- Start with folds open

@@ -19,21 +19,22 @@ d = ["desc"]
 di = ["diff"]
 e = ["edit"]
 f = ["git", "fetch"]
-l = ["log", "-r", "..@"]
+l = ["log", "-r", "trunk()..@"]
 n = ["new"]
 p = ["git", "push"]
 s = ["status"]
-
 # Move the closest bookmark to the current commit. This is useful when
 # working on a named branch, creating a bunch of commits, and then needing
 # to update the bookmark before pushing.
 tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
-
 # Rebase the current branch onto the trunk.
 retrunk = ["rebase", "-d", "trunk()"]
+# Tidy up the current branch, removing commits from dead branches.
+tidy = ["abandon", "mine() & ~bookmarks() & ~::@ & ~trunk() & mutable()"]
+# Tidy up all commits that have been merged into trunk.
+tidy-all = ["abandon", "~bookmarks() & ~::@ & ~trunk() & mutable()"]
 
 [git]
-# Don't abandon commits that become unreachable after git fetch
 abandon-unreachable-commits = false
 
 [remotes.origin]
@@ -41,7 +42,6 @@ auto-track-bookmarks = "glob:main"
 
 [templates]
 git_push_bookmark = '"maximilianpw/push-" ++ change_id.short()'
-# Prevent pushing work in progress or anything explicitly labeled "private"
 private-commits = "description(glob:'wip:*') | description(glob:'private:*')"
 
 [revset-aliases]

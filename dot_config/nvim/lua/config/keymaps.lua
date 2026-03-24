@@ -9,24 +9,24 @@ vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" }
 
 -- Copy file path with line number/range
 vim.keymap.set({ "n", "v" }, "<leader>yd", function()
-	local filepath = vim.fn.expand("%")
-	local start_line = vim.fn.line(".")
-	local end_line = vim.fn.line("v")
+  local filepath = vim.fn.expand("%")
+  local start_line = vim.fn.line(".")
+  local end_line = vim.fn.line("v")
 
-	local text
-	if vim.fn.mode() == "v" or vim.fn.mode() == "V" or vim.fn.mode() == "\22" then
-		start_line = vim.fn.line("v")
-		end_line = vim.fn.line(".")
-		if start_line > end_line then
-			start_line, end_line = end_line, start_line
-		end
-		text = string.format("%s:%d-%d", filepath, start_line, end_line)
-	else
-		text = string.format("%s:%d", filepath, start_line)
-	end
+  local text
+  if vim.fn.mode() == "v" or vim.fn.mode() == "V" or vim.fn.mode() == "\22" then
+    start_line = vim.fn.line("v")
+    end_line = vim.fn.line(".")
+    if start_line > end_line then
+      start_line, end_line = end_line, start_line
+    end
+    text = string.format("%s:%d-%d", filepath, start_line, end_line)
+  else
+    text = string.format("%s:%d", filepath, start_line)
+  end
 
-	vim.fn.setreg("+", text)
-	vim.notify("Copied: " .. text, vim.log.levels.INFO)
+  vim.fn.setreg("+", text)
+  vim.notify("Copied: " .. text, vim.log.levels.INFO)
 end, { desc = "Copy file path with line number/range" })
 
 -- Better buffer navigation
