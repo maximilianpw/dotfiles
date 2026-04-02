@@ -33,6 +33,19 @@ retrunk = ["rebase", "-d", "trunk()"]
 tidy = ["abandon", "mine() & ~bookmarks() & ~::@ & ~trunk() & mutable()"]
 # Tidy up all commits that have been merged into trunk.
 tidy-all = ["abandon", "~bookmarks() & ~::@ & ~trunk() & mutable()"]
+a = ["absorb"]
+el = ["evolog", "-p"]
+nx = ["next"]
+pv = ["prev"]
+sp = ["split"]
+
+[fix.tools.prettier]
+command = ["prettier", "--write", "$path"]
+patterns = ["glob:**/*.{ts,tsx,js,json,css}"]
+
+[fix.tools.rustfmt]
+command = ["rustfmt", "$path"]
+patterns = ["glob:**/*.rs"]
 
 [git]
 abandon-unreachable-commits = false
