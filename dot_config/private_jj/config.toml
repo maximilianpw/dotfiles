@@ -40,8 +40,18 @@ pv = ["prev"]
 sp = ["split"]
 
 [fix.tools.prettier]
-command = ["prettier", "--write", "$path"]
-patterns = ["glob:**/*.{ts,tsx,js,json,css}"]
+command = ["prettierd", "$path"]
+patterns = ["glob:'**/*.{js,jsx,ts,tsx,css,html,json,md,yaml,yml}'"]
+
+[fix.tools.eslint]
+command = [
+  "eslint_d",
+  "--fix-to-stdout",
+  "--stdin",
+  "--stdin-filename",
+  "$path",
+]
+patterns = ["glob:'**/*.{js,jsx,ts,tsx}'"]
 
 [fix.tools.rustfmt]
 command = ["rustfmt", "$path"]

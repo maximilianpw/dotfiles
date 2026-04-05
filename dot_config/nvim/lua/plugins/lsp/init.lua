@@ -23,12 +23,6 @@ return {
     lazy = false,
     config = function()
       -- Diagnostics UI
-      local diag_signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-      for type, icon in pairs(diag_signs) do
-        local hl = "DiagnosticSign" .. type
-        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-      end
-
       vim.diagnostic.config({
         virtual_text = {
           spacing = 4,
@@ -47,6 +41,12 @@ return {
         signs = {
           severity = { min = vim.diagnostic.severity.HINT },
           priority = 20, -- Show diagnostics above other signs
+          text = {
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN] = " ",
+            [vim.diagnostic.severity.HINT] = " ",
+            [vim.diagnostic.severity.INFO] = " ",
+          },
         },
         underline = true,
         update_in_insert = false,
@@ -150,10 +150,7 @@ return {
           -- Inlay hints toggle
           if vim.lsp.inlay_hint then
             map("<leader>ci", function()
-              vim.lsp.inlay_hint.enable(
-                not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }),
-                { bufnr = bufnr }
-              )
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
             end, "Toggle Inlay Hints")
           end
 

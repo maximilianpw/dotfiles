@@ -40,6 +40,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     -- Max treesitter: disable syntax features
     if size > vim.g.bigfile.max_ts then
       vim.b[bufnr].bigfile_level = "max_ts"
+      vim.treesitter.stop(bufnr)
       vim.opt_local.syntax = "off"
       vim.opt_local.foldmethod = "manual"
     end
