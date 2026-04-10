@@ -1,2 +1,16 @@
-.claude/
+.claude/*
+!.claude/CLAUDE.md
+!.claude/settings.json
+!.claude/commands/
+!.claude/skills/
+.claude/skills/find-skills
+.claude/skills/grill-me
+.claude/skills/improve-codebase-architecture
+.claude/skills/prd-to-issues
+.claude/skills/tdd
+.claude/skills/write-a-prd
 CLAUDE.md
+.config/zed/conversations
+.config/zed/themes
+.config/zed/prompts
+.config/zed/settings_backup.json
