@@ -16,7 +16,7 @@ return {
     -- Scope-aware operations and highlighting
     scope = { enabled = true },
     -- Smooth scrolling animations
-    scroll = { enabled = true },
+    scroll = { enabled = false },
     -- Advanced status column (disabled - set in options.lua)
     statuscolumn = { enabled = false },
     -- Quick scratch buffers for temporary notes

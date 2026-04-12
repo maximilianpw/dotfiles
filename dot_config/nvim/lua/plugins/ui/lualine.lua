@@ -65,6 +65,20 @@ return {
       return false
     end
 
+    -- Cache highlight-derived colors (invalidated on colorscheme change)
+    local cached_colors = {}
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      callback = function()
+        cached_colors = {}
+      end,
+    })
+    local function get_hl_color(hl, fallback)
+      if not cached_colors[hl] then
+        cached_colors[hl] = package.loaded["snacks"] and require("snacks").util.color(hl) or fallback
+      end
+      return cached_colors[hl]
+    end
+
     vim.o.laststatus = vim.g.lualine_laststatus
 
     local opts = {
@@ -112,10 +126,7 @@ return {
               return package.loaded["noice"] and require("noice").api.status.command.has()
             end,
             color = function()
-              return {
-                fg = package.loaded["snacks"] and require("snacks").util.color("Statement")
-                  or "#7aa2f7",
-              }
+              return { fg = get_hl_color("Statement", "#7aa2f7") }
             end,
           },
           {
@@ -126,9 +137,7 @@ return {
               return package.loaded["noice"] and require("noice").api.status.mode.has()
             end,
             color = function()
-              return {
-                fg = package.loaded["snacks"] and require("snacks").util.color("Constant") or "#bb9af7",
-              }
+              return { fg = get_hl_color("Constant", "#bb9af7") }
             end,
           },
           {
@@ -140,9 +149,7 @@ return {
               return package.loaded["dap"] and require("dap").status() ~= ""
             end,
             color = function()
-              return {
-                fg = package.loaded["snacks"] and require("snacks").util.color("Debug") or "#ff9e64",
-              }
+              return { fg = get_hl_color("Debug", "#ff9e64") }
             end,
           },
           {
@@ -157,9 +164,7 @@ return {
               return package.loaded["lazy"]
             end,
             color = function()
-              return {
-                fg = package.loaded["snacks"] and require("snacks").util.color("Special") or "#ff9e64",
-              }
+              return { fg = get_hl_color("Special", "#ff9e64") }
             end,
           },
           {

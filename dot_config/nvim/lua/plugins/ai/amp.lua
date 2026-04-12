@@ -1,7 +1,7 @@
 return {
   "sourcegraph/amp.nvim",
   branch = "main",
-  lazy = false,
+  event = "VeryLazy",
   enabled = true,
   opts = { auto_start = true, log_level = "info" },
 }

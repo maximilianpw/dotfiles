@@ -16,14 +16,7 @@ return {
     notify_on_error = true,
 
     format_on_save = function(bufnr)
-      -- Skip formatting for huge files using consolidated bigfile config
-      local huge_threshold = vim.g.bigfile and vim.g.bigfile.huge or 200 * 1024
-      local ok, stat = pcall((vim.uv or vim.loop).fs_stat, vim.api.nvim_buf_get_name(bufnr))
-      if ok and stat and stat.size > huge_threshold then
-        return nil
-      end
-
-      -- Also check buffer-local bigfile marker
+      -- Skip formatting for huge files (marker set by config/bigfile.lua on BufReadPost)
       if vim.b[bufnr].bigfile_level == "huge" then
         return nil
       end

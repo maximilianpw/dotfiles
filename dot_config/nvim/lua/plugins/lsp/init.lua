@@ -13,7 +13,7 @@ return {
   -- Native LSP configuration
   {
     "neovim/nvim-lspconfig",
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       -- Diagnostics UI
       vim.diagnostic.config({
@@ -143,17 +143,13 @@ return {
             return
           end
 
-          -- Document highlight on cursor hold (using vim.defer_fn instead of uv timers)
+          -- Document highlight on cursor hold
           if client and client:supports_method("textDocument/documentHighlight") then
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
               group = lsp_highlight_group,
               buffer = bufnr,
               callback = function()
-                vim.defer_fn(function()
-                  if vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_get_current_buf() == bufnr then
-                    pcall(vim.lsp.buf.document_highlight)
-                  end
-                end, 100)
+                pcall(vim.lsp.buf.document_highlight)
               end,
             })
 

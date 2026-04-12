@@ -59,13 +59,10 @@ return {
     require('bufferline').setup(opts)
 
     -- Fix bufferline when restoring a session (debounced for performance)
-    local timer = nil
+    local timer = (vim.uv or vim.loop).new_timer()
     vim.api.nvim_create_autocmd({ 'BufAdd', 'BufDelete' }, {
       callback = function()
-        if timer then
-          timer:stop()
-        end
-        timer = (vim.uv or vim.loop).new_timer()
+        timer:stop()
         timer:start(100, 0, function()
           vim.schedule(function()
             pcall(require('bufferline').refresh)

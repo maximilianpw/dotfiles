@@ -64,6 +64,7 @@ require("lazy").setup({
   {
     "echasnovski/mini.nvim",
     version = false,
+    event = "VeryLazy",
     config = function()
       require("mini.ai").setup({ n_lines = 250 })
       require("mini.move").setup()
