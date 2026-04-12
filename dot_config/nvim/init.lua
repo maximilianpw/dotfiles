@@ -14,8 +14,6 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Configure and install plugins
 require("lazy").setup({
-  { "tpope/vim-sleuth", event = "VeryLazy" }, -- Detect tabstop and shiftwidth automatically
-
   {
     "sainnhe/everforest",
     priority = 1000,

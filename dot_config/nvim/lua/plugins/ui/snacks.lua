@@ -22,22 +22,7 @@ return {
     -- Quick scratch buffers for temporary notes
     scratch = { enabled = true },
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- 🔍 SEARCH & PICKER SYSTEM (Telescope Replacement)
-    -- ═══════════════════════════════════════════════════════════════
-    -- Universal fuzzy finder - replaces Telescope entirely
-    picker = {
-      enabled = true,
-      -- Enhanced matcher for better fuzzy finding
-      matcher = {
-        fuzzy = true,
-        smartcase = true,
-        ignorecase = true,
-        filename_bonus = true,
-        file_pos = true,
-        sort_empty = false,
-      },
-    },
+    picker = { enabled = true },
 
     -- ═══════════════════════════════════════════════════════════════
     -- 💻 TERMINAL & DEVELOPMENT TOOLS
@@ -120,14 +105,7 @@ return {
               require("fff").live_grep()
             end,
           },
-          {
-            icon = " ",
-            key = "r",
-            desc = "Recent Files",
-            action = function()
-              require("snacks").picker.recent()
-            end,
-          },
+          { icon = " ", key = "r", desc = "Recent Files", action = ":browse oldfiles" },
           {
             icon = "󰒲 ",
             key = "l",
@@ -149,107 +127,6 @@ return {
   -- ⌨️  COMPREHENSIVE KEYMAPS FOR ALL SNACKS FEATURES
   -- ═══════════════════════════════════════════════════════════════
   keys = {
-    -- ────────────────────────────────────────────────────────────
-    -- 🔍 PICKER SYSTEM (Telescope replacement)
-    -- ────────────────────────────────────────────────────────────
-    -- NOTE: file finding (ff) and grep (fg/fz) are handled by fff.nvim
-    {
-      "<leader>fd",
-      function()
-        require("snacks").picker.diagnostics()
-      end,
-      desc = "Find Diagnostics",
-    },
-    {
-      "<leader>fD",
-      function()
-        require("snacks").picker.diagnostics({ severity = vim.diagnostic.severity.ERROR })
-      end,
-      desc = "Find Errors Only",
-    },
-    {
-      "<leader><leader>",
-      function()
-        require("snacks").picker.buffers()
-      end,
-      desc = "Find existing buffers",
-    },
-    {
-      "<leader>f.",
-      function()
-        require("snacks").picker.recent()
-      end,
-      desc = "Find Recent Files",
-    },
-    {
-      "<leader>fh",
-      function()
-        require("snacks").picker.help()
-      end,
-      desc = "Find Help",
-    },
-    {
-      "<leader>fk",
-      function()
-        require("snacks").picker.keymaps()
-      end,
-      desc = "Search Keymaps",
-    },
-    -- NOTE: <leader>fc (config files) and <leader>fg (git root) handled by fff.nvim
-    {
-      "<leader>fw",
-      function()
-        require("snacks").picker.grep_word()
-      end,
-      desc = "Find current Word",
-    },
-    {
-      "<leader>fs",
-      function()
-        require("snacks").picker.lsp_symbols()
-      end,
-      desc = "LSP Symbols",
-    },
-    {
-      "<leader>fu",
-      function()
-        require("snacks").picker.undo()
-      end,
-      desc = "Undo History",
-    },
-    -- Git related pickers (matching your telescope git keymaps)
-    -- NOTE: <leader>fg (find in git root) handled by fff.nvim
-    {
-      "<leader>fgb",
-      function()
-        require("snacks").picker.git_branches()
-      end,
-      desc = "Checkout Git Branch",
-    },
-    {
-      "<leader>fgc",
-      function()
-        require("snacks").picker.git_log()
-      end,
-      desc = "Checkout Commit (Git Log)",
-    },
-    -- Search in current buffer (matching your telescope config)
-    {
-      "<leader>/",
-      function()
-        require("snacks").picker.lines()
-      end,
-      desc = "Fuzzily search in current buffer",
-    },
-    -- Grep in open files (matching your telescope config)
-    {
-      "<leader>f/",
-      function()
-        require("snacks").picker.grep_buffers()
-      end,
-      desc = "Grep in Open Files",
-    },
-
     -- ────────────────────────────────────────────────────────────
     -- 📋 NOTIFICATIONS & DEBUG
     -- ────────────────────────────────────────────────────────────
