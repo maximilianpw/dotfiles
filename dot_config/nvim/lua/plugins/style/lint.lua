@@ -9,11 +9,13 @@ return {
         dockerfile = { 'hadolint' },
         terraform = { 'tflint' },
         text = { 'vale' },
-        -- eslint_d removed - already handled by conform.nvim for formatting/fixing
-        -- Diagnostics come from ESLint LSP or conform's eslint_d run
         java = { 'checkstyle' },
         nix = { 'nix' },
         go = { 'golangcilint' },
+        javascript = { 'oxlint' },
+        javascriptreact = { 'oxlint' },
+        typescript = { 'oxlint' },
+        typescriptreact = { 'oxlint' },
       }
 
       -- Distinguish heavy linters (need saved state / expensive)
