@@ -215,6 +215,13 @@ return {
       end,
       desc = "Select Scratch Buffer",
     },
+    {
+      "<leader>fd",
+      function()
+        require("snacks").picker.diagnostics()
+      end,
+      desc = "Find Diagnostics",
+    },
   },
   init = function()
     -- ═══════════════════════════════════════════════════════════════
