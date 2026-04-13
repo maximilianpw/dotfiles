@@ -5,6 +5,23 @@ return {
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local lint = require 'lint'
+
+      -- Override oxlint args to pass the config file it finds
+      local oxlint = lint.linters.oxlint
+      oxlint.args = function()
+        local cfg = vim.fs.find({ 'oxlintrc.json', '.oxlintrc.json' }, {
+          upward = true,
+          path = vim.fn.expand '%:p:h',
+        })
+        if cfg[1] then
+          return { '--format', 'github', '-c', cfg[1] }
+        end
+        return { '--format', 'github' }
+      end
+
+      -- JS/TS linters are resolved dynamically based on project config
+      local js_ts_fts = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' }
+
       lint.linters_by_ft = {
         dockerfile = { 'hadolint' },
         terraform = { 'tflint' },
@@ -12,26 +29,48 @@ return {
         java = { 'checkstyle' },
         nix = { 'nix' },
         go = { 'golangcilint' },
-        javascript = { 'oxlint' },
-        javascriptreact = { 'oxlint' },
-        typescript = { 'oxlint' },
-        typescriptreact = { 'oxlint' },
       }
+
+      --- Check if a project has an oxlint config anywhere above the buffer
+      local function has_oxlint_config(bufnr)
+        local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':h')
+        return #vim.fs.find({ 'oxlintrc.json', '.oxlintrc.json' }, { upward = true, path = buf_dir }) > 0
+      end
+
+      --- Check if a project has an eslint config (flat config = eslint.config.*)
+      local function has_eslint_config(bufnr)
+        local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':h')
+        return #vim.fs.find({
+          'eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs',
+          'eslint.config.ts', 'eslint.config.mts', 'eslint.config.cts',
+          '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', '.eslintrc.yml',
+        }, { upward = true, path = buf_dir }) > 0
+      end
 
       -- Distinguish heavy linters (need saved state / expensive)
       local heavy = {
         golangcilint = true,
+        eslint = true,
       }
+
+      --- Get the effective linter list for a buffer, including dynamic JS/TS linters
+      local function get_linters(bufnr)
+        local ft = vim.bo[bufnr].filetype
+        local configured = lint.linters_by_ft[ft]
+        local linters = configured and vim.list_slice(configured) or {}
+        if vim.tbl_contains(js_ts_fts, ft) then
+          if has_oxlint_config(bufnr) then table.insert(linters, 'oxlint') end
+          if has_eslint_config(bufnr) then table.insert(linters, 'eslint') end
+        end
+        return linters
+      end
 
       -- Run all configured linters for the buffer except heavy ones (unless forced)
       local function run_light_linters(bufnr)
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         if not vim.bo[bufnr].modifiable then return end
-        local ft = vim.bo[bufnr].filetype
-        local configured = lint.linters_by_ft[ft]
-        if not configured then return end
         local light_list = {}
-        for _, name in ipairs(configured) do
+        for _, name in ipairs(get_linters(bufnr)) do
           if not heavy[name] then table.insert(light_list, name) end
         end
         if #light_list > 0 then
@@ -42,11 +81,8 @@ return {
       local function run_heavy_linters(bufnr)
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         if not vim.bo[bufnr].modifiable then return end
-        local ft = vim.bo[bufnr].filetype
-        local configured = lint.linters_by_ft[ft]
-        if not configured then return end
         local heavy_list = {}
-        for _, name in ipairs(configured) do
+        for _, name in ipairs(get_linters(bufnr)) do
           if heavy[name] then table.insert(heavy_list, name) end
         end
         if #heavy_list > 0 then

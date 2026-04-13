@@ -12,43 +12,37 @@ return {
       desc = "Format buffer (Conform)",
     },
   },
-  opts = {
-    notify_on_error = true,
+  opts = function()
+    -- Prettier config file names (https://prettier.io/docs/en/configuration)
+    local prettier_configs = {
+      ".prettierrc",
+      ".prettierrc.json",
+      ".prettierrc.yml",
+      ".prettierrc.yaml",
+      ".prettierrc.json5",
+      ".prettierrc.js",
+      ".prettierrc.cjs",
+      ".prettierrc.mjs",
+      ".prettierrc.toml",
+      "prettier.config.js",
+      "prettier.config.cjs",
+      "prettier.config.mjs",
+    }
 
-    format_on_save = function(bufnr)
-      -- Skip formatting for huge files (marker set by config/bigfile.lua on BufReadPost)
-      if vim.b[bufnr].bigfile_level == "huge" then
-        return nil
-      end
+    local prettier_ft = {
+      "javascript", "javascriptreact", "typescript", "typescriptreact",
+      "vue", "css", "scss", "less", "html",
+      "json", "jsonc", "yaml", "markdown", "graphql",
+    }
 
-      local ft = vim.bo[bufnr].filetype
+    --- Check if the project has a prettier config
+    local function has_prettier_config(bufnr)
+      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
+      return #vim.fs.find(prettier_configs, { upward = true, path = buf_dir }) > 0
+    end
 
-      -- Disable LSP formatting for C/C++
-      local disable_filetypes = { c = true, cpp = true }
-      local lsp_format_opt = disable_filetypes[ft] and "never" or "fallback"
-
-      return {
-        timeout_ms = 2000,
-        lsp_format = lsp_format_opt,
-      }
-    end,
-
-    formatters_by_ft = {
+    local formatters_by_ft = {
       lua = { "stylua" },
-      javascript = { "prettierd", "prettier", stop_after_first = true },
-      typescript = { "prettierd", "prettier", stop_after_first = true },
-      javascriptreact = { "prettierd", "prettier", stop_after_first = true },
-      typescriptreact = { "prettierd", "prettier", stop_after_first = true },
-      vue = { "prettierd", "prettier", stop_after_first = true },
-      css = { "prettierd", "prettier", stop_after_first = true },
-      scss = { "prettierd", "prettier", stop_after_first = true },
-      less = { "prettierd", "prettier", stop_after_first = true },
-      html = { "prettierd", "prettier", stop_after_first = true },
-      json = { "prettierd", "prettier", stop_after_first = true },
-      jsonc = { "prettierd", "prettier", stop_after_first = true },
-      yaml = { "prettierd", "prettier", stop_after_first = true },
-      markdown = { "prettierd", "prettier", stop_after_first = true },
-      graphql = { "prettierd", "prettier", stop_after_first = true },
       nix = { "alejandra" },
       elixir = { "lsp" },
       heex = { "lsp" },
@@ -63,6 +57,42 @@ return {
       bash = { "shfmt" },
       zsh = { "shfmt" },
       toml = { "taplo" },
-    },
-  },
+    }
+
+    -- Prettier-eligible filetypes use LSP fallback; prettier is injected dynamically
+    for _, ft in ipairs(prettier_ft) do
+      formatters_by_ft[ft] = { "prettierd", "prettier", stop_after_first = true }
+    end
+
+    return {
+      notify_on_error = true,
+
+      format_on_save = function(bufnr)
+        if vim.b[bufnr].bigfile_level == "huge" then
+          return nil
+        end
+
+        local ft = vim.bo[bufnr].filetype
+
+        -- Skip prettier for filetypes that support it when no config is present
+        if vim.tbl_contains(prettier_ft, ft) and not has_prettier_config(bufnr) then
+          return {
+            timeout_ms = 2000,
+            lsp_format = "fallback",
+            formatters = {},
+          }
+        end
+
+        local disable_filetypes = { c = true, cpp = true }
+        local lsp_format_opt = disable_filetypes[ft] and "never" or "fallback"
+
+        return {
+          timeout_ms = 2000,
+          lsp_format = lsp_format_opt,
+        }
+      end,
+
+      formatters_by_ft = formatters_by_ft,
+    }
+  end,
 }
