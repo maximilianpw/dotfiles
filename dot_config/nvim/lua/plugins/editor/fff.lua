@@ -46,6 +46,17 @@ return {
       desc = "Find Config Files",
     },
     {
+      "<leader>fw",
+      function()
+        require("fff").live_grep({
+          grep = {
+            query = vim.fn.expand("<cword>"),
+          },
+        })
+      end,
+      desc = "Find Word Under Cursor",
+    },
+    {
       "<leader>fg",
       function()
         require("fff").find_in_git_root()

@@ -30,13 +30,14 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 # Rebase the current branch onto the trunk.
 retrunk = ["rebase", "-d", "trunk()"]
 # Tidy up the current branch, removing commits from dead branches.
-tidy = ["abandon", "mine() & ~bookmarks() & ~::@ & ~trunk() & mutable()"]
+tidy = [
+  "abandon",
+  "mine() & ~bookmarks() & ~(bookmarks()::) & ~::@ & ~trunk() & mutable()",
+]
 # Tidy up all commits that have been merged into trunk.
 tidy-all = ["abandon", "~bookmarks() & ~::@ & ~trunk() & mutable()"]
 a = ["absorb"]
 el = ["evolog", "-p"]
-nx = ["next"]
-pv = ["prev"]
 sp = ["split"]
 
 [fix.tools.prettier]
