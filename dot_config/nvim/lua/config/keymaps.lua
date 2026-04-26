@@ -6,7 +6,6 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 -- Exit terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
-
 -- Copy file path with line number/range
 vim.keymap.set({ "n", "v" }, "<leader>yd", function()
   local filepath = vim.fn.expand("%")

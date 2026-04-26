@@ -40,8 +40,8 @@ return {
         group = vim.api.nvim_create_augroup("treesitter-setup", { clear = true }),
         callback = function(ev)
           local bufnr = ev.buf
-          -- Skip large files
-          if vim.b[bufnr].bigfile and vim.b[bufnr].bigfile_level ~= "large" then
+          -- Skip files over the treesitter threshold.
+          if _G.is_bigfile and _G.is_bigfile(bufnr, "max_ts") then
             return
           end
           if vim.treesitter.language.add(vim.bo[bufnr].filetype) then

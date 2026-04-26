@@ -105,7 +105,14 @@ return {
               require("fff").live_grep()
             end,
           },
-          { icon = " ", key = "r", desc = "Recent Files", action = ":browse oldfiles" },
+          {
+            icon = " ",
+            key = "r",
+            desc = "Recent Files",
+            action = function()
+              require("snacks").picker.recent()
+            end,
+          },
           {
             icon = "󰒲 ",
             key = "l",

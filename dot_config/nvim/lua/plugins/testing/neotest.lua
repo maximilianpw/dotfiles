@@ -6,12 +6,26 @@ return {
     "antoinemadec/FixCursorHold.nvim",
     "nvim-treesitter/nvim-treesitter",
     "nvim-neotest/neotest-jest",
+    "marilari88/neotest-vitest",
+    "adrigzr/neotest-mocha",
   },
   config = function()
     require("neotest").setup({
       adapters = {
         require("neotest-jest")({
           jestCommand = "npm test --",
+          cwd = function(path)
+            return vim.fn.getcwd()
+          end,
+        }),
+        require("neotest-vitest")({
+          filter_dir = function(name, rel_path, root)
+            return name ~= "node_modules" and name ~= "dist"
+          end,
+        }),
+        require("neotest-mocha")({
+          command = "npm test --",
+          env = { CI = true },
           cwd = function(path)
             return vim.fn.getcwd()
           end,
