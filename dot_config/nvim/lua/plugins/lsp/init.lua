@@ -70,6 +70,7 @@ return {
       -- Note: rust-analyzer is managed by rustaceanvim
       local servers = {
         "bashls",
+        "biome",
         "cssls",
         "dockerls",
         "eslint",
