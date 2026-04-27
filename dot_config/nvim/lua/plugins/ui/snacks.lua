@@ -229,6 +229,13 @@ return {
       end,
       desc = "Find Diagnostics",
     },
+    {
+      "<leader>f.",
+      function()
+        require("snacks").picker.recent()
+      end,
+      desc = "Find Recent Files",
+    },
   },
   init = function()
     -- ═══════════════════════════════════════════════════════════════
