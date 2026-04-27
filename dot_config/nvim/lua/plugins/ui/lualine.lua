@@ -10,7 +10,6 @@ return {
     end
   end,
   opts = function()
-    local navic_ok, navic = pcall(require, "nvim-navic")
     local icons = {
       diagnostics = { Error = "󰅚 ", Warn = "󰀪 ", Info = "󰋽 ", Hint = "󰌶 " },
       git = { added = "+", modified = "~", removed = "-" },
@@ -207,18 +206,6 @@ return {
         lualine_y = {},
         lualine_z = {},
       },
-      winbar = navic_ok and {
-        lualine_a = {
-          {
-            function()
-              return navic.get_location()
-            end,
-            cond = function()
-              return navic.is_available()
-            end,
-          },
-        },
-      } or {},
       extensions = { "lazy" },
     }
 

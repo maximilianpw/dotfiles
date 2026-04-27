@@ -145,6 +145,11 @@ return {
 
           -- Document highlight on cursor hold
           if client and client:supports_method("textDocument/documentHighlight") then
+            if vim.b[bufnr].lsp_document_highlight_enabled then
+              return
+            end
+            vim.b[bufnr].lsp_document_highlight_enabled = true
+
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
               group = lsp_highlight_group,
               buffer = bufnr,
@@ -163,8 +168,23 @@ return {
               group = lsp_detach_group,
               buffer = bufnr,
               callback = function(ev)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds({ group = lsp_highlight_group, buffer = ev.buf })
+                vim.schedule(function()
+                  local has_highlight_client = false
+                  for _, attached_client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
+                    if attached_client:supports_method("textDocument/documentHighlight") then
+                      has_highlight_client = true
+                      break
+                    end
+                  end
+
+                  if has_highlight_client then
+                    return
+                  end
+
+                  vim.lsp.buf.clear_references()
+                  vim.b[ev.buf].lsp_document_highlight_enabled = false
+                  vim.api.nvim_clear_autocmds({ group = lsp_highlight_group, buffer = ev.buf })
+                end)
               end,
             })
           end

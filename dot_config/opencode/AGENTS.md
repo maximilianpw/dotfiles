@@ -37,3 +37,32 @@ The vault contains a persistent LLM-maintained wiki at `200-WIKI/`. See `200-WIK
 - `200-WIKI/` = compiled domain knowledge (protocols, patterns, concepts)
 - Project index files link to relevant wiki topics via "Wiki Context" sections
 - Don't duplicate — project notes reference wiki articles for domain context, wiki articles reference VEV for real-world examples
+
+## Version Control: prefer jj over git
+
+When a repo has a `.jj/` directory (run `jj root` to check), use `jj` instead of `git` for VCS operations. Most of my repos are jj-colocated with git — assume jj unless `jj root` fails.
+
+Background and deeper workflows: `200-WIKI/topics/dev-tools/` has my jj notes.
+
+**Command mapping** (use the jj form):
+- `git status` → `jj st`
+- `git diff` → `jj diff` (working copy) / `jj diff -r <rev>` (specific revision)
+- `git log` → `jj log` (default shows the relevant slice, not full history)
+- `git add` → *no equivalent needed* — jj auto-tracks all changes in the working copy
+- `git commit -m "msg"` → `jj commit -m "msg"` (finalize) or `jj describe -m "msg"` (set message on current change without starting a new one)
+- `git checkout -b foo` → `jj new -m "foo"` then `jj bookmark create foo -r @-` if a named branch is needed
+- `git push` → `jj git push` (pushes bookmarks)
+- `git pull` → `jj git fetch` then `jj rebase` as needed
+- `git stash` → not needed; just `jj new` to start fresh, the WIP becomes its own change
+
+**Gotchas for a git-trained agent:**
+- No staging area. Don't try to `jj add` files. The working copy *is* a commit (`@`).
+- Don't `git commit --amend` — use `jj squash` or just edit `@` and re-`jj describe`.
+- Branches in jj are called **bookmarks** and don't auto-follow new commits — push them explicitly with `jj git push`.
+- `jj undo` reverses the last operation; safer than git resets.
+- When a conflict appears, jj records it in the commit rather than blocking — resolve in the working copy, then continue.
+
+**When git is still the right tool:**
+- Repo has no `.jj/` directory.
+- Operating on remote-only refs the user explicitly named in git terms.
+- Reading `git log`/`git blame` for forensics where jj's view would obscure history (rare).
