@@ -1,10 +1,10 @@
 {
   // Telemetry & Base Settings
+  "edit_predictions": {
+    "provider": "zed"
+  },
   "git_panel": {
     "dock": "left"
-  },
-  "features": {
-    "edit_prediction_provider": "zed"
   },
   "icon_theme": "Material Icon Theme",
   "telemetry": {
@@ -13,18 +13,16 @@
   },
   "vim_mode": true,
   "base_keymap": "VSCode",
-
   // Font Settings
   "ui_font_size": 16,
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-
   // Theme — Everforest Dark Hard, fixed dark to match nvim
   "theme": {
     "mode": "dark",
+    "light": "Everforest Light Hard (material)",
     "dark": "Everforest Dark Hard (material)"
   },
-
   // Editor Settings
   "relative_line_numbers": "enabled",
   "vertical_scroll_margin": 10,
@@ -41,15 +39,15 @@
   "scroll_beyond_last_line": "off",
   "cursor_blink": false,
   "linked_edits": true,
-  "minimap": { "show": "never" },
-
+  "minimap": {
+    "show": "never"
+  },
   // Search Settings
   "search": {
     "case_sensitive": false,
     "whole_word": false,
     "regex": false
   },
-
   // Terminal Settings
   "terminal": {
     "copy_on_select": true,
@@ -62,7 +60,6 @@
     "font_size": 14,
     "line_height": "comfortable"
   },
-
   // Project Panel
   "project_panel": {
     "button": true,
@@ -74,21 +71,20 @@
     "indent_size": 20,
     "auto_reveal_entries": true,
     "auto_fold_dirs": true,
-    "scrollbar": { "show": "never" }
+    "scrollbar": {
+      "show": "never"
+    }
   },
-
   // Outline Panel
   "outline_panel": {
     "dock": "right",
     "default_width": 300
   },
-
   // Collaboration Panel
   "collaboration_panel": {
     "dock": "left",
     "default_width": 240
   },
-
   // Git Integration
   "git": {
     "git_gutter": "tracked_files",
@@ -97,7 +93,6 @@
       "delay_ms": 500
     }
   },
-
   // Inlay Hints - consistent: parameter hints only
   "inlay_hints": {
     "enabled": true,
@@ -107,7 +102,6 @@
     "edit_debounce_ms": 200,
     "scroll_debounce_ms": 50
   },
-
   // LSP Configuration
   "lsp": {
     "rust-analyzer": {
@@ -161,7 +155,6 @@
       }
     }
   },
-
   // Languages Configuration —
   // Prettier-eligible languages use "language_server" as their formatter; Zed's
   // built-in prettier integration runs in addition when the project has a prettier
@@ -242,8 +235,23 @@
     },
     "Python": {
       "formatter": [
-        { "external": { "command": "ruff", "arguments": ["format", "-"] } },
-        { "external": { "command": "black", "arguments": ["-"] } }
+        {
+          "external": {
+            "command": "ruff",
+            "arguments": [
+              "format",
+              "-"
+            ]
+          }
+        },
+        {
+          "external": {
+            "command": "black",
+            "arguments": [
+              "-"
+            ]
+          }
+        }
       ],
       "tab_size": 4,
       "format_on_save": "on"
@@ -252,7 +260,9 @@
       "formatter": {
         "external": {
           "command": "clang-format",
-          "arguments": ["--assume-filename={buffer_path}"]
+          "arguments": [
+            "--assume-filename={buffer_path}"
+          ]
         }
       },
       "tab_size": 2,
@@ -262,7 +272,9 @@
       "formatter": {
         "external": {
           "command": "clang-format",
-          "arguments": ["--assume-filename={buffer_path}"]
+          "arguments": [
+            "--assume-filename={buffer_path}"
+          ]
         }
       },
       "tab_size": 2,
@@ -272,7 +284,11 @@
       "formatter": {
         "external": {
           "command": "shfmt",
-          "arguments": ["-i", "2", "-"]
+          "arguments": [
+            "-i",
+            "2",
+            "-"
+          ]
         }
       },
       "tab_size": 2,
@@ -282,7 +298,10 @@
       "formatter": {
         "external": {
           "command": "taplo",
-          "arguments": ["fmt", "-"]
+          "arguments": [
+            "fmt",
+            "-"
+          ]
         }
       },
       "format_on_save": "on"
@@ -291,7 +310,9 @@
       "formatter": {
         "external": {
           "command": "stylua",
-          "arguments": ["-"]
+          "arguments": [
+            "-"
+          ]
         }
       },
       "format_on_save": "on"
@@ -300,13 +321,14 @@
       "formatter": {
         "external": {
           "command": "alejandra",
-          "arguments": ["-q"]
+          "arguments": [
+            "-q"
+          ]
         }
       },
       "format_on_save": "on"
     }
   },
-
   // File Finder Settings
   "file_scan_exclusions": [
     "**/.git",
@@ -342,13 +364,11 @@
     "**/tmp",
     "**/.tmp"
   ],
-
   // Vim Mode Settings
   "vim": {
     "use_system_clipboard": "always",
     "use_smartcase_find": true
   },
-
   // Assistant Settings
   "agent": {
     "enabled": true,
@@ -357,54 +377,48 @@
     "default_height": 480,
     "dock": "right"
   },
-
   // Diagnostics
   "diagnostics": {
     "include_warnings": true
   },
-
   // Preview Tabs - disabled (less surprising behavior)
   "preview_tabs": {
     "enabled": false,
     "enable_preview_from_file_finder": false,
     "enable_keep_preview_on_code_navigation": false
   },
-
   // Tabs
   "tabs": {
     "close_position": "right",
     "file_icons": true,
     "git_status": true
   },
-
   // Toolbar
   "toolbar": {
     "breadcrumbs": true,
     "quick_actions": true,
     "selections_menu": true
   },
-
   // Journal
   "journal": {
     "path": "~",
     "hour_format": "hour24"
   },
-
   // Calls
   "calls": {
     "mute_on_join": true,
     "share_on_join": false
   },
-
   // Collaboration
   "show_call_status_icon": true,
-
   // Inline Completion
   "show_edit_predictions": true,
-
   // UI Settings
   "show_wrap_guides": true,
-  "wrap_guides": [80, 120],
+  "wrap_guides": [
+    80,
+    120
+  ],
   "indent_guides": {
     "enabled": true,
     "line_width": 1,
@@ -412,19 +426,14 @@
     "coloring": "indent_aware",
     "background_coloring": "disabled"
   },
-
   // Hover Popover
   "hover_popover_enabled": true,
-
   // Multi-cursor Settings
   "multi_cursor_modifier": "alt",
-
   // Seed Search Query From Cursor
   "seed_search_query_from_cursor": "selection",
-
   // Current Line Highlight
   "current_line_highlight": "gutter",
-
   // Scrollbar
   "scrollbar": {
     "show": "auto",
@@ -434,19 +443,22 @@
     "selected_symbol": true,
     "diagnostics": "all"
   },
-
   // File Types (associate extensions with languages)
   "file_types": {
-    "Dockerfile": ["Dockerfile*", "*.dockerfile"],
-    "Shell Script": [".envrc", ".env.example"]
+    "Dockerfile": [
+      "Dockerfile*",
+      "*.dockerfile"
+    ],
+    "Shell Script": [
+      ".envrc",
+      ".env.example"
+    ]
   },
-
   // Centered Layout
   "centered_layout": {
     "left_padding": 0.15,
     "right_padding": 0.15
   },
-
   // Gutter
   "gutter": {
     "line_numbers": true,
