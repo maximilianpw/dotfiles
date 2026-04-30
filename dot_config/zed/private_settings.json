@@ -1,26 +1,28 @@
 {
   // Telemetry & Base Settings
-  "features": {
-    "edit_prediction_provider": "copilot"
+  "git_panel": {
+    "dock": "left"
   },
-  "icon_theme": "Catppuccin Frappé",
+  "features": {
+    "edit_prediction_provider": "zed"
+  },
+  "icon_theme": "Material Icon Theme",
   "telemetry": {
     "diagnostics": true,
     "metrics": false
   },
   "vim_mode": true,
-  "base_keymap": "JetBrains",
+  "base_keymap": "VSCode",
 
   // Font Settings
   "ui_font_size": 16,
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
 
-  // Theme
+  // Theme — Everforest Dark Hard, fixed dark to match nvim
   "theme": {
-    "mode": "system",
-    "light": "One Light",
-    "dark": "One Dark"
+    "mode": "dark",
+    "dark": "Everforest Dark Hard (material)"
   },
 
   // Editor Settings
@@ -28,13 +30,18 @@
   "vertical_scroll_margin": 10,
   "tab_size": 2,
   "hard_tabs": false,
-  "soft_wrap": "none",
+  "soft_wrap": "editor_width",
   "show_whitespaces": "trailing",
   "ensure_final_newline_on_save": true,
   "format_on_save": "on",
   "remove_trailing_whitespace_on_save": true,
   "confirm_quit": true,
   "always_treat_brackets_as_autoclosed": true,
+  "autosave": "off",
+  "scroll_beyond_last_line": "off",
+  "cursor_blink": false,
+  "linked_edits": true,
+  "minimap": { "show": "never" },
 
   // Search Settings
   "search": {
@@ -155,15 +162,14 @@
     }
   },
 
-  // Languages Configuration
+  // Languages Configuration —
+  // Prettier-eligible languages use "language_server" as their formatter; Zed's
+  // built-in prettier integration runs in addition when the project has a prettier
+  // config (default: prettier.allowed = true), otherwise the LSP formats. Mirrors
+  // nvim autoformat.lua's "prettier-when-config-exists, else LSP" behavior.
   "languages": {
     "TypeScript": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on",
       "code_actions_on_format": {
@@ -172,12 +178,7 @@
       }
     },
     "TSX": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on",
       "code_actions_on_format": {
@@ -186,12 +187,7 @@
       }
     },
     "JavaScript": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on",
       "code_actions_on_format": {
@@ -200,62 +196,32 @@
       }
     },
     "JSON": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on"
     },
     "JSONC": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on"
     },
     "HTML": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on"
     },
     "CSS": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on"
     },
     "YAML": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on"
     },
     "Markdown": {
-      "formatter": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
+      "formatter": "language_server",
       "tab_size": 2,
       "format_on_save": "on",
       "soft_wrap": "editor_width"
@@ -271,6 +237,14 @@
     },
     "Rust": {
       "formatter": "language_server",
+      "tab_size": 4,
+      "format_on_save": "on"
+    },
+    "Python": {
+      "formatter": [
+        { "external": { "command": "ruff", "arguments": ["format", "-"] } },
+        { "external": { "command": "black", "arguments": ["-"] } }
+      ],
       "tab_size": 4,
       "format_on_save": "on"
     },
@@ -303,6 +277,33 @@
       },
       "tab_size": 2,
       "format_on_save": "on"
+    },
+    "TOML": {
+      "formatter": {
+        "external": {
+          "command": "taplo",
+          "arguments": ["fmt", "-"]
+        }
+      },
+      "format_on_save": "on"
+    },
+    "Lua": {
+      "formatter": {
+        "external": {
+          "command": "stylua",
+          "arguments": ["-"]
+        }
+      },
+      "format_on_save": "on"
+    },
+    "Nix": {
+      "formatter": {
+        "external": {
+          "command": "alejandra",
+          "arguments": ["-q"]
+        }
+      },
+      "format_on_save": "on"
     }
   },
 
@@ -311,6 +312,7 @@
     "**/.git",
     "**/.svn",
     "**/.hg",
+    "**/.jj",
     "**/CVS",
     "**/.DS_Store",
     "**/Thumbs.db",
@@ -321,6 +323,7 @@
     "**/vendor",
     "**/.venv",
     "**/venv",
+    "**/.direnv",
     "**/__pycache__",
     "**/*.pyc",
     "**/target",
