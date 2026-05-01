@@ -55,7 +55,7 @@
     },
     "edit": "ask",
     "external_directory": {
-      "/Users/max-vev/Documents/obsidian vault/**": "allow"
+      "~/Documents/obsidian vault/**": "allow"
     }
   },
   "mcp": {
