@@ -66,3 +66,23 @@ Background and deeper workflows: `200-WIKI/topics/dev-tools/` has my jj notes.
 - Repo has no `.jj/` directory.
 - Operating on remote-only refs the user explicitly named in git terms.
 - Reading `git log`/`git blame` for forensics where jj's view would obscure history (rare).
+
+## Shell: prefer Nushell over POSIX text tools
+
+Nushell is the primary interactive shell. When generating commands, scripts, or one-liners for the user to run, prefer Nushell's structured-data pipelines over POSIX text-munging tools.
+
+**Substitutions:**
+- `grep` → `where`, `find`, or `str contains`
+- `awk` / `cut` → `get`, `select`, `columns`
+- `sed` → `str replace`
+- `wc -l` → `length`
+- `sort | uniq -c` → `group-by | transpose`
+- `xargs` → `each { |it| ... }`
+- `jq` → native `from json` + `get` / `where`
+- `head` / `tail` → `first N` / `last N`
+- `find . -name` → `ls **/*pattern*` or `glob`
+
+**When the POSIX tool is still right:**
+- Target is a Bash/POSIX script, CI step, Makefile, or README example that runs under `/bin/sh`.
+- Tool shells out via `system()` or similar and won't pick up Nushell.
+- Piping to a tool that expects raw text on stdin in a way Nushell would mangle.
