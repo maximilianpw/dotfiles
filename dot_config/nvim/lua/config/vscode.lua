@@ -57,7 +57,7 @@ map("n", "<leader>co", action("editor.action.organizeImports"), "Organize Import
 map("n", "<leader>cs", action("workbench.action.gotoSymbol"), "Document Symbols")
 map("n", "<leader>cS", action("workbench.action.showAllSymbols"), "Workspace Symbols")
 
--- ───────── Diagnostics / trouble ─────────
+-- ───────── Diagnostics ─────────
 map("n", "[d", action("editor.action.marker.prev"), "Previous Diagnostic")
 map("n", "]d", action("editor.action.marker.next"), "Next Diagnostic")
 map("n", "<leader>xx", action("workbench.actions.view.problems"), "Problems")

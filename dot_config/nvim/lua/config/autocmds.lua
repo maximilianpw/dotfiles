@@ -43,3 +43,23 @@ vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
     end
   end,
 })
+
+local function clean_invalid_neotree_buffers()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local name = vim.fn.bufname(buf)
+    local is_neotree_buffer = name:match("^neo%-tree [^ ]+ %[%d+%]$")
+    local has_neotree_state = pcall(vim.api.nvim_buf_get_var, buf, "neo_tree_source")
+
+    if is_neotree_buffer and not has_neotree_state then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end
+end
+
+-- Persistence can restore Neo-tree's named special buffers before the lazy
+-- loaded Neo-tree plugin has registered its own session cleanup hook.
+vim.api.nvim_create_autocmd("SessionLoadPost", {
+  desc = "Clean stale Neo-tree buffers after session restore",
+  group = vim.api.nvim_create_augroup("clean-restored-neotree-buffers", { clear = true }),
+  callback = clean_invalid_neotree_buffers,
+})

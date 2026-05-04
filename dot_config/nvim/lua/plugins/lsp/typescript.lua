@@ -46,11 +46,6 @@ return {
     end,
   },
   {
-    "folke/ts-comments.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
-  {
     "dmmulroy/ts-error-translator.nvim",
     ft = { "typescript", "typescriptreact" },
     opts = {},

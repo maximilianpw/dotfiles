@@ -209,23 +209,6 @@ return {
       extensions = { "lazy" },
     }
 
-    if package.loaded["trouble"] then
-      local ts = require("trouble").statusline({
-        mode = "symbols",
-        groups = {},
-        title = false,
-        filter = { range = true },
-        format = "{kind_icon}{symbol.name:Normal}",
-        hl_group = "lualine_c_normal",
-      })
-      table.insert(opts.sections.lualine_c, {
-        ts.get,
-        cond = function()
-          return vim.b.trouble_lualine ~= false and ts.has()
-        end,
-      })
-    end
-
     return opts
   end,
 }

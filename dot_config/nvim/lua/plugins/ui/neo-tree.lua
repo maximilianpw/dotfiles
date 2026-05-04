@@ -25,11 +25,12 @@ return {
     },
   },
   opts = {
+    auto_clean_after_session_restore = true,
     close_if_last_window = false,
     popup_border_style = "rounded",
     enable_git_status = true,
     enable_diagnostics = true,
-    open_files_do_not_replace_types = { "terminal", "trouble", "qf" },
+    open_files_do_not_replace_types = { "terminal", "qf" },
 
     default_component_configs = {
       container = {

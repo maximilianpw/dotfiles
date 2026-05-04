@@ -24,40 +24,6 @@ require("lazy").setup({
     end,
   },
   {
-    "folke/todo-comments.nvim",
-    event = "VimEnter",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = { signs = false },
-  },
-  {
-    "folke/persistence.nvim",
-    event = "BufReadPre",
-    opts = {},
-    keys = {
-      {
-        "<leader>qs",
-        function()
-          require("persistence").load()
-        end,
-        desc = "Restore Session",
-      },
-      {
-        "<leader>ql",
-        function()
-          require("persistence").load({ last = true })
-        end,
-        desc = "Restore Last Session",
-      },
-      {
-        "<leader>qd",
-        function()
-          require("persistence").stop()
-        end,
-        desc = "Don't Save Current Session",
-      },
-    },
-  },
-  {
     "b0o/schemastore.nvim",
     lazy = true,
   },
@@ -70,7 +36,59 @@ require("lazy").setup({
       require("mini.move").setup()
       require("mini.surround").setup()
       require("mini.pairs").setup()
+      require("mini.splitjoin").setup()
+      require("mini.align").setup()
+      require("mini.trailspace").setup()
+      require("mini.sessions").setup()
+
+      local hipatterns = require("mini.hipatterns")
+      hipatterns.setup({
+        highlighters = {
+          fixme = { pattern = "%f[%w]()FIXME()%f[%W]", group = "MiniHipatternsFixme" },
+          hack = { pattern = "%f[%w]()HACK()%f[%W]", group = "MiniHipatternsHack" },
+          todo = { pattern = "%f[%w]()TODO()%f[%W]", group = "MiniHipatternsTodo" },
+          note = { pattern = "%f[%w]()NOTE()%f[%W]", group = "MiniHipatternsNote" },
+        },
+      })
     end,
+    keys = {
+      {
+        "<leader>qs",
+        function()
+          require("mini.sessions").select("read")
+        end,
+        desc = "Select Session",
+      },
+      {
+        "<leader>ql",
+        function()
+          require("mini.sessions").read()
+        end,
+        desc = "Restore Latest Session",
+      },
+      {
+        "<leader>qw",
+        function()
+          require("mini.sessions").write()
+        end,
+        desc = "Write Session",
+      },
+      {
+        "<leader>qd",
+        function()
+          require("mini.sessions").select("delete")
+        end,
+        desc = "Delete Session",
+      },
+      {
+        "<leader>cw",
+        function()
+          require("mini.trailspace").trim()
+          require("mini.trailspace").trim_last_lines()
+        end,
+        desc = "Trim Whitespace",
+      },
+    },
   },
   { import = "plugins.editor" },
   { import = "plugins.git" },

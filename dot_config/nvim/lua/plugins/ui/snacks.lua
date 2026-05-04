@@ -236,6 +236,13 @@ return {
       end,
       desc = "Find Recent Files",
     },
+    {
+      "<leader>fs",
+      function()
+        require("snacks").picker.lsp_symbols()
+      end,
+      desc = "Find Symbols",
+    },
   },
   init = function()
     -- ═══════════════════════════════════════════════════════════════

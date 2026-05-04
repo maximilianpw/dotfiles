@@ -14,3 +14,4 @@ CLAUDE.md
 .config/zed/themes
 .config/zed/prompts
 .config/zed/settings_backup.json
+.config/nvim/lazy-lock.json

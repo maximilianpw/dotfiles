@@ -50,7 +50,6 @@ return {
       { "<leader>e", group = "Explorer" },
       { "<leader>s", group = "Search/Format" },
       { "<leader>S", desc = "Select Scratch Buffer" },
-      { "<leader>x", group = "Trouble" },
       { "<leader>n", group = "Notifications" },
       { "<leader>b", group = "Buffer" },
       { "<leader>y", group = "Yank" },
@@ -74,6 +73,10 @@ return {
       { "]a", desc = "Next Parameter Start" },
       { "[A", desc = "Previous Parameter End" },
       { "]A", desc = "Next Parameter End" },
+      -- Mini editing helpers
+      { "gS", desc = "Toggle Split/Join" },
+      { "ga", desc = "Align" },
+      { "gA", desc = "Align with Preview" },
       -- Noice scrolling
       { "<c-f>", desc = "Scroll Forward (LSP)", mode = { "i", "n", "s" } },
       { "<c-b>", desc = "Scroll Backward (LSP)", mode = { "i", "n", "s" } },
