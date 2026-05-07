@@ -73,12 +73,21 @@ return {
       toml = { "taplo" },
     }
 
-    -- Prettier-eligible filetypes use LSP fallback; biome wins over prettier when both apply
+    local prettier_formatters = { "prettierd", "prettier", stop_after_first = true }
+    local biome_formatters = { "biome", "prettierd", "prettier", stop_after_first = true }
+
+    -- Prettier-eligible filetypes use LSP fallback; biome wins only in projects with a biome config
     for _, ft in ipairs(prettier_ft) do
       if biome_ft[ft] then
-        formatters_by_ft[ft] = { "biome", "prettierd", "prettier", stop_after_first = true }
+        formatters_by_ft[ft] = function(bufnr)
+          if has_biome_config(bufnr) then
+            return biome_formatters
+          end
+
+          return prettier_formatters
+        end
       else
-        formatters_by_ft[ft] = { "prettierd", "prettier", stop_after_first = true }
+        formatters_by_ft[ft] = prettier_formatters
       end
     end
 
