@@ -17,6 +17,7 @@ end
 local function resolve_js_debug_command()
   local data_dir = vim.fn.stdpath("data")
   local mason_dir = data_dir .. "/mason"
+  local lazy_dir = data_dir .. "/lazy"
   local node_path = vim.fn.exepath("node")
   local candidates = {
     vim.fn.exepath("js-debug"),
@@ -31,9 +32,18 @@ local function resolve_js_debug_command()
   end
 
   local vscode_js_debug_root = mason_dir .. "/packages/js-debug-adapter/node_modules/js-debug"
-  local bundled_server = vscode_js_debug_root .. "/src/dapDebugServer.js"
-  if file_exists(bundled_server) and node_path ~= "" then
-    return { node_path, bundled_server }
+  local bundled_servers = {
+    vscode_js_debug_root .. "/src/dapDebugServer.js",
+    lazy_dir .. "/vscode-js-debug/out/src/dapDebugServer.js",
+    lazy_dir .. "/vscode-js-debug/out/src/vsDebugServer.js",
+  }
+
+  if node_path ~= "" then
+    for _, bundled_server in ipairs(bundled_servers) do
+      if file_exists(bundled_server) then
+        return { node_path, bundled_server }
+      end
+    end
   end
 end
 
@@ -198,6 +208,7 @@ function M.setup(dap)
   end
 
   local js_configurations = {
+    docker_nest_attach("Node: Attach vev-notifications (Docker)", 9229),
     docker_nest_attach("Node: Attach vev-ocpi (Docker)", 9589),
     docker_nest_attach("Node: Attach vev-server (Docker)", 9681),
     config_with(node_attach_defaults, {

@@ -12,6 +12,13 @@ behavior = "own"
 default-command = "log"
 editor = "nvim"
 
+[[--scope]]
+--when.commands = ["diff", "show"]
+
+[--scope.ui]
+pager = ["hunk", "pager"]
+diff-formatter = ":git"
+
 [aliases]
 b = ["bookmark"]
 c = ["commit"]

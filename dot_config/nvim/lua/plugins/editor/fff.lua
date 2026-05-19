@@ -50,9 +50,7 @@ return {
       "<leader>fw",
       function()
         require("fff").live_grep({
-          grep = {
-            query = vim.fn.expand("<cword>"),
-          },
+          query = vim.fn.expand("<cword>"),
         })
       end,
       desc = "Find Word Under Cursor",
