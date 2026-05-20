@@ -43,16 +43,45 @@ return {
       json = true, jsonc = true, graphql = true,
     }
 
-    --- Check if the project has a prettier config
-    local function has_prettier_config(bufnr)
-      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-      return #vim.fs.find(prettier_configs, { upward = true, path = buf_dir }) > 0
+    local function project_root(buf_dir)
+      -- Use the nearest package boundary before falling back to VCS root. This keeps
+      -- nested packages (for example backend/packages/types) from inheriting a
+      -- parent repo's Prettier config when that package does not define one.
+      return vim.fs.root(buf_dir, { "package.json", ".git", ".jj" }) or buf_dir
     end
 
-    --- Check if the project has a biome config
+    local function find_upward_until(names, start_dir, stop_dir)
+      local dir = start_dir
+      while dir and dir ~= "" do
+        for _, name in ipairs(names) do
+          local candidate = vim.fs.joinpath(dir, name)
+          if vim.uv.fs_stat(candidate) then
+            return candidate
+          end
+        end
+
+        if dir == stop_dir then
+          break
+        end
+
+        local parent = vim.fs.dirname(dir)
+        if parent == dir then
+          break
+        end
+        dir = parent
+      end
+    end
+
+    --- Check if the project has a prettier config without walking above the project root.
+    local function has_prettier_config(bufnr)
+      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
+      return find_upward_until(prettier_configs, buf_dir, project_root(buf_dir)) ~= nil
+    end
+
+    --- Check if the project has a biome config without walking above the project root.
     local function has_biome_config(bufnr)
       local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-      return #vim.fs.find({ "biome.json", "biome.jsonc" }, { upward = true, path = buf_dir }) > 0
+      return find_upward_until({ "biome.json", "biome.jsonc" }, buf_dir, project_root(buf_dir)) ~= nil
     end
 
     local formatters_by_ft = {
@@ -101,12 +130,23 @@ return {
 
         local ft = vim.bo[bufnr].filetype
 
-        -- Skip prettier/biome for filetypes that support them when neither config is present
-        if vim.tbl_contains(prettier_ft, ft) and not has_prettier_config(bufnr) and not has_biome_config(bufnr) then
+        -- Skip prettier/biome filetypes entirely when the project has no formatter config.
+        -- Do not fall back to tsserver/html/css LSP formatting: it ignores project Prettier
+        -- ownership and can apply editor/default style or ~/.prettierrc.
+        if vim.tbl_contains(prettier_ft, ft) then
+          if not has_prettier_config(bufnr) and not has_biome_config(bufnr) then
+            return {
+              timeout_ms = 2000,
+              lsp_format = "never",
+              formatters = {},
+            }
+          end
+
           return {
             timeout_ms = 2000,
-            lsp_format = "fallback",
-            formatters = {},
+            lsp_format = "never",
+            formatters = has_biome_config(bufnr) and { "biome", "prettierd", "prettier" } or { "prettierd", "prettier" },
+            stop_after_first = true,
           }
         end
 
