@@ -26,10 +26,12 @@ d = ["desc"]
 di = ["diff"]
 e = ["edit"]
 f = ["git", "fetch"]
+jrf = ["refetch"]
 l = ["log", "-r", "trunk()..@"]
 n = ["new"]
 p = ["git", "push"]
 s = ["status"]
+refetch = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj rebase -s @ -d trunk"]
 # Move the closest bookmark to the current commit. This is useful when
 # working on a named branch, creating a bunch of commits, and then needing
 # to update the bookmark before pushing.
