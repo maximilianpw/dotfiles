@@ -44,10 +44,9 @@ return {
     }
 
     local function project_root(buf_dir)
-      -- Use the nearest package boundary before falling back to VCS root. This keeps
-      -- nested packages (for example backend/packages/types) from inheriting a
-      -- parent repo's Prettier config when that package does not define one.
-      return vim.fs.root(buf_dir, { "package.json", ".git", ".jj" }) or buf_dir
+      -- Formatter ownership is repository-scoped. Do not walk above the VCS root,
+      -- but do allow nested package.json workspaces to inherit a root formatter config.
+      return vim.fs.root(buf_dir, { ".git", ".jj" })
     end
 
     local function find_upward_until(names, start_dir, stop_dir)
@@ -84,6 +83,23 @@ return {
       return find_upward_until({ "biome.json", "biome.jsonc" }, buf_dir, project_root(buf_dir)) ~= nil
     end
 
+    --- Check if the project has an eslint config without walking above the project root.
+    local function has_eslint_config(bufnr)
+      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
+      return find_upward_until({
+        ".eslintrc",
+        ".eslintrc.js",
+        ".eslintrc.cjs",
+        ".eslintrc.mjs",
+        ".eslintrc.json",
+        ".eslintrc.yaml",
+        ".eslintrc.yml",
+        "eslint.config.js",
+        "eslint.config.mjs",
+        "eslint.config.cjs",
+      }, buf_dir, project_root(buf_dir)) ~= nil
+    end
+
     local formatters_by_ft = {
       lua = { "stylua" },
       nix = { "alejandra" },
@@ -112,11 +128,19 @@ return {
           if has_biome_config(bufnr) then
             return biome_formatters
           end
-
-          return prettier_formatters
+          if has_prettier_config(bufnr) then
+            return prettier_formatters
+          end
+          return {}
         end
       else
-        formatters_by_ft[ft] = prettier_formatters
+        formatters_by_ft[ft] = function(bufnr)
+          if has_prettier_config(bufnr) then
+            return prettier_formatters
+          end
+
+          return {}
+        end
       end
     end
 
@@ -137,15 +161,18 @@ return {
           if not has_prettier_config(bufnr) and not has_biome_config(bufnr) then
             return {
               timeout_ms = 2000,
-              lsp_format = "never",
+              lsp_format = has_eslint_config(bufnr) and "fallback" or "never",
               formatters = {},
             }
           end
 
+          local formatters = has_biome_config(bufnr) and { "biome", "prettierd", "prettier" }
+            or { "prettierd", "prettier" }
+
           return {
             timeout_ms = 2000,
             lsp_format = "never",
-            formatters = has_biome_config(bufnr) and { "biome", "prettierd", "prettier" } or { "prettierd", "prettier" },
+            formatters = formatters,
             stop_after_first = true,
           }
         end
