@@ -81,6 +81,7 @@ return {
         "html",
         "jsonls",
         "lua_ls",
+        "nil_ls",
         "nushell",
         "tailwindcss",
         "taplo",
