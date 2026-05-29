@@ -50,6 +50,6 @@ NixOS vs macOS detection via `/etc/NIXOS`. Node path auto-detected in `lua/confi
 
 **Plugin specs**: lazy.nvim format. Use `ft` for language-specific, `event` for deferred, `cmd` for on-demand loading.
 
-**Indentation**: Lua files use tabs. JSON files use 2-space indent.
+**Indentation**: Lua files use 2-space indent (enforced by `.stylua.toml`). JSON files use 2-space indent.
 
 **Keybind groups** (defined in which-key): `<leader>c` code, `<leader>f` find, `<leader>g` git, `<leader>d` debug, `<leader>t` test, `<leader>x` trouble, `<leader>e` explorer, `<leader>s` search/replace.

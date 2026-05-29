@@ -1,7 +1,7 @@
 return {
   cmd = { "vscode-eslint-language-server", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
-  root_markers = { ".eslintrc", ".eslintrc.js", ".eslintrc.json", ".eslintrc.yaml", ".eslintrc.yml", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs" },
+  root_markers = require("util.tooling").eslint,
   settings = {
     validate = "on",
     packageManager = nil,

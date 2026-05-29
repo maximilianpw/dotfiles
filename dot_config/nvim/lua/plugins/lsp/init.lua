@@ -1,4 +1,7 @@
 return {
+  -- JSON/YAML schema catalog, injected into jsonls/yamlls below.
+  { "b0o/schemastore.nvim", lazy = true },
+
   -- Lua dev ergonomics (luv/vim types for better completion)
   {
     "folke/lazydev.nvim",
@@ -140,7 +143,7 @@ return {
           end
 
           -- Skip document highlighting for large files
-          if vim.b[bufnr].bigfile then
+          if _G.is_bigfile and _G.is_bigfile(bufnr) then
             return
           end
 

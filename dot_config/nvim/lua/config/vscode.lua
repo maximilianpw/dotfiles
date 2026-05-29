@@ -1,24 +1,26 @@
 -- vscode-neovim integration
 -- Loaded only when running inside VS Code / Cursor via the vscode-neovim extension.
 -- Mirrors familiar terminal-nvim keymaps onto VS Code commands so muscle memory carries over.
+-- Keep the lhs/desc here in sync with the native equivalents in lua/plugins/lsp/init.lua
+-- and lua/config/keymaps.lua.
 
 if not vim.g.vscode then
-	return
+  return
 end
 
 local ok, vscode = pcall(require, "vscode")
 if not ok then
-	return
+  return
 end
 
 local function action(name, opts)
-	return function()
-		vscode.action(name, opts)
-	end
+  return function()
+    vscode.action(name, opts)
+  end
 end
 
 local map = function(mode, lhs, rhs, desc)
-	vim.keymap.set(mode, lhs, rhs, { desc = desc, silent = true })
+  vim.keymap.set(mode, lhs, rhs, { desc = desc, silent = true })
 end
 
 -- ───────── Find / search (mirrors fff.nvim leader keys) ─────────
@@ -27,34 +29,35 @@ map("n", "<leader>fg", action("workbench.action.quickOpen"), "Find in Git Root")
 map("n", "<leader>fl", action("workbench.action.findInFiles"), "Find by Grep")
 map("n", "<leader>fb", action("workbench.action.showAllEditors"), "Find Buffers")
 map("n", "<leader>fr", action("workbench.action.openRecent"), "Recent Files")
+map("n", "<leader>fs", action("workbench.action.gotoSymbol"), "Find Symbols")
 map("n", "<leader>fc", function()
-	vscode.action("workbench.action.quickOpen", { args = { "~/.config/nvim/" } })
+  vscode.action("workbench.action.quickOpen", { args = { "~/.config/nvim/" } })
 end, "Find Config Files")
 map("n", "<leader>fw", function()
-	vscode.action("workbench.action.findInFiles", {
-		args = { query = vim.fn.expand("<cword>") },
-	})
+  vscode.action("workbench.action.findInFiles", {
+    args = { query = vim.fn.expand("<cword>") },
+  })
 end, "Find Word Under Cursor")
 map("v", "<leader>fw", function()
-	vim.cmd('normal! "vy')
-	vscode.action("workbench.action.findInFiles", {
-		args = { query = vim.fn.getreg("v") },
-	})
+  vim.cmd('normal! "vy')
+  vscode.action("workbench.action.findInFiles", {
+    args = { query = vim.fn.getreg("v") },
+  })
 end, "Find Selection")
 
 -- ───────── LSP (the <leader>c group) ─────────
-map("n", "gd", action("editor.action.revealDefinition"), "Go to Definition")
-map("n", "gD", action("editor.action.revealDeclaration"), "Go to Declaration")
-map("n", "gI", action("editor.action.goToImplementation"), "Go to Implementation")
-map("n", "gy", action("editor.action.goToTypeDefinition"), "Go to Type Definition")
-map("n", "gr", action("editor.action.goToReferences"), "References")
-map("n", "K", action("editor.action.showHover"), "Hover")
+map("n", "gd", action("editor.action.revealDefinition"), "Goto Definition")
+map("n", "gD", action("editor.action.revealDeclaration"), "Goto Declaration")
+map("n", "gI", action("editor.action.goToImplementation"), "Goto Implementation")
+map("n", "gt", action("editor.action.goToTypeDefinition"), "Goto Type Definition")
+map("n", "gr", action("editor.action.goToReferences"), "Goto References")
+map("n", "K", action("editor.action.showHover"), "Hover Documentation")
 map("n", "<leader>ca", action("editor.action.quickFix"), "Code Action")
 map("n", "<leader>cr", action("editor.action.rename"), "Rename")
 map("n", "<leader>cf", action("editor.action.formatDocument"), "Format Document")
 map("v", "<leader>cf", action("editor.action.formatSelection"), "Format Selection")
 map("n", "<leader>co", action("editor.action.organizeImports"), "Organize Imports")
-map("n", "<leader>cs", action("workbench.action.gotoSymbol"), "Document Symbols")
+map("n", "<leader>cs", action("editor.action.triggerParameterHints"), "Signature Documentation")
 map("n", "<leader>cS", action("workbench.action.showAllSymbols"), "Workspace Symbols")
 
 -- ───────── Diagnostics ─────────

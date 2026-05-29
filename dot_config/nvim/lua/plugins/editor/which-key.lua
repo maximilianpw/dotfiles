@@ -42,7 +42,7 @@ return {
     spec = {
       { "<leader>c", group = "Code", mode = { "n", "x" } },
       { "<leader>q", group = "Session/Diagnostics" },
-      { "<leader>d", group = "Debug/Document" },
+      { "<leader>d", group = "Debug" },
       { "<leader>f", group = "Find" },
       { "<leader>t", group = "Test/Toggle" },
       { "<leader>g", group = "Git" },

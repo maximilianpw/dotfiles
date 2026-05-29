@@ -13,21 +13,8 @@ return {
     },
   },
   opts = function()
-    -- Prettier config file names (https://prettier.io/docs/en/configuration)
-    local prettier_configs = {
-      ".prettierrc",
-      ".prettierrc.json",
-      ".prettierrc.yml",
-      ".prettierrc.yaml",
-      ".prettierrc.json5",
-      ".prettierrc.js",
-      ".prettierrc.cjs",
-      ".prettierrc.mjs",
-      ".prettierrc.toml",
-      "prettier.config.js",
-      "prettier.config.cjs",
-      "prettier.config.mjs",
-    }
+    local fs = require("util.fs")
+    local tooling = require("util.tooling")
 
     local prettier_ft = {
       "javascript", "javascriptreact", "typescript", "typescriptreact",
@@ -43,61 +30,17 @@ return {
       json = true, jsonc = true, graphql = true,
     }
 
-    local function project_root(buf_dir)
-      -- Formatter ownership is repository-scoped. Do not walk above the VCS root,
-      -- but do allow nested package.json workspaces to inherit a root formatter config.
-      return vim.fs.root(buf_dir, { ".git", ".jj" })
-    end
-
-    local function find_upward_until(names, start_dir, stop_dir)
-      local dir = start_dir
-      while dir and dir ~= "" do
-        for _, name in ipairs(names) do
-          local candidate = vim.fs.joinpath(dir, name)
-          if vim.uv.fs_stat(candidate) then
-            return candidate
-          end
-        end
-
-        if dir == stop_dir then
-          break
-        end
-
-        local parent = vim.fs.dirname(dir)
-        if parent == dir then
-          break
-        end
-        dir = parent
-      end
-    end
-
-    --- Check if the project has a prettier config without walking above the project root.
+    -- Config presence checks, repository-scoped (never walk above the VCS root).
     local function has_prettier_config(bufnr)
-      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-      return find_upward_until(prettier_configs, buf_dir, project_root(buf_dir)) ~= nil
+      return fs.has_config(bufnr, tooling.prettier)
     end
 
-    --- Check if the project has a biome config without walking above the project root.
     local function has_biome_config(bufnr)
-      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-      return find_upward_until({ "biome.json", "biome.jsonc" }, buf_dir, project_root(buf_dir)) ~= nil
+      return fs.has_config(bufnr, tooling.biome)
     end
 
-    --- Check if the project has an eslint config without walking above the project root.
     local function has_eslint_config(bufnr)
-      local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-      return find_upward_until({
-        ".eslintrc",
-        ".eslintrc.js",
-        ".eslintrc.cjs",
-        ".eslintrc.mjs",
-        ".eslintrc.json",
-        ".eslintrc.yaml",
-        ".eslintrc.yml",
-        "eslint.config.js",
-        "eslint.config.mjs",
-        "eslint.config.cjs",
-      }, buf_dir, project_root(buf_dir)) ~= nil
+      return fs.has_config(bufnr, tooling.eslint)
     end
 
     local formatters_by_ft = {
@@ -148,7 +91,7 @@ return {
       notify_on_error = true,
 
       format_on_save = function(bufnr)
-        if vim.b[bufnr].bigfile_level == "huge" then
+        if _G.is_bigfile and _G.is_bigfile(bufnr, "huge") then
           return nil
         end
 

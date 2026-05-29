@@ -19,7 +19,7 @@ return {
         handlers = {
           ["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
             -- Skip semantic tokens for large files (performance optimization)
-            if ctx and ctx.bufnr and vim.b[ctx.bufnr].bigfile then
+            if ctx and ctx.bufnr and _G.is_bigfile and _G.is_bigfile(ctx.bufnr) then
               return nil
             end
             return vim.lsp.handlers["textDocument/semanticTokens/full"](err, result, ctx, config)

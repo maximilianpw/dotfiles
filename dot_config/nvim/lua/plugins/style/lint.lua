@@ -5,11 +5,13 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       local lint = require("lint")
+      local fs = require("util.fs")
+      local tooling = require("util.tooling")
 
       -- Override oxlint args to pass the config file it finds
       local oxlint = lint.linters.oxlint
       oxlint.args = function()
-        local cfg = vim.fs.find({ "oxlintrc.json", ".oxlintrc.json" }, {
+        local cfg = vim.fs.find(tooling.oxlint, {
           upward = true,
           path = vim.fn.expand("%:p:h"),
         })
@@ -32,10 +34,9 @@ return {
         go = { "golangcilint" },
       }
 
-      --- Check if a project has an oxlint config anywhere above the buffer
+      --- Check if a project has an oxlint config, repository-scoped.
       local function has_oxlint_config(bufnr)
-        local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
-        return #vim.fs.find({ "oxlintrc.json", ".oxlintrc.json" }, { upward = true, path = buf_dir }) > 0
+        return fs.has_config(bufnr, tooling.oxlint)
       end
 
       -- Distinguish heavy linters (need saved state / expensive)

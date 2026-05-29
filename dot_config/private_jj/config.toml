@@ -6,7 +6,8 @@ email = "mpinderwhite@proton.me"
 
 [signing]
 backend = "gpg"
-behavior = "own"
+behavior = "drop"
+key = "992CF94F12CF7405147D81FD4AB37B87F45FAC60"
 
 [ui]
 default-command = "log"
@@ -68,6 +69,7 @@ patterns = ["glob:**/*.rs"]
 
 [git]
 abandon-unreachable-commits = false
+sign-on-push = true
 
 [remotes.origin]
 auto-track-bookmarks = "glob:main"
