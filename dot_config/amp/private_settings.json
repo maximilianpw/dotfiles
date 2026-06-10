@@ -25,6 +25,5 @@
       "tool": "mcp__*",
       "action": "ask"
     }
-  ],
-  "amp.dangerouslyAllowAll": true
+  ]
 }

@@ -22,6 +22,13 @@ require("lazy").setup({
   { import = "plugins.ui" },
   { import = "plugins.ai" },
 }, {
+  checker = { enabled = true, notify = false },
+  performance = {
+    rtp = {
+      -- Keep netrw: neo-tree is lazy-loaded, so `nvim <dir>` still needs it.
+      disabled_plugins = { "gzip", "tarPlugin", "zipPlugin", "tohtml", "tutor" },
+    },
+  },
   ui = {
     icons = vim.g.have_nerd_font and {} or {
       cmd = "⌘",

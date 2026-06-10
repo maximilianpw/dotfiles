@@ -54,13 +54,9 @@ command = ["prettierd", "$path"]
 patterns = ["glob:'**/*.{js,jsx,ts,tsx,css,html,json,md,yaml,yml}'"]
 
 [fix.tools.eslint]
-command = [
-  "eslint_d",
-  "--fix-to-stdout",
-  "--stdin",
-  "--stdin-filename",
-  "$path",
-]
+# ESLint v9 no longer has --fix-to-stdout. Run a dry fix on stdin and
+# emit the fixed source from the JSON formatter for jj fix to consume.
+command = ["node", "-e", "const { spawnSync } = require('node:child_process'); const path = process.argv[1]; let input = ''; process.stdin.setEncoding('utf8'); process.stdin.on('data', c => input += c); process.stdin.on('end', () => { const r = spawnSync('eslint', ['--fix-dry-run', '--format', 'json', '--stdin', '--stdin-filename', path], { input, encoding: 'utf8' }); if (r.error) { console.error(r.error.message); process.exit(1); } try { const result = JSON.parse(r.stdout || '[]')[0]; process.stdout.write(result && Object.prototype.hasOwnProperty.call(result, 'output') ? result.output : input); process.exit(0); } catch (e) { if (r.stderr) process.stderr.write(r.stderr); if (r.stdout) process.stderr.write(r.stdout); process.exit(r.status || 1); } });", "$path"]
 patterns = ["glob:'**/*.{js,jsx,ts,tsx}'"]
 
 [fix.tools.rustfmt]

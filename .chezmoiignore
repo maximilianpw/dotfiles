@@ -4,4 +4,7 @@ CLAUDE.md
 .config/zed/themes
 .config/zed/prompts
 .config/zed/settings_backup.json
-.config/nvim/lazy-lock.json
+# Local-only: contains employer AWS account details; repo is public
+.aws
+# Machine-rewritten by btop itself; managing it is permanent diff noise
+.config/btop

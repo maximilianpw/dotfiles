@@ -56,8 +56,9 @@ local function clean_invalid_neotree_buffers()
   end
 end
 
--- Persistence can restore Neo-tree's named special buffers before the lazy
--- loaded Neo-tree plugin has registered its own session cleanup hook.
+-- Session restore (mini.sessions) can bring back Neo-tree's named special
+-- buffers before the lazy-loaded Neo-tree plugin has registered its own
+-- session cleanup hook.
 vim.api.nvim_create_autocmd("SessionLoadPost", {
   desc = "Clean stale Neo-tree buffers after session restore",
   group = vim.api.nvim_create_augroup("clean-restored-neotree-buffers", { clear = true }),

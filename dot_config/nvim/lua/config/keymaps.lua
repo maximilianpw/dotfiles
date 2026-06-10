@@ -32,9 +32,13 @@ end, { desc = "Copy file path with line number/range" })
 vim.keymap.set("n", "<leader>bf", "<cmd>bfirst<cr>", { desc = "First buffer" })
 vim.keymap.set("n", "<leader>bL", "<cmd>blast<cr>", { desc = "Last buffer" })
 
--- Diagnostic navigation
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+-- Diagnostic navigation (vim.diagnostic.goto_prev/next are deprecated since 0.11)
+vim.keymap.set("n", "[d", function()
+  vim.diagnostic.jump({ count = -1, float = true })
+end, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", function()
+  vim.diagnostic.jump({ count = 1, float = true })
+end, { desc = "Next diagnostic" })
 
 -- Quickfix navigation
 vim.keymap.set("n", "[q", "<cmd>cprevious<cr>", { desc = "Previous quickfix" })

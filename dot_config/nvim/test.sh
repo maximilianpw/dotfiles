@@ -16,7 +16,7 @@ echo ""
 
 # 1. Parse check all Lua files
 echo "--- Lua syntax check ---"
-for f in $(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" -name '*.lua' 2>/dev/null); do
+while IFS= read -rd '' f; do
   rel="${f#"$NVIM_DIR/"}"
   if ! nvim --headless -c "lua dofile('$f')" -c 'qa' 2>/dev/null; then
     echo "FAIL $rel"
@@ -24,7 +24,7 @@ for f in $(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" -name '*.lua' 2>/dev/null); do
   else
     echo "ok   $rel"
   fi
-done
+done < <(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" -name '*.lua' -print0 2>/dev/null)
 
 echo ""
 

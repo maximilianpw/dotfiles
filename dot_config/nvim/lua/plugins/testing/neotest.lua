@@ -8,7 +8,7 @@ return {
     "nvim-neotest/neotest-jest",
     "marilari88/neotest-vitest",
     "adrigzr/neotest-mocha",
-    "nvim-neotest/neotest-go",
+    "fredrikaverpil/neotest-golang",
   },
   keys = {
     {
@@ -89,9 +89,8 @@ return {
             return vim.fn.getcwd()
           end,
         }),
-        require("neotest-go")({
-          experimental = { test_table = true },
-          args = { "-count=1" },
+        require("neotest-golang")({
+          go_test_args = { "-v", "-count=1" },
         }),
       },
     })

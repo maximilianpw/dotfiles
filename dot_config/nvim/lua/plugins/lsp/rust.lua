@@ -1,6 +1,6 @@
 return {
   "mrcjkb/rustaceanvim",
-  version = "^5",
+  version = "^6",
   ft = { "rust" },
   config = function()
     vim.g.rustaceanvim = {
@@ -11,17 +11,18 @@ return {
             numThreads = 4,
             cargo = {
               allFeatures = false,
-              loadOutDirsFromCheck = false,
+              -- Build scripts + proc macros enabled: without them rust-analyzer
+              -- produces phantom errors on any serde/tokio-style crate.
               buildScripts = {
-                enable = false,
+                enable = true,
               },
             },
-            checkOnSave = {
+            checkOnSave = true,
+            check = {
               command = "check",
-              extraArgs = {},
             },
             procMacro = {
-              enable = false,
+              enable = true,
             },
             diagnostics = {
               enable = true,

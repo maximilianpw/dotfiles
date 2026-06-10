@@ -3,7 +3,9 @@ return {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
     build = ":TSUpdate",
-    event = "VeryLazy",
+    -- BufReadPre (not VeryLazy) so the FileType autocmd below is registered
+    -- before the first buffer's FileType event fires.
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
     },

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). Directories prefixed `private_` contain sensitive configs. A `.chezmoiignore` excludes `.claude/` from deployment. No templates or external sources are used.
+Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). Directories prefixed `private_` contain sensitive configs. `.chezmoiignore` excludes `.claude/` from deployment and keeps `~/.aws` and `~/.config/btop` unmanaged (the repo is public; never add employer/credential material here). `lazy-lock.json` IS tracked — when plugins change, re-copy it into the source dir. No templates or external sources are used.
 
 To preview changes: `chezmoi diff`
 To dry-run apply: `chezmoi apply --dry-run`
@@ -20,12 +20,12 @@ The neovim config (`dot_config/nvim/`) is the bulk of this repo (~50 Lua files).
 - `ai/` - AI assistants
 - `editor/` - Completion (blink.cmp), treesitter, flash navigation, file finder, which-key
 - `git/` - gitsigns
-- `lsp/` - Language-specific plugin configs (typescript-tools, go.nvim, rustaceanvim, omnisharp)
+- `lsp/` - Language-specific plugin configs (typescript-tools, go.nvim, rustaceanvim)
 - `style/` - conform.nvim (formatting), nvim-lint (linting)
-- `testing/` - neotest, DAP debugging (Go/C#/JS/Rust)
+- `testing/` - neotest, DAP debugging (Go/JS/Rust)
 - `ui/` - snacks.nvim (picker, git, notifications, dashboard), neo-tree, lualine, bufferline, noice
 
-**LSP servers** are configured as individual files in `lsp/` (e.g. `lsp/gopls.lua`, `lsp/pyright.lua`). There are 14+ servers. The main LSP setup (`lua/plugins/lsp/init.lua`) defines shared keymaps and diagnostics via `LspAttach` autocmd.
+**LSP servers** are configured as individual files in `lsp/` (e.g. `lsp/gopls.lua`, `lsp/lua_ls.lua`). There are 14 servers. The main LSP setup (`lua/plugins/lsp/init.lua`) defines shared keymaps and diagnostics via `LspAttach` autocmd.
 
 ### Bigfile System
 
@@ -34,11 +34,11 @@ Central performance optimization in `lua/config/bigfile.lua`. Three tiers stored
 - **max_ts** (150KB): disables syntax, treesitter
 - **huge** (200KB): disables formatting
 
-Sets `vim.b.bigfile` (boolean) and `vim.b.bigfile_level` (string) per buffer. Global helper `_G.is_bigfile(bufnr, level)` available. Multiple modules check these: LSP init (document highlighting), typescript (semantic tokens), autoformat (format-on-save), gitsigns.
+Sets `vim.b.bigfile` (boolean) and `vim.b.bigfile_level` (string) per buffer. Global helper `_G.is_bigfile(bufnr, level)` available. Multiple modules check these: treesitter setup, typescript (semantic tokens), autoformat (format-on-save), gitsigns.
 
 ### Formatter/Linter Pattern
 
-Formatters (conform.nvim) use `stop_after_first = true` for prettier-based entries. LSP fallback for languages without dedicated formatters. Linters (nvim-lint) split into "light" (InsertLeave/BufEnter) and "heavy" (BufWritePost only) categories with per-buffer debounce timers.
+Formatters (conform.nvim) use `stop_after_first = true` for prettier-based entries. LSP fallback for languages without dedicated formatters. Linters (nvim-lint) split into "light" (FileType/InsertLeave) and "heavy" (BufWritePost only) categories.
 
 ### Cross-platform
 
@@ -52,4 +52,4 @@ NixOS vs macOS detection via `/etc/NIXOS`. Node path auto-detected in `lua/confi
 
 **Indentation**: Lua files use 2-space indent (enforced by `.stylua.toml`). JSON files use 2-space indent.
 
-**Keybind groups** (defined in which-key): `<leader>c` code, `<leader>f` find, `<leader>g` git, `<leader>d` debug, `<leader>t` test, `<leader>x` trouble, `<leader>e` explorer, `<leader>s` search/replace.
+**Keybind groups** (defined in which-key): `<leader>c` code, `<leader>f` find, `<leader>g` git, `<leader>d` debug, `<leader>t` test, `<leader>e` explorer, `<leader>s` search/replace, `<leader>O` obsidian, `<leader>q` session.

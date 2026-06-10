@@ -100,8 +100,9 @@ return {
         end,
       })
 
-      -- Also lint light set when entering buffer (useful for fresh open)
-      vim.api.nvim_create_autocmd("BufEnter", {
+      -- Lint light set once on open. FileType (not BufEnter) so the filetype is
+      -- already set and we don't re-lint on every window/buffer switch.
+      vim.api.nvim_create_autocmd("FileType", {
         group = lint_augroup,
         callback = function(ev)
           run_light_linters(ev.buf)

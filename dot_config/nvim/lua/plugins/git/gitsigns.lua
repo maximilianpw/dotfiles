@@ -1,6 +1,7 @@
 -- Git signs to show changes in the sign column
 return {
   'lewis6991/gitsigns.nvim',
+  event = { 'BufReadPre', 'BufNewFile' },
   opts = {
     -- Performance optimizations
     max_file_length = 10000, -- Disable for files with more than 10k lines

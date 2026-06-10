@@ -16,7 +16,7 @@ return {
   -- Native LSP configuration
   {
     "neovim/nvim-lspconfig",
-    event = "VeryLazy",
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
       -- Diagnostics UI
       vim.diagnostic.config({
@@ -89,10 +89,6 @@ return {
       }
       vim.lsp.enable(servers)
 
-      -- Create augroups once
-      local lsp_highlight_group = vim.api.nvim_create_augroup("lsp-highlight", { clear = true })
-      local lsp_detach_group = vim.api.nvim_create_augroup("lsp-detach", { clear = true })
-
       -- Helper function to format buffer with conform fallback to LSP
       local function format_buffer()
         local has_conform, conform = pcall(require, "conform")
@@ -143,56 +139,8 @@ return {
             end, "Toggle Inlay Hints")
           end
 
-          -- Skip document highlighting for large files
-          if _G.is_bigfile and _G.is_bigfile(bufnr) then
-            return
-          end
-
-          -- Document highlight on cursor hold
-          if client and client:supports_method("textDocument/documentHighlight") then
-            if vim.b[bufnr].lsp_document_highlight_enabled then
-              return
-            end
-            vim.b[bufnr].lsp_document_highlight_enabled = true
-
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-              group = lsp_highlight_group,
-              buffer = bufnr,
-              callback = function()
-                pcall(vim.lsp.buf.document_highlight)
-              end,
-            })
-
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-              group = lsp_highlight_group,
-              buffer = bufnr,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd("LspDetach", {
-              group = lsp_detach_group,
-              buffer = bufnr,
-              callback = function(ev)
-                vim.schedule(function()
-                  local has_highlight_client = false
-                  for _, attached_client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
-                    if attached_client:supports_method("textDocument/documentHighlight") then
-                      has_highlight_client = true
-                      break
-                    end
-                  end
-
-                  if has_highlight_client then
-                    return
-                  end
-
-                  vim.lsp.buf.clear_references()
-                  vim.b[ev.buf].lsp_document_highlight_enabled = false
-                  vim.api.nvim_clear_autocmds({ group = lsp_highlight_group, buffer = ev.buf })
-                end)
-              end,
-            })
-          end
+          -- Document highlighting of the symbol under the cursor is handled by
+          -- snacks.nvim's `words` module (see plugins/ui/snacks.lua).
         end,
       })
     end,

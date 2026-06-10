@@ -53,7 +53,8 @@ return {
   {
     "vuki656/package-info.nvim",
     dependencies = "MunifTanjim/nui.nvim",
-    ft = "json",
+    -- Only relevant for package.json, not every JSON file
+    event = "BufRead package.json",
     opts = {
       highlights = {
         up_to_date = {

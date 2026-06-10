@@ -1,47 +1,6 @@
 local M = {}
 
 function M.setup(dap)
-  -- C# debugging using netcoredbg.
-  dap.adapters.coreclr = {
-    type = "executable",
-    command = "netcoredbg",
-    args = { "--interpreter=vscode" },
-  }
-
-  dap.configurations.cs = {
-    {
-      type = "coreclr",
-      name = "launch - netcoredbg",
-      request = "launch",
-      program = function()
-        local cwd = vim.fn.getcwd()
-        local dll_patterns = {
-          cwd .. "/bin/Debug/**/*.dll",
-          cwd .. "/bin/Release/**/*.dll",
-          cwd .. "/**/bin/Debug/**/*.dll",
-        }
-
-        for _, pattern in ipairs(dll_patterns) do
-          local dlls = vim.fn.glob(pattern, false, true)
-          if #dlls > 0 then
-            table.sort(dlls, function(a, b)
-              return vim.fn.getftime(a) > vim.fn.getftime(b)
-            end)
-            return vim.fn.input("Path to dll: ", dlls[1], "file")
-          end
-        end
-
-        return vim.fn.input("Path to dll: ", cwd .. "/bin/Debug/", "file")
-      end,
-    },
-    {
-      type = "coreclr",
-      name = "attach - netcoredbg",
-      request = "attach",
-      processId = require("dap.utils").pick_process,
-    },
-  }
-
   local ok_dap_go, dap_go = pcall(require, "dap-go")
   if ok_dap_go then
     dap_go.setup({
