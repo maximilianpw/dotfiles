@@ -59,6 +59,7 @@ return {
       bash = { "shfmt" },
       zsh = { "shfmt" },
       toml = { "taplo" },
+      zig = { "zigfmt" },
     }
 
     local prettier_formatters = { "prettierd", "prettier", stop_after_first = true }

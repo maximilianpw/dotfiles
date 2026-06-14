@@ -37,6 +37,7 @@ return {
         "vim",
         "vimdoc",
         "yaml",
+        "zig",
       })
 
       -- Enable built-in treesitter highlighting and indentation per filetype

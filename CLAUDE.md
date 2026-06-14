@@ -25,7 +25,7 @@ The neovim config (`dot_config/nvim/`) is the bulk of this repo (~50 Lua files).
 - `testing/` - neotest, DAP debugging (Go/JS/Rust)
 - `ui/` - snacks.nvim (picker, git, notifications, dashboard), neo-tree, lualine, bufferline, noice
 
-**LSP servers** are configured as individual files in `lsp/` (e.g. `lsp/gopls.lua`, `lsp/lua_ls.lua`). There are 14 servers. The main LSP setup (`lua/plugins/lsp/init.lua`) defines shared keymaps and diagnostics via `LspAttach` autocmd.
+**LSP servers** are configured as individual files in `lsp/` (e.g. `lsp/gopls.lua`, `lsp/lua_ls.lua`). There are 15 servers. The main LSP setup (`lua/plugins/lsp/init.lua`) defines shared keymaps and diagnostics via `LspAttach` autocmd.
 
 ### Bigfile System
 

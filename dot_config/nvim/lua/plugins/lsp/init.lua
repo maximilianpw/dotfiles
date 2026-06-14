@@ -86,6 +86,7 @@ return {
         "tailwindcss",
         "taplo",
         "yamlls",
+        "zls",
       }
       vim.lsp.enable(servers)
 

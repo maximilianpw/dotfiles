@@ -31,6 +31,8 @@ home.packages = with pkgs; [
   typescript-language-server
   vscode-langservers-extracted
   yaml-language-server
+  zig
+  zls
 ];
 ```
 
@@ -52,6 +54,7 @@ Add optional tools only when needed: `netcoredbg` for C#, `lldb`/`lldb-dap` for 
 - `tailwindcss`
 - `taplo`
 - `yamlls`
+- `zls`
 
 Rust is handled by `rustaceanvim`, not the shared LSP server list.
 
