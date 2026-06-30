@@ -1,3 +1,8 @@
+local lazygit_nvim_edit_bin = vim.fn.expand("~/.local/bin/lazygit-nvim-edit")
+local lazygit_nvim_edit = lazygit_nvim_edit_bin .. " -- {{filename}}"
+local lazygit_nvim_edit_at_line = lazygit_nvim_edit_bin .. " --line {{line}} -- {{filename}}"
+local lazygit_nvim_open_dir = lazygit_nvim_edit_bin .. " -- {{dir}}"
+
 return {
   "folke/snacks.nvim",
   priority = 1000,
@@ -35,7 +40,18 @@ return {
     git = { enabled = true },
 
     -- lazygit
-    lazygit = { enabled = true },
+    lazygit = {
+      enabled = true,
+      config = {
+        os = {
+          editPreset = "",
+          edit = lazygit_nvim_edit,
+          editAtLine = lazygit_nvim_edit_at_line,
+          editAtLineAndWait = lazygit_nvim_edit_at_line,
+          openDirInEditor = lazygit_nvim_open_dir,
+        },
+      },
+    },
 
     -- ═══════════════════════════════════════════════════════════════
     -- ⚡ PRODUCTIVITY & WORKFLOW

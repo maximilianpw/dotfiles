@@ -12,10 +12,7 @@ return {
         path = "~/Documents/obsidian vault",
       },
     },
-    completion = {
-      nvim_cmp = false,
-      blink = true,
-    },
+    legacy_commands = false,
     callbacks = {
       enter_note = function()
         vim.keymap.set("n", "<leader>ch", "<cmd>Obsidian toggle_checkbox<cr>", {
