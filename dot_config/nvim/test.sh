@@ -62,7 +62,32 @@ for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
   fi
 done
 
-# 4. Check for error messages on startup
+# 4. LSP registration drift: every lsp/*.lua must be in the enable list in
+#    lua/plugins/lsp/init.lua and documented in NIXOS_SETUP.md (rust-analyzer
+#    is managed by rustaceanvim and has no lsp/ file, so the reverse
+#    direction only warns on unknown names).
+echo "--- LSP drift check ---"
+ENABLE_LIST=$(sed -n '/local servers = {/,/^      }/p' "$NVIM_DIR/lua/plugins/lsp/init.lua" | grep -o '"[a-z_]*"' | tr -d '"')
+for f in "$NVIM_DIR"/lsp/*.lua; do
+  name="$(basename "$f" .lua)"
+  if ! printf '%s\n' "$ENABLE_LIST" | grep -qx "$name"; then
+    echo "FAIL lsp/$name.lua exists but '$name' is not in the vim.lsp.enable list"
+    FAILED=1
+  elif ! grep -q "\`$name\`" "$NVIM_DIR/NIXOS_SETUP.md"; then
+    echo "FAIL '$name' enabled but not documented in NIXOS_SETUP.md"
+    FAILED=1
+  else
+    echo "ok   lsp/$name.lua"
+  fi
+done
+for name in $ENABLE_LIST; do
+  if [ ! -f "$NVIM_DIR/lsp/$name.lua" ]; then
+    echo "FAIL '$name' is enabled but lsp/$name.lua does not exist"
+    FAILED=1
+  fi
+done
+
+# 5. Check for error messages on startup
 ERRORS=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'redir @a | silent messages | redir END | lua print(vim.fn.getreg("a"))' -c 'qa' 2>&1 | grep -iE 'error|Error|E[0-9]{3,4}:' || true)
 if [[ -n "$ERRORS" ]]; then
   echo "WARN startup messages contain errors:"
