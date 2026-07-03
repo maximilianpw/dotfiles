@@ -121,11 +121,11 @@ return {
             vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
           end
 
-          local snacks = require("snacks")
-          map("gd", snacks.picker.lsp_definitions, "Goto Definition")
-          map("gr", snacks.picker.lsp_references, "Goto References")
-          map("gI", snacks.picker.lsp_implementations, "Goto Implementation")
-          map("gt", snacks.picker.lsp_type_definitions, "Goto Type Definition")
+          local ok_snacks, snacks = pcall(require, "snacks")
+          map("gd", ok_snacks and snacks.picker.lsp_definitions or vim.lsp.buf.definition, "Goto Definition")
+          map("gr", ok_snacks and snacks.picker.lsp_references or vim.lsp.buf.references, "Goto References")
+          map("gI", ok_snacks and snacks.picker.lsp_implementations or vim.lsp.buf.implementation, "Goto Implementation")
+          map("gt", ok_snacks and snacks.picker.lsp_type_definitions or vim.lsp.buf.type_definition, "Goto Type Definition")
           map("<leader>cr", vim.lsp.buf.rename, "Rename")
           map("<leader>ca", vim.lsp.buf.code_action, "Code Action", { "n", "x" })
           map("gD", vim.lsp.buf.declaration, "Goto Declaration")

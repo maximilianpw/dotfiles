@@ -184,11 +184,8 @@ return {
         lualine_z = {
           {
             function()
-              local clients = vim.lsp.get_clients()
+              local clients = vim.lsp.get_clients({ bufnr = 0 })
               return clients[1] and clients[1].name or ""
-            end,
-            cond = function()
-              return #vim.lsp.get_clients() > 0
             end,
           },
           {
