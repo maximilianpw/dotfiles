@@ -46,7 +46,13 @@ return {
       ghost_text = { enabled = false },
     },
     sources = {
-      default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+      default = function()
+        local sources = { "lazydev", "lsp", "path", "snippets" }
+        if not (_G.is_bigfile and _G.is_bigfile(0, "max_ts")) then
+          table.insert(sources, "buffer")
+        end
+        return sources
+      end,
       providers = {
         lazydev = {
           name = "LazyDev",

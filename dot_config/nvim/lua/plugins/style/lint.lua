@@ -63,6 +63,9 @@ return {
         if not vim.bo[bufnr].modifiable then
           return
         end
+        if _G.is_bigfile and _G.is_bigfile(bufnr, "large") then
+          return
+        end
         local light_list = {}
         for _, name in ipairs(get_linters(bufnr)) do
           if not heavy[name] then
@@ -77,6 +80,9 @@ return {
       local function run_heavy_linters(bufnr)
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         if not vim.bo[bufnr].modifiable then
+          return
+        end
+        if _G.is_bigfile and _G.is_bigfile(bufnr, "large") then
           return
         end
         local heavy_list = {}
