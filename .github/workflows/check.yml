@@ -1,0 +1,29 @@
+name: check
+on:
+  push:
+    branches: [chezmoi]
+  pull_request:
+
+jobs:
+  stylua:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: >-
+            --check
+            --config-path dot_config/nvim/.stylua.toml
+            dot_config/nvim/lua dot_config/nvim/lsp
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+      - run: ./dot_config/nvim/test.sh --ci
