@@ -49,8 +49,8 @@ return {
           if _G.is_bigfile and _G.is_bigfile(bufnr, "max_ts") then
             return
           end
-          if vim.treesitter.language.add(vim.bo[bufnr].filetype) then
-            vim.treesitter.start(bufnr)
+          local ok = pcall(vim.treesitter.start, bufnr)
+          if ok then
             vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
         end,

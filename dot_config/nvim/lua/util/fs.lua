@@ -52,7 +52,11 @@ end
 --- @return boolean
 function M.has_config(bufnr, names)
   local dir = M.buf_dir(bufnr)
-  return M.find_upward_until(names, dir, M.project_root(dir)) ~= nil
+  local root = M.project_root(dir)
+  if not root then
+    return false
+  end
+  return M.find_upward_until(names, dir, root) ~= nil
 end
 
 return M

@@ -9,6 +9,7 @@ Install the tools you use in your NixOS or home-manager configuration. Example p
 ```nix
 home.packages = with pkgs; [
   alejandra
+  astro-language-server
   bash-language-server
   biome
   black
@@ -43,6 +44,7 @@ Add optional tools only when needed: `lldb`/`lldb-dap` for Rust debugging, `vale
 
 `lua/plugins/lsp/init.lua` enables these native Neovim LSP configs:
 
+- `astro`
 - `bashls`
 - `biome`
 - `cssls`
@@ -98,6 +100,7 @@ Use these commands inside Neovim:
 Use shell checks to verify tools are on PATH:
 
 ```bash
+which astro-ls
 which gopls
 which lua-language-server
 which prettierd

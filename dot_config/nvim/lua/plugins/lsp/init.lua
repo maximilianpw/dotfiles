@@ -72,6 +72,7 @@ return {
       -- Enable all LSP servers (configs loaded from lsp/ directory)
       -- Note: rust-analyzer is managed by rustaceanvim
       local servers = {
+        "astro",
         "bashls",
         "biome",
         "cssls",

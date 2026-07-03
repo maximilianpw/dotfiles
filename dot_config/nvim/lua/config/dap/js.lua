@@ -208,9 +208,6 @@ function M.setup(dap)
   end
 
   local js_configurations = {
-    docker_nest_attach("Node: Attach vev-notifications (Docker)", 9229),
-    docker_nest_attach("Node: Attach vev-ocpi (Docker)", 9589),
-    docker_nest_attach("Node: Attach vev-server (Docker)", 9681),
     config_with(node_attach_defaults, {
       name = "Node: Attach by port",
       port = function()
@@ -257,6 +254,22 @@ function M.setup(dap)
       skipFiles = { "<node_internals>/**", "node_modules/**" },
     },
   }
+
+  local ok_local, local_js = pcall(require, "config.dap.local_js")
+  if ok_local and type(local_js) == "table" then
+    local local_configurations = local_js.configurations
+    if type(local_configurations) == "function" then
+      local_configurations = local_configurations({
+        config_with = config_with,
+        docker_nest_attach = docker_nest_attach,
+        nest_attach_defaults = nest_attach_defaults,
+        node_attach_defaults = node_attach_defaults,
+      })
+    end
+    if type(local_configurations) == "table" then
+      vim.list_extend(js_configurations, local_configurations)
+    end
+  end
 
   for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
     dap.configurations[language] = vim.deepcopy(js_configurations)

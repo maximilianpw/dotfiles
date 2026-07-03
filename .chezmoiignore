@@ -1,5 +1,8 @@
 .claude/*
 CLAUDE.md
+# Local-only LLM review prompt and generated review artifacts
+LLM_CONFIG_REVIEW_PROMPT.md
+.review-plans/*
 .config/zed/conversations
 .config/zed/themes
 .config/zed/prompts
