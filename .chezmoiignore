@@ -1,5 +1,6 @@
 .claude/*
 CLAUDE.md
+AGENTS.md
 # Local-only LLM review prompt and generated review artifacts
 LLM_CONFIG_REVIEW_PROMPT.md
 .review-plans/*
