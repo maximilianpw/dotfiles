@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). Directories prefixed `private_` contain sensitive configs. `.chezmoiignore` excludes `.claude/` from deployment and keeps `~/.aws` and `~/.config/btop` unmanaged (the repo is public; never add employer/credential material here). `lazy-lock.json` IS tracked — when plugins change, re-copy it into the source dir. No templates or external sources are used.
+Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). A `private_` prefix changes target permissions only; it does **not** encrypt file contents or make them safe to commit. This repository is public, so never add credentials, tokens, private keys, employer material, or other secrets. Secret values belong in a password manager or another encrypted secret store. `.chezmoiignore` excludes `.claude/` from deployment and keeps `~/.aws` and `~/.config/btop` unmanaged. `lazy-lock.json` is tracked and the source copy is canonical; apply chezmoi after a deliberate plugin update rather than copying an older target lockfile back over it. No templates or external sources are used.
 
 To preview changes: `chezmoi diff`
 To dry-run apply: `chezmoi apply --dry-run`

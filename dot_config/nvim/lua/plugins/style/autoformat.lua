@@ -17,17 +17,33 @@ return {
     local tooling = require("util.tooling")
 
     local prettier_ft = {
-      "javascript", "javascriptreact", "typescript", "typescriptreact",
-      "vue", "css", "scss", "less", "html",
-      "json", "jsonc", "yaml", "markdown", "graphql",
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
+      "vue",
+      "css",
+      "scss",
+      "less",
+      "html",
+      "json",
+      "jsonc",
+      "yaml",
+      "markdown",
+      "graphql",
     }
 
     -- Filetypes biome can format (subset of prettier_ft)
     local biome_ft = {
-      javascript = true, javascriptreact = true,
-      typescript = true, typescriptreact = true,
-      vue = true, css = true,
-      json = true, jsonc = true, graphql = true,
+      javascript = true,
+      javascriptreact = true,
+      typescript = true,
+      typescriptreact = true,
+      vue = true,
+      css = true,
+      json = true,
+      jsonc = true,
+      graphql = true,
     }
 
     -- Config presence checks, repository-scoped (never walk above the VCS root).

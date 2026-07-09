@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Quick smoke test for neovim config
-# Usage: ./test.sh [--apply|--ci]  (--apply runs chezmoi apply first; --ci skips plugin-dependent checks)
+# Usage: ./test.sh [--apply|--ci]
+# --apply deploys the source first; --ci bootstraps plugins in an isolated XDG home.
 set -euo pipefail
 
 NVIM_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -18,6 +19,13 @@ if [[ "${1:-}" == "--apply" ]]; then
   chezmoi apply
 elif [[ "${1:-}" == "--ci" ]]; then
   CI_MODE=1
+  export XDG_CONFIG_HOME="$TEST_TMPDIR/config"
+  export XDG_DATA_HOME="$TEST_TMPDIR/data"
+  export XDG_STATE_HOME="$TEST_TMPDIR/state"
+  export XDG_CACHE_HOME="$TEST_TMPDIR/cache"
+  mkdir -p "$XDG_CONFIG_HOME"
+  cp -R "$NVIM_DIR" "$XDG_CONFIG_HOME/nvim"
+  NVIM_DIR="$XDG_CONFIG_HOME/nvim"
 fi
 
 echo "=== Neovim config smoke test ==="
@@ -37,37 +45,48 @@ done < <(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" -name '*.lua' -print0 2>/dev/null)
 
 echo ""
 
-if [[ "$CI_MODE" != "1" ]]; then
-  # 2. Headless startup
-  echo "--- Startup check ---"
-  OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'lua print("init ok")' -c 'qa' 2>&1)
-  if echo "$OUTPUT" | grep -q "init ok"; then
-    echo "ok   startup"
+# 2. CI starts with no plugin cache. A successful synchronous install proves
+#    the lockfile resolves before the ordinary startup assertions run.
+if [[ "$CI_MODE" == "1" ]]; then
+  echo "--- Plugin bootstrap ---"
+  if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'Lazy! sync' -c 'qa' 2>&1); then
+    echo "ok   lazy-lock.json resolves"
   else
-    echo "FAIL startup"
+    echo "FAIL plugin bootstrap"
     echo "$OUTPUT"
     FAILED=1
   fi
-
-  # 3. Check core treesitter filetype aliases that have regressed before.
-  printf '%s\n' 'export default function App(){ return <div /> }' > "$TEST_TMPDIR/probe.tsx"
-  printf '%s\n' 'const el = <div />' > "$TEST_TMPDIR/probe.jsx"
-  for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
-    rel="${probe##*/}"
-    OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" "$probe" \
-      -c 'lua local b=vim.api.nvim_get_current_buf(); print(vim.treesitter.highlighter.active[b] ~= nil and "active" or "inactive")' \
-      -c 'qa' 2>&1)
-    if echo "$OUTPUT" | grep -q "active"; then
-      echo "ok   treesitter $rel"
-    else
-      echo "FAIL treesitter $rel"
-      echo "$OUTPUT"
-      FAILED=1
-    fi
-  done
 fi
 
-# 4. LSP registration drift: every lsp/*.lua must be in the enable list in
+# 3. Headless startup
+echo "--- Startup check ---"
+if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'lua print("init ok")' -c 'qa' 2>&1) \
+  && echo "$OUTPUT" | grep -q "init ok"; then
+  echo "ok   startup"
+else
+  echo "FAIL startup"
+  echo "$OUTPUT"
+  FAILED=1
+fi
+
+# 4. Check core treesitter filetype aliases that have regressed before.
+printf '%s\n' 'export default function App(){ return <div /> }' > "$TEST_TMPDIR/probe.tsx"
+printf '%s\n' 'const el = <div />' > "$TEST_TMPDIR/probe.jsx"
+for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
+  rel="${probe##*/}"
+  OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" "$probe" \
+    -c 'lua local b=vim.api.nvim_get_current_buf(); print(vim.treesitter.highlighter.active[b] ~= nil and "active" or "inactive")' \
+    -c 'qa' 2>&1)
+  if echo "$OUTPUT" | grep -q "active"; then
+    echo "ok   treesitter $rel"
+  else
+    echo "FAIL treesitter $rel"
+    echo "$OUTPUT"
+    FAILED=1
+  fi
+done
+
+# 5. LSP registration drift: every lsp/*.lua must be in the enable list in
 #    lua/plugins/lsp/init.lua and documented in NIXOS_SETUP.md (rust-analyzer
 #    is managed by rustaceanvim and has no lsp/ file, so the reverse
 #    direction only warns on unknown names).
@@ -92,15 +111,14 @@ for name in $ENABLE_LIST; do
   fi
 done
 
-if [[ "$CI_MODE" != "1" ]]; then
-  # 5. Check for error messages on startup
-  ERRORS=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'redir @a | silent messages | redir END | lua print(vim.fn.getreg("a"))' -c 'qa' 2>&1 | grep -iE 'error|Error|E[0-9]{3,4}:' || true)
-  if [[ -n "$ERRORS" ]]; then
-    echo "WARN startup messages contain errors:"
-    echo "$ERRORS"
-  else
-    echo "ok   no error messages"
-  fi
+# 6. Check for error messages on startup
+ERRORS=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'redir @a | silent messages | redir END | lua print(vim.fn.getreg("a"))' -c 'qa' 2>&1 | grep -iE 'error|Error|E[0-9]{3,4}:' || true)
+if [[ -n "$ERRORS" ]]; then
+  echo "FAIL startup messages contain errors:"
+  echo "$ERRORS"
+  FAILED=1
+else
+  echo "ok   no error messages"
 fi
 
 echo ""
