@@ -27,23 +27,22 @@ yellow = "#eed49f"
 channel = "stable"
 
 [keys]
-# Prefix: C-;
-prefix = "ctrl+semicolon"
+# Match tmux: C-Space.
+prefix = "ctrl+space"
 
 # Basics.
 help = "prefix+?"
-# Keep prefix+s available for workspace picking.
 settings = "prefix+shift+s"
 detach = ["prefix+d", "prefix+q"]
 reload_config = "prefix+r"
-goto = "prefix+g"
+goto = "prefix+semicolon"
 
 # Workspace controls:
-#   prefix+s       choose workspace
-#   prefix+w       also open workspace navigation (Herdr default muscle memory)
+#   prefix+o       choose workspace (tmux-sessionx muscle memory)
+#   prefix+s / w   Herdr navigation aliases
 #   prefix+shift+w rename workspace (avoids symbol-layer gymnastics)
 #   prefix+( / )   previous / next workspace
-workspace_picker = ["prefix+s", "prefix+w"]
+workspace_picker = ["prefix+o", "prefix+s", "prefix+w"]
 new_workspace = "prefix+shift+n"
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
@@ -58,18 +57,18 @@ focus_agent = "prefix+alt+1..9"
 new_tab = "prefix+c"
 previous_tab = "prefix+p"
 next_tab = "prefix+n"
-switch_tab = "prefix+1..9"
+switch_tab = "alt+1..9"
 rename_tab = "prefix+comma"
-close_tab = "prefix+shift+x"
+close_tab = "prefix+ampersand"
 
 # Pane creation:
-#   prefix+\     split right
-#   prefix+Enter split down
-split_vertical = "prefix+backslash"
-split_horizontal = "prefix+enter"
+#   prefix+| split right
+#   prefix+- split down
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
 close_pane = "prefix+x"
-zoom = "prefix+m"
-copy_mode = "prefix+v"
+zoom = "prefix+z"
+copy_mode = "prefix+["
 
 # Pane resize mode.
 resize_mode = "prefix+shift+r"
@@ -83,7 +82,7 @@ focus_pane_right = "prefix+l"
 cycle_pane_next = "prefix+tab"
 cycle_pane_previous = "prefix+shift+tab"
 
-# Keep Herdr's dashboard/sidebar available, but not on prefix+b since C-b is not the prefix here.
+# Match tmux's status toggle.
 toggle_sidebar = "prefix+b"
 
 # Navigate-mode movement.
@@ -119,6 +118,51 @@ key = "ctrl+l"
 type = "plugin_action"
 command = "vim-herdr-navigation.right"
 description = "Navigate right (Vim/Herdr)"
+
+# Match tmux's three-cell prefix+arrow pane resizing.
+[[keys.command]]
+key = "prefix+left"
+type = "shell"
+command = "herdr pane resize --current --direction left --amount 3"
+description = "Resize pane left"
+
+[[keys.command]]
+key = "prefix+down"
+type = "shell"
+command = "herdr pane resize --current --direction down --amount 3"
+description = "Resize pane down"
+
+[[keys.command]]
+key = "prefix+up"
+type = "shell"
+command = "herdr pane resize --current --direction up --amount 3"
+description = "Resize pane up"
+
+[[keys.command]]
+key = "prefix+right"
+type = "shell"
+command = "herdr pane resize --current --direction right --amount 3"
+description = "Resize pane right"
+
+# Match tmux's terminal-tool popups.
+[[keys.command]]
+key = "prefix+g"
+type = "popup"
+command = "lazygit"
+description = "Open lazygit"
+
+[[keys.command]]
+key = "prefix+shift+g"
+type = "popup"
+command = "jjui"
+description = "Open jjui"
+
+# Fleet/codex counterpart to cmux's Kim workspace launcher.
+[[keys.command]]
+key = "prefix+shift+k"
+type = "shell"
+command = "fleet herdr kim"
+description = "Open Kim in a new Herdr workspace"
 
 [ui]
 sidebar_width = 32
