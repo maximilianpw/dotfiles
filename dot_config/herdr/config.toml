@@ -33,21 +33,23 @@ prefix = "ctrl+space"
 # Basics.
 help = "prefix+?"
 settings = "prefix+shift+s"
-detach = ["prefix+d", "prefix+q"]
+detach = "prefix+d"
 reload_config = "prefix+r"
 goto = "prefix+semicolon"
+open_notification_target = "prefix+o"
 
 # Workspace controls:
-#   prefix+o       choose workspace (tmux-sessionx muscle memory)
-#   prefix+s / w   Herdr navigation aliases
+#   prefix+w       choose workspace
 #   prefix+shift+w rename workspace (avoids symbol-layer gymnastics)
 #   prefix+( / )   previous / next workspace
-workspace_picker = ["prefix+o", "prefix+s", "prefix+w"]
+workspace_picker = "prefix+w"
 new_workspace = "prefix+shift+n"
+new_worktree = "prefix+shift+t"
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+("
 next_workspace = "prefix+)"
+switch_workspace = "prefix+shift+1..9"
 
 # agents
 focus_agent = "prefix+alt+1..9"
@@ -60,6 +62,8 @@ next_tab = "prefix+n"
 switch_tab = "alt+1..9"
 rename_tab = "prefix+comma"
 close_tab = "prefix+ampersand"
+rename_pane = "prefix+shift+p"
+edit_scrollback = "prefix+e"
 
 # Pane creation:
 #   prefix+| split right
