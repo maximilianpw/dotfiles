@@ -5,8 +5,8 @@
 onboarding = false
 
 [terminal]
-# Use Fish while preserving macOS login shell behavior.
-default_shell = "fish"
+# Use Fish locally; the wrapper opens plain SSH shells in remote workspaces.
+default_shell = "herdr-shell"
 shell_mode = "auto"
 # New panes and tabs start in the current pane's directory.
 new_cwd = "follow"
@@ -15,13 +15,23 @@ new_cwd = "follow"
 name = "catppuccin"
 
 [theme.custom]
-# Catppuccin Macchiato-inspired overrides.
-panel_bg = "#24273a"
-accent = "#c6a0f6"
-blue = "#8aadf4"
-green = "#a6da95"
-red = "#ed8796"
-yellow = "#eed49f"
+# Everforest Dark Hard palette.
+panel_bg = "#272e33"
+surface0 = "#2e383c"
+surface1 = "#374145"
+surface_dim = "#1e2326"
+overlay0 = "#7a8478"
+overlay1 = "#859289"
+text = "#d3c6aa"
+subtext0 = "#9da9a0"
+accent = "#a7c080"
+mauve = "#d699b6"
+green = "#a7c080"
+yellow = "#dbbc7f"
+red = "#e67e80"
+blue = "#7fbbb3"
+teal = "#83c092"
+peach = "#e69875"
 
 [update]
 channel = "stable"
@@ -35,7 +45,7 @@ help = "prefix+?"
 settings = "prefix+shift+s"
 detach = "prefix+d"
 reload_config = "prefix+r"
-goto = "prefix+semicolon"
+goto = "prefix+slash"
 open_notification_target = "prefix+o"
 
 # Workspace controls:
@@ -45,15 +55,18 @@ open_notification_target = "prefix+o"
 workspace_picker = "prefix+w"
 new_workspace = "prefix+shift+n"
 new_worktree = "prefix+shift+t"
+open_worktree = "prefix+t"
+remove_worktree = "prefix+alt+t"
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+("
 next_workspace = "prefix+)"
 switch_workspace = "prefix+shift+1..9"
 
-# agents
+# Agent controls.
 focus_agent = "prefix+alt+1..9"
-
+previous_agent = "prefix+alt+["
+next_agent = "prefix+alt+]"
 
 # Tab controls.
 new_tab = "prefix+c"
@@ -85,6 +98,7 @@ focus_pane_up = "prefix+k"
 focus_pane_right = "prefix+l"
 cycle_pane_next = "prefix+tab"
 cycle_pane_previous = "prefix+shift+tab"
+last_pane = "prefix+semicolon"
 
 # Match tmux's status toggle.
 toggle_sidebar = "prefix+b"
@@ -153,20 +167,31 @@ description = "Resize pane right"
 key = "prefix+g"
 type = "popup"
 command = "lazygit"
+width = "90%"
+height = "90%"
 description = "Open lazygit"
 
 [[keys.command]]
 key = "prefix+shift+g"
 type = "popup"
 command = "jjui"
+width = "90%"
+height = "90%"
 description = "Open jjui"
 
-# Fleet/codex counterpart to cmux's Kim workspace launcher.
+# Match tmux's prefix+shift+b break-pane binding.
 [[keys.command]]
-key = "prefix+shift+k"
+key = "prefix+shift+b"
 type = "shell"
-command = "fleet herdr kim"
-description = "Open Kim in a new Herdr workspace"
+command = "pane_id=$(herdr pane current | jq -r '.result.pane.pane_id') && herdr pane move \"$pane_id\" --new-tab --focus"
+description = "Break pane into a new tab"
+
+# The herdr-shell wrapper opens every pane in this workspace over plain SSH.
+[[keys.command]]
+key = "prefix+alt+k"
+type = "shell"
+command = "herdr workspace create --label kim --focus"
+description = "Open Kim in a new remote workspace"
 
 [ui]
 sidebar_width = 32
@@ -179,10 +204,15 @@ mouse_scroll_lines = 3
 confirm_close = false
 prompt_new_tab_name = true
 prompt_new_workspace_name = true
-accent = "#c6a0f6"
+accent = "#a7c080"
 
 show_agent_labels_on_pane_borders = false
 agent_panel_sort = "spaces"
+
+[ui.sidebar.spaces]
+# Keep the default layout, but avoid the pink/purple branch color.
+rows = [["state_icon", "workspace"], [{ token = "branch", fg = "#a7c080" }, "git_status"]]
+
 [ui.toast]
 delivery = "herdr"
 delay_seconds = 1

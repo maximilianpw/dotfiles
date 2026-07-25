@@ -16,6 +16,12 @@ return {
         -- typescript-tools handles root_dir automatically
         -- It looks for: tsconfig.json, jsconfig.json, package.json, .git
         single_file_support = true,
+        on_attach = function(client, bufnr)
+          local ok, twoslash = pcall(require, "twoslash-queries")
+          if ok then
+            twoslash.attach(client, bufnr)
+          end
+        end,
         handlers = {
           ["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
             -- Skip semantic tokens for large files (performance optimization)
