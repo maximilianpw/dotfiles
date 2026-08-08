@@ -1,7 +1,5 @@
-# Everforest-inspired palette (lightened)
-# red: #f09395  orange: #f0ac8a  yellow: #e5cb93
-# green: #b8d09a  aqua: #9ad4a8  blue: #96cdc6
-# purple: #e2adc8  grey: #909d8f
+# Catppuccin Mocha palette
+palette = "catppuccin_mocha"
 
 format = """
 $directory\
@@ -22,27 +20,27 @@ $character"""
 symbol = " "
 
 [character]
-success_symbol = "[❯](bold #b8d09a)"
-error_symbol = "[❯](bold #f09395)"
-vimcmd_symbol = "[❮](bold #96cdc6)"
-vimcmd_replace_one_symbol = "[❮](bold #f0ac8a)"
-vimcmd_replace_symbol = "[❮](bold #f0ac8a)"
-vimcmd_visual_symbol = "[❮](bold #e2adc8)"
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold blue)"
+vimcmd_replace_one_symbol = "[❮](bold peach)"
+vimcmd_replace_symbol = "[❮](bold peach)"
+vimcmd_visual_symbol = "[❮](bold mauve)"
 
 [directory]
-style = "bold #b8d09a"
+style = "bold green"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "#f09395"
+read_only_style = "red"
 
 [git_branch]
 symbol = ""
-style = "#96cdc6"
+style = "blue"
 format = "[$symbol$branch]($style)"
 
 [git_status]
-style = "#e2adc8"
+style = "mauve"
 format = "( [$all_status$ahead_behind]($style))"
 ahead = "↑${count}"
 behind = "↓${count}"
@@ -56,45 +54,73 @@ renamed = "»${count}"
 deleted = "✘${count}"
 
 [cmd_duration]
-style = "#909d8f"
+style = "overlay1"
 format = "[  $duration]($style)"
 min_time = 2_000
 
 [python]
 symbol = " "
-style = "#e5cb93"
+style = "yellow"
 format = "[ $symbol$virtualenv]($style)"
 
 [rust]
 symbol = " "
-style = "#f0ac8a"
+style = "peach"
 format = "[ $symbol$version]($style)"
 
 [golang]
 symbol = " "
-style = "#9ad4a8"
+style = "teal"
 format = "[ $symbol$version]($style)"
 
 [nix_shell]
 symbol = " "
-style = "#96cdc6"
+style = "blue"
 format = "[ $symbol$state($name)]($style)"
 
 [aws]
 symbol = " "
-style = "#f0ac8a"
+style = "peach"
 format = "[ $symbol$profile($region)]($style)"
 
 [kubernetes]
 symbol = "󱃾 "
-style = "#96cdc6"
+style = "blue"
 format = "[ $symbol$context($namespace)]($style)"
 disabled = true
 
 [docker_context]
 symbol = " "
-style = "#96cdc6"
+style = "blue"
 format = "[$symbol$context]($style)"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
 
 [nodejs]
 disabled = true

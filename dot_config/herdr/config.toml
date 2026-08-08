@@ -14,25 +14,6 @@ new_cwd = "follow"
 [theme]
 name = "catppuccin"
 
-[theme.custom]
-# Everforest Dark Hard palette.
-panel_bg = "#272e33"
-surface0 = "#2e383c"
-surface1 = "#374145"
-surface_dim = "#1e2326"
-overlay0 = "#7a8478"
-overlay1 = "#859289"
-text = "#d3c6aa"
-subtext0 = "#9da9a0"
-accent = "#a7c080"
-mauve = "#d699b6"
-green = "#a7c080"
-yellow = "#dbbc7f"
-red = "#e67e80"
-blue = "#7fbbb3"
-teal = "#83c092"
-peach = "#e69875"
-
 [update]
 channel = "stable"
 
@@ -204,14 +185,15 @@ mouse_scroll_lines = 3
 confirm_close = false
 prompt_new_tab_name = true
 prompt_new_workspace_name = true
-accent = "#a7c080"
 
 show_agent_labels_on_pane_borders = false
 agent_panel_sort = "spaces"
 
 [ui.sidebar.spaces]
-# Keep the default layout, but avoid the pink/purple branch color.
-rows = [["state_icon", "workspace"], [{ token = "branch", fg = "#a7c080" }, "git_status"]]
+# Leave a blank row between workspaces for clearer visual separation.
+row_gap = 1
+# Keep the default Catppuccin styling.
+rows = [["state_icon", "workspace"], ["branch", "git_status"]]
 
 [ui.toast]
 delivery = "herdr"
