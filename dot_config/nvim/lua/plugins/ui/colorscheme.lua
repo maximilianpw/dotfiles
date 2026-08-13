@@ -1,10 +1,13 @@
 -- Colorscheme. High priority so it loads before other UI plugins.
 return {
-  "sainnhe/everforest",
+  "catppuccin/nvim",
+  name = "catppuccin",
   priority = 1000,
   config = function()
-    vim.g.everforest_background = "hard"
-    vim.g.everforest_better_performance = 1
-    vim.cmd.colorscheme("everforest")
+    require("catppuccin").setup({
+      flavour = "mocha",
+      background = { dark = "mocha" },
+    })
+    vim.cmd.colorscheme("catppuccin")
   end,
 }

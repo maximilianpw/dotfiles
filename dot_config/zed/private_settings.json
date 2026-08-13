@@ -17,11 +17,11 @@
   "ui_font_size": 16,
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-  // Theme — Everforest Dark Hard, fixed dark to match nvim
+  // Theme — Catppuccin Mocha, fixed dark to match Neovim.
   "theme": {
     "mode": "dark",
-    "light": "Everforest Light Hard (material)",
-    "dark": "Everforest Dark Hard (material)"
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Mocha"
   },
   // Editor Settings
   "relative_line_numbers": "enabled",
