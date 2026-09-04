@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). A `private_` prefix changes target permissions only; it does **not** encrypt file contents or make them safe to commit. This repository is public, so never add credentials, tokens, private keys, employer material, or other secrets. Secret values belong in a password manager or another encrypted secret store. `.chezmoiignore` excludes `.claude/` from deployment and keeps `~/.aws` and `~/.config/btop` unmanaged. `lazy-lock.json` is tracked and the source copy is canonical; apply chezmoi after a deliberate plugin update rather than copying an older target lockfile back over it. No templates or external sources are used.
+Chezmoi-managed dotfiles. All target files use chezmoi's `dot_` prefix convention (e.g. `dot_config/nvim/` → `~/.config/nvim/`). A `private_` prefix changes target permissions only; it does **not** encrypt file contents or make them safe to commit. This repository is public, so never add credentials, tokens, private keys, employer material, or other secrets. Secret values belong in a password manager or another encrypted secret store. `.chezmoiignore` excludes `.claude/` from deployment and keeps `~/.aws` and `~/.config/btop` unmanaged. `lazy-lock.json` is tracked and the source copy is canonical; apply chezmoi after a deliberate plugin update rather than copying an older target lockfile back over it. The Glow config is templated for a portable home path; no external sources are used.
 
 To preview changes: `chezmoi diff`
 To dry-run apply: `chezmoi apply --dry-run`
@@ -34,7 +34,7 @@ Central performance optimization in `lua/config/bigfile.lua`. Three tiers stored
 - **max_ts** (150KB): disables syntax, treesitter
 - **huge** (200KB): disables formatting
 
-Sets `vim.b.bigfile` (boolean) and `vim.b.bigfile_level` (string) per buffer. Global helper `_G.is_bigfile(bufnr, level)` available. Multiple modules check these: treesitter setup, typescript (semantic tokens), autoformat (format-on-save), gitsigns.
+Sets `vim.b.bigfile` (boolean) and `vim.b.bigfile_level` (string) per buffer. Global helper `_G.is_bigfile(bufnr, level)` available. Multiple modules check these: treesitter setup, nvim-lint, blink buffer sources, typescript semantic-token handling, and autoformat-on-save. Gitsigns uses its own line-count limit instead.
 
 ### Formatter/Linter Pattern
 
@@ -42,7 +42,7 @@ Formatters (conform.nvim) use `stop_after_first = true` for prettier-based entri
 
 ### Cross-platform
 
-NixOS vs macOS detection via `/etc/NIXOS`. Node path auto-detected in `lua/config/options.lua` and stored in `vim.g.node_host_prog`. See `dot_config/nvim/NIXOS_SETUP.md` for LSP/formatter package details.
+Node is discovered from `PATH` in `lua/config/options.lua` and stored in `vim.g.node_host_prog`. See `dot_config/nvim/NIXOS_SETUP.md` for NixOS LSP/formatter package details.
 
 ## Code Patterns
 

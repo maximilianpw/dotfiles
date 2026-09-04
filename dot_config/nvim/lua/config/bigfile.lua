@@ -7,47 +7,63 @@ vim.g.bigfile = {
   huge = 200 * 1024, -- 200KB: Disable formatting
 }
 
--- Performance: Large file optimizations
+local function classify(bufnr)
+  vim.b[bufnr].bigfile = false
+  vim.b[bufnr].bigfile_level = nil
+
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  if name == "" or vim.bo[bufnr].buftype ~= "" then
+    return
+  end
+
+  local ok, stat = pcall((vim.uv or vim.loop).fs_stat, name)
+  if not ok or not stat then
+    return
+  end
+
+  if stat.size > vim.g.bigfile.huge then
+    vim.b[bufnr].bigfile = true
+    vim.b[bufnr].bigfile_level = "huge"
+  elseif stat.size > vim.g.bigfile.max_ts then
+    vim.b[bufnr].bigfile = true
+    vim.b[bufnr].bigfile_level = "max_ts"
+  elseif stat.size > vim.g.bigfile.large then
+    vim.b[bufnr].bigfile = true
+    vim.b[bufnr].bigfile_level = "large"
+  end
+end
+
+local group = vim.api.nvim_create_augroup("bigfile-optimizations", { clear = true })
+
+-- Classify before lazy-loaded FileType consumers can start expensive work.
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  desc = "Classify large files before plugin setup",
+  group = group,
+  callback = function(args)
+    classify(args.buf)
+  end,
+})
+
+-- Reclassify after the read in case the file changed, then enforce UI/parser policy.
 vim.api.nvim_create_autocmd("BufReadPost", {
   desc = "Disable expensive features for large files",
-  group = vim.api.nvim_create_augroup("bigfile-optimizations", { clear = true }),
+  group = group,
   callback = function(args)
     local bufnr = args.buf
-    local name = vim.api.nvim_buf_get_name(bufnr)
-
-    -- Skip special buffers
-    if name == "" or vim.bo[bufnr].buftype ~= "" then
-      return
-    end
-
-    local ok, stat = pcall((vim.uv or vim.loop).fs_stat, name)
-    if not ok or not stat then
-      return
-    end
-
-    local size = stat.size
+    classify(bufnr)
 
     -- Large file: disable expensive UI features
-    if size > vim.g.bigfile.large then
-      vim.opt_local.updatetime = 1000
+    if vim.b[bufnr].bigfile then
       vim.opt_local.cursorline = false
       vim.opt_local.relativenumber = false
       vim.opt_local.scrolloff = 3
-      vim.b[bufnr].bigfile = true
-      vim.b[bufnr].bigfile_level = "large"
     end
 
     -- Max treesitter: disable syntax features
-    if size > vim.g.bigfile.max_ts then
-      vim.b[bufnr].bigfile_level = "max_ts"
+    if _G.is_bigfile and _G.is_bigfile(bufnr, "max_ts") then
       vim.treesitter.stop(bufnr)
       vim.opt_local.syntax = "off"
       vim.opt_local.foldmethod = "manual"
-    end
-
-    -- Huge file: will skip formatting (handled by conform)
-    if size > vim.g.bigfile.huge then
-      vim.b[bufnr].bigfile_level = "huge"
     end
   end,
 })

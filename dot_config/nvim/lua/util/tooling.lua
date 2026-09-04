@@ -43,4 +43,27 @@ M.oxlint = {
   ".oxlintrc.json",
 }
 
+local function package_has_prettier(path)
+  local ok_read, lines = pcall(vim.fn.readfile, path)
+  if not ok_read then
+    return false
+  end
+
+  local ok_decode, package = pcall(vim.json.decode, table.concat(lines, "\n"))
+  if not ok_decode or type(package) ~= "table" then
+    return false
+  end
+
+  local prettier = package.prettier
+  if type(prettier) == "string" then
+    return prettier ~= ""
+  end
+  return type(prettier) == "table" and not vim.islist(prettier)
+end
+
+function M.has_prettier_config(bufnr)
+  local fs = require("util.fs")
+  return fs.has_config(bufnr, M.prettier) or fs.has_config(bufnr, { "package.json" }, package_has_prettier)
+end
+
 return M

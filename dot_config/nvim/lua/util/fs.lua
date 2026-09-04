@@ -3,17 +3,18 @@
 
 local M = {}
 
---- Walk upward from start_dir looking for any of `names`, not crossing above stop_dir.
+--- Walk upward from start_dir looking for any accepted `names`, not crossing above stop_dir.
 --- @param names string[] candidate file names
 --- @param start_dir string directory to start from
 --- @param stop_dir string|nil directory to stop at (inclusive); nil walks to filesystem root
+--- @param accept fun(path: string): boolean|nil optional content predicate
 --- @return string|nil # path to the first match found, or nil
-function M.find_upward_until(names, start_dir, stop_dir)
+function M.find_upward_until(names, start_dir, stop_dir, accept)
   local dir = start_dir
   while dir and dir ~= "" do
     for _, name in ipairs(names) do
       local candidate = vim.fs.joinpath(dir, name)
-      if vim.uv.fs_stat(candidate) then
+      if vim.uv.fs_stat(candidate) and (not accept or accept(candidate)) then
         return candidate
       end
     end
@@ -49,14 +50,15 @@ end
 --- the project root. Does not walk above the VCS root.
 --- @param bufnr integer
 --- @param names string[]
+--- @param accept fun(path: string): boolean|nil optional content predicate
 --- @return boolean
-function M.has_config(bufnr, names)
+function M.has_config(bufnr, names, accept)
   local dir = M.buf_dir(bufnr)
   local root = M.project_root(dir)
   if not root then
     return false
   end
-  return M.find_upward_until(names, dir, root) ~= nil
+  return M.find_upward_until(names, dir, root, accept) ~= nil
 end
 
 return M

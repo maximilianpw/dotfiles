@@ -53,13 +53,16 @@ jobs:
           sudo install -m 0755 "$RUNNER_TEMP/chezmoi" /usr/local/bin/chezmoi
       - name: Render, apply in isolation, and verify
         run: |
-          export HOME="$RUNNER_TEMP/chezmoi-home"
+          export HOME="$RUNNER_TEMP/chezmoi home"
           mkdir -p "$HOME"
           chezmoi --source "$GITHUB_WORKSPACE" --destination "$HOME" \
             --refresh-externals=never --no-tty --dry-run apply
           chezmoi --source "$GITHUB_WORKSPACE" --destination "$HOME" \
             --refresh-externals=never --no-tty apply
           chezmoi --source "$GITHUB_WORKSPACE" --destination "$HOME" verify
+          grep -Fx "style: \"$HOME/.config/glow/catppuccin-mocha.json\"" \
+            "$HOME/.config/glow/glow.yml"
+          test -f "$HOME/.config/glow/catppuccin-mocha.json"
 
   smoke:
     runs-on: ubuntu-latest
@@ -69,4 +72,5 @@ jobs:
         with:
           neovim: true
           version: v0.12.4
+      - run: npm install --global tree-sitter-cli@0.27.0
       - run: ./dot_config/nvim/test.sh --ci

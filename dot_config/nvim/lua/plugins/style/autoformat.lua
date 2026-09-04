@@ -48,7 +48,7 @@ return {
 
     -- Config presence checks, repository-scoped (never walk above the VCS root).
     local function has_prettier_config(bufnr)
-      return fs.has_config(bufnr, tooling.prettier)
+      return tooling.has_prettier_config(bufnr)
     end
 
     local function has_biome_config(bufnr)

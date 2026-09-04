@@ -8,7 +8,13 @@ NVIM_DIR="$(cd "$(dirname "$0")" && pwd)"
 FAILED=0
 CI_MODE=0
 TEST_TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/nvim-config-test.XXXXXX")"
-trap 'rm -rf "$TEST_TMPDIR"' EXIT
+cleanup() {
+  rm -rf "$TEST_TMPDIR" 2>/dev/null || {
+    sleep 1
+    rm -rf "$TEST_TMPDIR"
+  }
+}
+trap cleanup EXIT
 
 run_nvim() {
   NVIM_LOG_FILE="$TEST_TMPDIR/nvim.log" nvim "$@"
@@ -41,7 +47,7 @@ while IFS= read -rd '' f; do
   else
     echo "ok   $rel"
   fi
-done < <(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" -name '*.lua' -print0 2>/dev/null)
+done < <(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" "$NVIM_DIR/tests" -name '*.lua' -print0 2>/dev/null)
 
 echo ""
 
@@ -49,8 +55,10 @@ echo ""
 #    the lockfile resolves before the ordinary startup assertions run.
 if [[ "$CI_MODE" == "1" ]]; then
   echo "--- Plugin bootstrap ---"
-  if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'Lazy! sync' -c 'qa' 2>&1); then
-    echo "ok   lazy-lock.json resolves"
+  if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'Lazy! sync' \
+    -c 'lua local ok, installed = pcall(function() return require("nvim-treesitter").install({ "javascript", "tsx" }):wait(300000) end); if not ok or not installed then vim.cmd("cquit") end' \
+    -c 'qa' 2>&1); then
+    echo "ok   lazy-lock.json resolves and smoke-test parsers install"
   else
     echo "FAIL plugin bootstrap"
     echo "$OUTPUT"
@@ -77,7 +85,7 @@ for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
   OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" "$probe" \
     -c 'lua local b=vim.api.nvim_get_current_buf(); print(vim.treesitter.highlighter.active[b] ~= nil and "active" or "inactive")' \
     -c 'qa' 2>&1)
-  if echo "$OUTPUT" | grep -q "active"; then
+  if echo "$OUTPUT" | grep -qx "active"; then
     echo "ok   treesitter $rel"
   else
     echo "FAIL treesitter $rel"
@@ -86,7 +94,17 @@ for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
   fi
 done
 
-# 5. LSP registration drift: every lsp/*.lua must be in the enable list in
+# 5. Architecture contracts that do not require plugin state.
+echo "--- Architecture checks ---"
+if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --clean -l "$NVIM_DIR/tests/architecture.lua" 2>&1); then
+  echo "ok   bigfile ordering and formatter ownership"
+else
+  echo "FAIL architecture checks"
+  echo "$OUTPUT"
+  FAILED=1
+fi
+
+# 6. LSP registration drift: every lsp/*.lua must be in the enable list in
 #    lua/plugins/lsp/init.lua and documented in NIXOS_SETUP.md (rust-analyzer
 #    is managed by rustaceanvim and has no lsp/ file, so the reverse
 #    direction only warns on unknown names).
@@ -111,7 +129,7 @@ for name in $ENABLE_LIST; do
   fi
 done
 
-# 6. Check for error messages on startup
+# 7. Check for error messages on startup
 ERRORS=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'redir @a | silent messages | redir END | lua print(vim.fn.getreg("a"))' -c 'qa' 2>&1 | grep -iE 'error|Error|E[0-9]{3,4}:' || true)
 if [[ -n "$ERRORS" ]]; then
   echo "FAIL startup messages contain errors:"
