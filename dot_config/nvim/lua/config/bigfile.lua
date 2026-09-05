@@ -101,11 +101,12 @@ local function refresh(bufnr)
   local state = buffers[bufnr] or { options = {} }
   buffers[bufnr] = state
   local max_ts = _G.is_bigfile(bufnr, "max_ts")
-  option(vim.bo[bufnr], state.options, "syntax", max_ts and "off" or nil)
-  option(vim.bo[bufnr], state.options, "indentexpr", max_ts and "" or nil)
   if max_ts then
+    -- Stopping Treesitter restores legacy syntax; disable it afterwards.
     vim.treesitter.stop(bufnr)
   end
+  option(vim.bo[bufnr], state.options, "syntax", max_ts and "off" or nil)
+  option(vim.bo[bufnr], state.options, "indentexpr", max_ts and "" or nil)
   semantic_policy(bufnr, state)
   for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
     window_policy(win)

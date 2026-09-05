@@ -35,6 +35,7 @@ local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 vim.api.nvim_buf_set_lines(0, 0, -1, false, { "// " .. string.rep("x", vim.g.bigfile.huge) })
 vim.api.nvim_exec_autocmds("TextChanged", { buffer = 0 })
 assert(not vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()], "growing buffer retained highlighting")
+assert(vim.bo.syntax == "off", "stopping Treesitter re-enabled legacy syntax in a large buffer")
 vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 vim.api.nvim_exec_autocmds("TextChanged", { buffer = 0 })
 assert(
