@@ -4,6 +4,11 @@
 # --apply deploys the source first; --ci bootstraps plugins in an isolated XDG home.
 set -euo pipefail
 
+if ! command -v nvim >/dev/null 2>&1; then
+  echo "Neovim is required on PATH." >&2
+  exit 1
+fi
+
 NVIM_DIR="$(cd "$(dirname "$0")" && pwd)"
 FAILED=0
 CI_MODE=0
@@ -33,6 +38,8 @@ elif [[ "${1:-}" == "--ci" ]]; then
   cp -R "$NVIM_DIR" "$XDG_CONFIG_HOME/nvim"
   NVIM_DIR="$XDG_CONFIG_HOME/nvim"
 fi
+export NVIM_CONFIG_TEST_LOCK="$TEST_TMPDIR/lazy-lock.json"
+cp "$NVIM_DIR/lazy-lock.json" "$NVIM_CONFIG_TEST_LOCK"
 
 echo "=== Neovim config smoke test ==="
 echo ""
@@ -41,13 +48,13 @@ echo ""
 echo "--- Lua syntax check ---"
 while IFS= read -rd '' f; do
   rel="${f#"$NVIM_DIR/"}"
-  if ! run_nvim --clean --headless -c "lua assert(loadfile([[$f]]))" -c 'qa' 2>/dev/null; then
+  if ! run_nvim --clean --headless -c "lua if not loadfile([[$f]]) then vim.cmd('cquit') end" -c 'qa' </dev/null 2>/dev/null; then
     echo "FAIL $rel"
     FAILED=1
   else
     echo "ok   $rel"
   fi
-done < <(find "$NVIM_DIR/lua" "$NVIM_DIR/lsp" "$NVIM_DIR/tests" -name '*.lua' -print0 2>/dev/null)
+done < <(find "$NVIM_DIR" -name '*.lua' -print0)
 
 echo ""
 
@@ -55,7 +62,7 @@ echo ""
 #    the lockfile resolves before the ordinary startup assertions run.
 if [[ "$CI_MODE" == "1" ]]; then
   echo "--- Plugin bootstrap ---"
-  if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'Lazy! sync' \
+  if OUTPUT=$(run_nvim --headless -u "$NVIM_DIR/init.lua" -c 'Lazy! restore' \
     -c 'lua local ok, installed = pcall(function() return require("nvim-treesitter").install({ "javascript", "tsx" }):wait(300000) end); if not ok or not installed then vim.cmd("cquit") end' \
     -c 'qa' 2>&1); then
     echo "ok   lazy-lock.json resolves and smoke-test parsers install"
@@ -94,14 +101,38 @@ for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
   fi
 done
 
-# 5. Architecture contracts that do not require plugin state.
-echo "--- Architecture checks ---"
-if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --clean -l "$NVIM_DIR/tests/architecture.lua" 2>&1); then
-  echo "ok   bigfile ordering and formatter ownership"
-else
-  echo "FAIL architecture checks"
-  echo "$OUTPUT"
-  FAILED=1
+# 5. Contracts that do not require plugin state.
+for suite in architecture bigfile formatting project-tools vscode; do
+  echo "--- $suite checks ---"
+  if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --clean -l "$NVIM_DIR/tests/$suite.lua" 2>&1); then
+    echo "ok   $suite"
+  else
+    echo "FAIL $suite checks"
+    echo "$OUTPUT"
+    FAILED=1
+  fi
+done
+
+# Exercise plugin APIs without touching real breakpoint state outside --ci.
+if [[ "$CI_MODE" == "1" ]]; then
+  echo "--- Locked plugin contracts ---"
+  if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --headless -u "$NVIM_DIR/init.lua" \
+    -c 'lua local ok, err = pcall(dofile, vim.env.NVIM_CONFIG_TEST_ROOT .. "/tests/plugins.lua"); if not ok then print(err); vim.cmd("cquit") end' \
+    -c 'qa!' 2>&1); then
+    echo "ok   locked revisions, textobject mappings, completion keys, and breakpoint persistence"
+  else
+    echo "FAIL locked plugin contracts"
+    echo "$OUTPUT"
+    FAILED=1
+  fi
+
+  if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --clean -l "$NVIM_DIR/tests/vscode-plugins.lua" 2>&1); then
+    echo "ok   real VS Code plugin boundary and shared lock preservation"
+  else
+    echo "FAIL real VS Code plugin boundary"
+    echo "$OUTPUT"
+    FAILED=1
+  fi
 fi
 
 # 6. LSP registration drift: every lsp/*.lua must be in the enable list in
@@ -112,7 +143,7 @@ echo "--- LSP drift check ---"
 ENABLE_LIST=$(sed -n '/local servers = {/,/^      }/p' "$NVIM_DIR/lua/plugins/lsp/init.lua" | grep -o '"[a-z_]*"' | tr -d '"')
 for f in "$NVIM_DIR"/lsp/*.lua; do
   name="$(basename "$f" .lua)"
-  if ! printf '%s\n' "$ENABLE_LIST" | grep -qx "$name"; then
+  if ! grep -qx "$name" <<< "$ENABLE_LIST"; then
     echo "FAIL lsp/$name.lua exists but '$name' is not in the vim.lsp.enable list"
     FAILED=1
   elif ! grep -q "\`$name\`" "$NVIM_DIR/NIXOS_SETUP.md"; then

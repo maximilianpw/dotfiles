@@ -1,8 +1,7 @@
 return {
   "ray-x/go.nvim",
   ft = { "go", "gomod", "gosum", "gotmpl" },
-  event = "CmdlineEnter",
-  build = ':lua require("go.install").update_all_sync()',
+  -- Tools are supplied by Nix or the project, not installed during plugin builds.
   opts = {
     -- Disable go.nvim's LSP handling (use native lspconfig instead)
     lsp_cfg = false,

@@ -60,16 +60,19 @@ return {
   config = function(_, opts)
     require("bufferline").setup(opts)
 
-    -- Fix bufferline when restoring a session (debounced for performance)
-    local timer = (vim.uv or vim.loop).new_timer()
+    -- Coalesce session-restoration events. defer_fn closes its timer for us.
+    local pending = false
     vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
+      group = vim.api.nvim_create_augroup("bufferline-session-refresh", { clear = true }),
       callback = function()
-        timer:stop()
-        timer:start(100, 0, function()
-          vim.schedule(function()
-            pcall(require("bufferline").refresh)
-          end)
-        end)
+        if pending then
+          return
+        end
+        pending = true
+        vim.defer_fn(function()
+          pending = false
+          require("bufferline").refresh()
+        end, 100)
       end,
     })
   end,

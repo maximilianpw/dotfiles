@@ -22,15 +22,7 @@ return {
             twoslash.attach(client, bufnr)
           end
         end,
-        handlers = {
-          ["textDocument/semanticTokens/full"] = function(err, result, ctx, config)
-            -- Skip semantic tokens for large files (performance optimization)
-            if ctx and ctx.bufnr and _G.is_bigfile and _G.is_bigfile(ctx.bufnr) then
-              return nil
-            end
-            return vim.lsp.handlers["textDocument/semanticTokens/full"](err, result, ctx, config)
-          end,
-        },
+        -- Buffer-local semantic token policy is owned by config.bigfile.
         settings = {
           separate_diagnostic_server = true,
           publish_diagnostic_on = "insert_leave",

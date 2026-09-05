@@ -39,14 +39,14 @@ return {
     {
       "<leader>db",
       function()
-        require("dap").toggle_breakpoint()
+        require("persistent-breakpoints.api").toggle_breakpoint()
       end,
       desc = "Debug: Toggle Breakpoint",
     },
     {
       "<leader>dB",
       function()
-        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+        require("persistent-breakpoints.api").set_conditional_breakpoint()
       end,
       desc = "Debug: Set Conditional Breakpoint",
     },

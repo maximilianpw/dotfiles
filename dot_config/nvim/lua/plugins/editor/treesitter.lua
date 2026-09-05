@@ -40,63 +40,61 @@ return {
         "zig",
       })
 
-      -- Enable built-in treesitter highlighting and indentation per filetype
+      local function start(bufnr)
+        if _G.is_bigfile(bufnr, "max_ts") then
+          return
+        end
+        if pcall(vim.treesitter.start, bufnr) then
+          vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end
+      local group = vim.api.nvim_create_augroup("treesitter-setup", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("treesitter-setup", { clear = true }),
+        group = group,
         callback = function(ev)
-          local bufnr = ev.buf
-          -- Skip files over the treesitter threshold.
-          if _G.is_bigfile and _G.is_bigfile(bufnr, "max_ts") then
-            return
-          end
-          local ok = pcall(vim.treesitter.start, bufnr)
-          if ok then
-            vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-          end
+          start(ev.buf)
+        end,
+      })
+      vim.api.nvim_create_autocmd("User", {
+        group = group,
+        pattern = "BigfileChanged",
+        callback = function(ev)
+          start(ev.data.buf)
         end,
       })
 
-      -- Textobjects
-      local ok, configs = pcall(require, "nvim-treesitter-textobjects")
-      if ok then
-        configs.setup({
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = {
-              ["]f"] = "@function.outer",
-              ["]c"] = "@class.outer",
-              ["]a"] = "@parameter.inner",
-            },
-            goto_next_end = {
-              ["]F"] = "@function.outer",
-              ["]C"] = "@class.outer",
-              ["]A"] = "@parameter.inner",
-            },
-            goto_previous_start = {
-              ["[f"] = "@function.outer",
-              ["[c"] = "@class.outer",
-              ["[a"] = "@parameter.inner",
-            },
-            goto_previous_end = {
-              ["[F"] = "@function.outer",
-              ["[C"] = "@class.outer",
-              ["[A"] = "@parameter.inner",
-            },
-          },
-        })
+      -- The main-branch API requires explicit mappings (setup no longer creates them).
+      require("nvim-treesitter-textobjects").setup({
+        select = { lookahead = true },
+        move = { set_jumps = true },
+      })
+      for key, query in pairs({
+        af = "@function.outer",
+        ["if"] = "@function.inner",
+        ac = "@class.outer",
+        ic = "@class.inner",
+        aa = "@parameter.outer",
+        ia = "@parameter.inner",
+      }) do
+        vim.keymap.set({ "x", "o" }, key, function()
+          if not _G.is_bigfile(0, "max_ts") then
+            require("nvim-treesitter-textobjects.select").select_textobject(query, "textobjects")
+          end
+        end, { desc = "Select " .. query })
+      end
+      for method, mappings in pairs({
+        goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },
+        goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer", ["]A"] = "@parameter.inner" },
+        goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer", ["[a"] = "@parameter.inner" },
+        goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer", ["[A"] = "@parameter.inner" },
+      }) do
+        for key, query in pairs(mappings) do
+          vim.keymap.set({ "n", "x", "o" }, key, function()
+            if not _G.is_bigfile(0, "max_ts") then
+              require("nvim-treesitter-textobjects.move")[method](query, "textobjects")
+            end
+          end, { desc = method .. " " .. query })
+        end
       end
     end,
   },

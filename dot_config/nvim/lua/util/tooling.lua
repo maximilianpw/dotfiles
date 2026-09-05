@@ -14,10 +14,16 @@ M.prettier = {
   ".prettierrc.js",
   ".prettierrc.cjs",
   ".prettierrc.mjs",
+  ".prettierrc.ts",
+  ".prettierrc.cts",
+  ".prettierrc.mts",
   ".prettierrc.toml",
   "prettier.config.js",
   "prettier.config.cjs",
   "prettier.config.mjs",
+  "prettier.config.ts",
+  "prettier.config.cts",
+  "prettier.config.mts",
 }
 
 M.biome = {
@@ -36,6 +42,9 @@ M.eslint = {
   "eslint.config.js",
   "eslint.config.mjs",
   "eslint.config.cjs",
+  "eslint.config.ts",
+  "eslint.config.mts",
+  "eslint.config.cts",
 }
 
 M.oxlint = {

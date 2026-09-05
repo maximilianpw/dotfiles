@@ -4,11 +4,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.have_nerd_font = true
 
--- Auto-detect node path
-local node = vim.fn.exepath("node")
-if node ~= "" then
-  vim.g.node_host_prog = node
-end
+-- Leave Node remote-host discovery to Neovim; `node` itself is not that host.
 
 -- Speed up Lua module loading
 if vim.loader then

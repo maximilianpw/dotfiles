@@ -10,6 +10,11 @@ return {
     require("mini.pairs").setup()
     require("mini.splitjoin").setup()
     require("mini.align").setup()
+
+    if vim.g.vscode then
+      return
+    end
+
     require("mini.trailspace").setup()
     require("mini.sessions").setup()
 
@@ -23,7 +28,7 @@ return {
       },
     })
   end,
-  keys = {
+  keys = vim.g.vscode and {} or {
     {
       "<leader>qs",
       function()

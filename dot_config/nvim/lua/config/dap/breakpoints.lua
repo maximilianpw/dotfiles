@@ -8,6 +8,8 @@ function M.setup()
       load_breakpoints_event = { "BufReadPost" },
       perf_record = false,
     })
+    -- DAP loads on a keypress, after existing buffers' BufReadPost events.
+    require("persistent-breakpoints.api").load_breakpoints()
   end
 end
 

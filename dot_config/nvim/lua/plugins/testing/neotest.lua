@@ -1,3 +1,12 @@
+local function project_root(path)
+  path = path or vim.api.nvim_buf_get_name(0)
+  if path == "" then
+    path = vim.fn.getcwd()
+  end
+
+  return vim.fs.root(path, { "package.json", "go.mod", "Cargo.toml", ".git", ".jj" }) or vim.fn.getcwd()
+end
+
 return {
   "nvim-neotest/neotest",
   dependencies = {
@@ -27,7 +36,7 @@ return {
     {
       "<leader>tF",
       function()
-        require("neotest").run.run(vim.fn.getcwd())
+        require("neotest").run.run(project_root())
       end,
       desc = "Test: Run project",
     },
@@ -70,23 +79,15 @@ return {
   config = function()
     require("neotest").setup({
       adapters = {
-        require("neotest-jest")({
-          jestCommand = "npm test --",
-          cwd = function(path)
-            return vim.fn.getcwd()
-          end,
-        }),
+        require("neotest-jest")({ cwd = project_root }),
         require("neotest-vitest")({
           filter_dir = function(name, rel_path, root)
             return name ~= "node_modules" and name ~= "dist"
           end,
         }),
         require("neotest-mocha")({
-          command = "npm test --",
           env = { CI = true },
-          cwd = function(path)
-            return vim.fn.getcwd()
-          end,
+          cwd = project_root,
         }),
         require("neotest-golang")({
           go_test_args = { "-v", "-count=1" },

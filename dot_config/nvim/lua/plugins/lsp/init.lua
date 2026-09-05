@@ -91,16 +91,6 @@ return {
       }
       vim.lsp.enable(servers)
 
-      -- Helper function to format buffer with conform fallback to LSP
-      local function format_buffer()
-        local has_conform, conform = pcall(require, "conform")
-        if has_conform then
-          conform.format({ async = true, lsp_format = "fallback" })
-        else
-          vim.lsp.buf.format({ async = true })
-        end
-      end
-
       -- LspAttach autocmd for keybindings
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
@@ -140,7 +130,7 @@ return {
           map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("<leader>cs", vim.lsp.buf.signature_help, "Signature Documentation")
           map("<leader>Q", vim.diagnostic.open_float, "Show line diagnostics")
-          map("<leader>cf", format_buffer, "Format Document")
+          -- Formatting keys and policy are owned by plugins/style/autoformat.lua.
 
           -- Inlay hints toggle
           if vim.lsp.inlay_hint then

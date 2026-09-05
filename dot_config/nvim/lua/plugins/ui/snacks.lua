@@ -6,7 +6,7 @@ local lazygit_nvim_open_dir = lazygit_nvim_edit_bin .. " -- {{dir}}"
 return {
   "folke/snacks.nvim",
   priority = 1000,
-  event = "VeryLazy",
+  lazy = false, -- Register dashboard hooks before the first UI event.
   opts = {
     -- ═══════════════════════════════════════════════════════════════
     -- 🎨 VISUAL & UI ENHANCEMENTS
@@ -72,8 +72,9 @@ return {
     -- Large file handling (disabled - using consolidated config/bigfile.lua)
     bigfile = { enabled = false },
 
-    -- Quick file operations and access
-    quickfile = { enabled = true },
+    -- Our treesitter setup owns early highlighting and checks the shared size
+    -- tiers; quickfile only recognizes Snacks' separate `bigfile` filetype.
+    quickfile = { enabled = false },
 
     -- Word movement and selection enhancements with LSP references
     words = { enabled = true },

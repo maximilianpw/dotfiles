@@ -66,11 +66,15 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        neovim: [v0.12.5, nightly]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: rhysd/action-setup-vim@febef33995d6649302e9d88dda81e071b68f16a7 # v1
         with:
           neovim: true
-          version: v0.12.4
+          version: ${{ matrix.neovim }}
       - run: npm install --global tree-sitter-cli@0.27.0
       - run: ./dot_config/nvim/test.sh --ci
