@@ -102,7 +102,7 @@ for probe in "$TEST_TMPDIR/probe.tsx" "$TEST_TMPDIR/probe.jsx"; do
 done
 
 # 5. Contracts that do not require plugin state.
-for suite in architecture bigfile formatting project-tools vscode; do
+for suite in architecture bigfile bufferline formatting project-tools vscode; do
   echo "--- $suite checks ---"
   if OUTPUT=$(NVIM_CONFIG_TEST_ROOT="$NVIM_DIR" run_nvim --clean -l "$NVIM_DIR/tests/$suite.lua" 2>&1); then
     echo "ok   $suite"

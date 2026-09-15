@@ -17,10 +17,11 @@ It does not validate every external language server, authenticated AI service,
 or every interactive workflow. Do not use `Lazy sync` as a lockfile compatibility test:
 it updates plugins rather than restoring their committed revisions.
 
-Treesitter textobject mappings use the standalone main-branch API. Blink owns
-insert-mode `<Tab>` for snippets; Supermaven accepts suggestions with `<C-l>`.
-The `<leader>db` and `<leader>dB` mappings save breakpoints and restore them
-even when DAP loads after the file was opened.
+Treesitter textobject mappings use the standalone main-branch API. Insert-mode
+`<Tab>` accepts a visible Blink completion, advances snippets, accepts visible
+Supermaven ghost text, or falls back to indentation, in that order. `<C-l>`
+accepts Supermaven directly. The `<leader>db` and `<leader>dB` mappings save
+breakpoints and restore them even when DAP loads after the file was opened.
 
 Before switching to 0.13, review `:help news`: `Q` adds native multicursors,
 while the default `<C-l>` clears them. This config maps normal-mode `<C-l>` to

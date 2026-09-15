@@ -11,7 +11,24 @@ return {
       ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
       ["<C-e>"] = { "hide" },
       ["<CR>"] = { "accept", "fallback" },
-      ["<Tab>"] = { "snippet_forward", "fallback" },
+      -- Prefer Blink's menu, then snippet navigation, then Supermaven, then indentation.
+      ["<Tab>"] = {
+        function(cmp)
+          if cmp.is_menu_visible() then
+            return cmp.select_and_accept()
+          end
+        end,
+        "snippet_forward",
+        function()
+          local ok, suggestion = pcall(require, "supermaven-nvim.completion_preview")
+          if ok and suggestion.has_suggestion() then
+            -- Blink invokes keymap handlers while Neovim may still hold a text lock.
+            vim.schedule(suggestion.on_accept_suggestion)
+            return true
+          end
+        end,
+        "fallback",
+      },
       ["<S-Tab>"] = { "snippet_backward", "fallback" },
       ["<Up>"] = { "select_prev", "fallback" },
       ["<Down>"] = { "select_next", "fallback" },

@@ -20,3 +20,6 @@ LLM_CONFIG_REVIEW_PROMPT.md
 .aws
 # Machine-rewritten by btop itself; managing it is permanent diff noise
 .config/btop
+# Amp settings belong to Nix/Home Manager; backups and write metadata stay local.
+.config/amp/settings.json
+.config/amp/settings.json.*

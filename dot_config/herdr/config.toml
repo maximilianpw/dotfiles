@@ -10,6 +10,7 @@ default_shell = "herdr-shell"
 shell_mode = "auto"
 # New panes and tabs start in the current pane's directory.
 new_cwd = "follow"
+kitty_graphics = true
 
 [theme]
 # Herdr's built-in dark Catppuccin theme is the Mocha palette.
@@ -29,6 +30,8 @@ settings = "prefix+shift+s"
 detach = "prefix+d"
 reload_config = "prefix+r"
 goto = "prefix+slash"
+# prefix+o opens document review; prefix+n switches to the next tab.
+open_notification_target = ""
 
 # Workspace controls:
 #   prefix+w       choose workspace
@@ -197,7 +200,7 @@ description = "Open jjui"
 [[keys.command]]
 key = "prefix+shift+b"
 type = "shell"
-command = "pane_id=$(herdr pane current | jq -r '.result.pane.pane_id') && herdr pane move \"$pane_id\" --new-tab --focus"
+command = "pane_id=$(herdr pane current --current | jq -r '.result.pane.pane_id') && herdr pane move \"$pane_id\" --new-tab --focus"
 description = "Break pane into a new tab"
 
 # The herdr-shell wrapper opens every pane in this workspace over plain SSH.
@@ -257,7 +260,6 @@ manage_ssh_config = true
 # This persists recent pane output to disk; keep in mind it may include secrets.
 pane_history = true
 allow_nested = false
-kitty_graphics = true
 
 [advanced]
 # Scrollback limit is byte-based.

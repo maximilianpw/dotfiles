@@ -48,8 +48,55 @@ assert(vim.bo.indentexpr ~= "", "shrinking buffer did not restore treesitter ind
 local ai = dofile(plugins["supermaven-nvim"].dir .. "/lua/supermaven-nvim/config.lua")
 ai.setup(dofile(root .. "/lua/plugins/ai/supermaven.lua").opts)
 local blink = dofile(root .. "/lua/plugins/editor/blink.lua").opts
+local tab = blink.keymap["<Tab>"]
+assert(blink.keymap.preset == "default", "Blink default completion preset is disabled")
+assert(type(tab) == "table", "Blink contextual Tab mapping is missing")
+assert(tab[2] == "snippet_forward" and tab[4] == "fallback", "Blink Tab priority is misconfigured")
+
+local blink_accepted = false
+local handled = tab[1]({
+  is_menu_visible = function()
+    return true
+  end,
+  select_and_accept = function()
+    blink_accepted = true
+    return true
+  end,
+})
+assert(handled and blink_accepted, "Blink Tab did not prioritize the visible completion menu")
+assert(tab[1]({
+  is_menu_visible = function()
+    return false
+  end,
+}) == nil, "Blink Tab blocked snippet navigation without a visible menu")
+
+local preview_module = "supermaven-nvim.completion_preview"
+local original_preview = package.loaded[preview_module]
+local supermaven_accepted = false
+package.loaded[preview_module] = {
+  has_suggestion = function()
+    return true
+  end,
+  on_accept_suggestion = function()
+    supermaven_accepted = true
+  end,
+}
+assert(tab[3]() == true, "Blink Tab did not handle visible Supermaven text")
+assert(not supermaven_accepted, "Blink Tab accepted Supermaven text while Neovim may hold a text lock")
+vim.wait(100, function()
+  return supermaven_accepted
+end)
+assert(supermaven_accepted, "Blink Tab did not accept visible Supermaven text after deferring")
+package.loaded[preview_module] = {
+  has_suggestion = function()
+    return false
+  end,
+}
+assert(tab[3]() == nil, "Blink Tab blocked indentation without a Supermaven suggestion")
+package.loaded[preview_module] = original_preview
+
 assert(blink.keymap[ai.keymaps.accept_suggestion] == nil, "AI acceptance conflicts with Blink")
-assert(ai.keymaps.accept_suggestion ~= "<Tab>", "AI still owns snippet Tab")
+assert(ai.keymaps.accept_suggestion ~= "<Tab>", "AI direct acceptance still owns contextual Tab")
 
 -- Use the real persistence APIs through the configured keys, then emulate
 -- late setup with an already-open buffer and no in-memory DAP breakpoints.
@@ -85,21 +132,5 @@ end
 vim.fn.input = input
 
 require("lazy").load({ plugins = { "bufferline.nvim" } })
-local bufferline = require("bufferline")
-local spec = dofile(root .. "/lua/plugins/ui/bufferline.lua")
-spec.config(nil, spec.opts)
-spec.config(nil, spec.opts)
-local autocmds = vim.api.nvim_get_autocmds({ group = "bufferline-session-refresh" })
-assert(#autocmds == 2, "bufferline reload accumulated autocmds")
-local refresh, count = bufferline.refresh, 0
-bufferline.refresh = function()
-  count = count + 1
-end
-autocmds[1].callback()
-autocmds[1].callback()
-vim.wait(200, function()
-  return count > 0
-end)
-bufferline.refresh = refresh
-assert(count == 1, "bufferline did not coalesce refresh events")
+dofile(root .. "/tests/bufferline.lua")
 print("plugin contracts passed")

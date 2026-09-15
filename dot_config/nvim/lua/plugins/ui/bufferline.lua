@@ -71,7 +71,7 @@ return {
         pending = true
         vim.defer_fn(function()
           pending = false
-          require("bufferline").refresh()
+          vim.cmd.redrawtabline()
         end, 100)
       end,
     })
