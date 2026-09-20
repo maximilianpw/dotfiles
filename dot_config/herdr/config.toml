@@ -30,8 +30,8 @@ settings = "prefix+shift+s"
 detach = "prefix+d"
 reload_config = "prefix+r"
 goto = "prefix+slash"
-# prefix+o opens document review; prefix+n switches to the next tab.
-open_notification_target = ""
+# Reserve prefix+o for Plannotator document review.
+open_notification_target = "prefix+alt+o"
 
 # Workspace controls:
 #   prefix+w       choose workspace
@@ -96,44 +96,24 @@ navigate_pane_down = "j"
 navigate_pane_up = "k"
 navigate_pane_right = "l"
 
-# vim-herdr-navigation forwards these chords into Vim/Neovim when focused;
-# otherwise it focuses the adjacent Herdr pane.
-[[keys.command]]
-key = "ctrl+h"
-type = "plugin_action"
-command = "vim-herdr-navigation.left"
-description = "Navigate left (Vim/Herdr)"
-
-[[keys.command]]
-key = "ctrl+j"
-type = "plugin_action"
-command = "vim-herdr-navigation.down"
-description = "Navigate down (Vim/Herdr)"
-
-[[keys.command]]
-key = "ctrl+k"
-type = "plugin_action"
-command = "vim-herdr-navigation.up"
-description = "Navigate up (Vim/Herdr)"
-
-[[keys.command]]
-key = "ctrl+l"
-type = "plugin_action"
-command = "vim-herdr-navigation.right"
-description = "Navigate right (Vim/Herdr)"
-
-# Plannotator terminal annotations.
+# Herdr Annotate and Plannotator TUI.
 [[keys.command]]
 key = "prefix+a"
 type = "plugin_action"
 command = "annotate.capture"
-description = "Annotate terminal text"
+description = "Annotate selected terminal text"
 
 [[keys.command]]
 key = "prefix+shift+a"
 type = "plugin_action"
 command = "annotate.copy-context"
-description = "Copy annotations as context"
+description = "Copy annotations as agent context"
+
+[[keys.command]]
+key = "prefix+ctrl+a"
+type = "plugin_action"
+command = "annotate.copy-archive"
+description = "Copy and archive annotations"
 
 [[keys.command]]
 key = "prefix+m"
@@ -141,12 +121,11 @@ type = "plugin_action"
 command = "annotate.manage"
 description = "Manage annotations"
 
-# Plannotator document and agent-reply review.
 [[keys.command]]
 key = "prefix+o"
 type = "plugin_action"
 command = "annotate.open"
-description = "Review documents in this folder"
+description = "Review documents with Plannotator TUI"
 
 [[keys.command]]
 key = "prefix+shift+o"
