@@ -23,3 +23,42 @@ LLM_CONFIG_REVIEW_PROMPT.md
 # Amp settings belong to Nix/Home Manager; backups and write metadata stay local.
 .config/amp/settings.json
 .config/amp/settings.json.*
+
+# Nixvim, Hjem and Home Manager own these paths on migrated fleet hosts.
+# Keep unmanaged siblings (application state, credentials) out of this handoff.
+{{/* chezmoi's DNS-derived hostname can be 127-0-0-1 on NixOS. */}}
+{{ $fleetHost := output "hostname" | trim | lower | trimSuffix ".local" }}
+{{ if or (eq $fleetHost "kim") (eq $fleetHost "cuno") (eq $fleetHost "joyce") }}
+.config/nvim
+.config/nvim/**
+.local/bin/herdr-shell
+.local/bin/lazygit-nvim-edit
+.config/amp/plugins/ask-user.ts
+.config/amp/plugins/executor.ts
+.config/amp/plugins/github-pr-comments.ts
+.config/amp/plugins/plannotator.ts
+.config/amp/plugins/safety-guard.ts
+.config/amp/plugins/thread-commands.ts
+.config/amp/plugins/vcs-status.ts
+.config/direnv/direnv.toml
+.config/glow/catppuccin-mocha.json
+.config/glow/glow.yml
+.config/herdr/config.toml
+.config/hunk/config.toml
+.config/kitty/kitty.conf
+.config/lazydocker/config.yml
+.config/lazygit/config.yml
+.config/ripgrep/config
+.config/starship.toml
+.config/vale/.vale.ini
+.eslintrc.typescript.json
+.oxlintrc.json
+.prettierrc
+.cursor/permissions.json
+.cursor/sandbox.json
+.plannotator/config.json
+{{ if eq .chezmoi.os "darwin" }}
+Library/Application Support/Cursor/User/settings.json
+Library/Application Support/Cursor/User/keybindings.json
+{{ end }}
+{{ end }}
